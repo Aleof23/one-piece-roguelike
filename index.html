@@ -113,12 +113,22 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 .man-menu-card{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border:3px solid #000;border-radius:4px;background:linear-gradient(90deg,rgba(246,183,60,.18),rgba(0,0,0,.2));box-shadow:inset 0 0 0 2px var(--gold)}
 .btn.man-open{background:linear-gradient(#7be0ff,#3aa9d6);color:#06222d}
 @media (max-width:640px){.man-wrap{padding:0}.man{max-height:100%;border-radius:0}.man-head h2{font-size:26px}}
-</style></head><body>
-<title>OnePieceLike</title>
+</style>
+<title>One Piece Like - One Piece Roguelike</title>
+<meta name="description" content="One Piece Like is a free One Piece roguelike game playable directly in your browser.">
+<meta name="robots" content="index, follow">
+
+<link rel="canonical" href="https://onepiecelike.com/">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<meta property="og:image" content="logo.png">
+<meta property="og:title" content="One Piece Like - One Piece Roguelike">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
 <script src="https://cdn.tailwindcss.com"></script>
+
 <style>
 /* Concepto: puente de mando de un barco. Tres paneles de casco oscuro con bordes gruesos de arcade
    rodean un mar de nodos que se sube de abajo hacia arriba. El oro es la unica voz fuerte. */
@@ -420,7 +430,8 @@ function buildData(raw){
   const items = it.items.map((x, i) => {
     need(x && x.id, 'items.json: items[' + i + '] needs an "id"');
     const id = String(x && x.id); seen(iids, id, 'items.json');
-    return { id, name:x.name || id, desc:x.desc || '', icon:x.icon || 'treasure', fx:x.fx || {}, price:num(x.price, 100) };
+    const eq = x.equip && typeof x.equip === 'object' ? x.equip : null;
+    return { id, name:x.name || id, desc:x.desc || '', icon:x.icon || 'treasure', fx:x.fx || {}, equip:eq, minStage:Math.max(1, Math.round(num(x.minStage, 1))), price:num(x.price, 100) };
   });
 
   const settings = { ...DEFAULT_SETTINGS, ...(st.settings || {}) };
@@ -562,15 +573,45 @@ function newGame(captainId, opts = {}){
   g.map = genMap(seed, 0, ctxOf(g));
   return g;
 }
-const mods = g => g.items.reduce((m, it) => { for (const k in it.fx) m[k] = (m[k] || 0) + it.fx[k]; return m; }, { power:0, berry:0, guard:0, camp:0 });
+const mods = g => g.items.reduce((m, it) => { for (const k in it.fx) m[k] = (m[k] || 0) + it.fx[k]; return m; },
+  { power:0, berry:0, guard:0, camp:0, spd:0, crit:0, dodge:0, acc:0, charge:0, regen:0, harm:0, reveal:0, calm:0, ambush:0, loot:0, ward:0, revive:0 });
+/* objetos que aun pueden aparecer (no los tienes y ya has llegado al mar minimo) */
+const itemPool = g => ITEMS.filter(i => !g.items.some(o => o.id === i.id) && (i.minStage || 1) <= g.stage + 1);
 const crewPower = g => g.crew.filter(c => c.hp > 0).reduce((s, c) => s + c.atk, 0) * (1 + mods(g).power);
 const availableIds = g => g.pos ? g.map.byId[g.pos].next : g.map.floors[0].map(n => n.id);
 
+/* equipo: lo lleva UN tripulante (c.gear); la vida extra se guarda en c.gearHp para poder quitarla igual */
+function putGear(c, it){
+  const d = Math.round(c.maxHp * ((it.equip && it.equip.hpPct) || 0));
+  return { ...c, gear:it, gearHp:d, maxHp:Math.max(1, c.maxHp + d), hp: c.hp > 0 ? Math.max(1, c.hp + d) : 0 };
+}
+function stripGear(c){
+  const d = c.gearHp || 0;
+  return { ...c, gear:null, gearHp:0, maxHp:Math.max(1, c.maxHp - d), hp: c.hp > 0 ? Math.max(1, c.hp - d) : 0 };
+}
+const holderOf = (g, itemId) => g.crew.find(c => c.gear && c.gear.id === itemId) || null;
+function equipItem(g, itemId, crewId){
+  const it = g.items.find(i => i.id === itemId);
+  if (!it || !it.equip || !g.crew.some(c => c.id === crewId)) return g;
+  const crew = g.crew.map(c => c.gear && c.gear.id === itemId ? stripGear(c) : c).map(c => c.id === crewId ? putGear(c.gear ? stripGear(c) : c, it) : c);
+  return { ...g, crew };
+}
+const unequipItem = (g, itemId) => ({ ...g, crew:g.crew.map(c => c.gear && c.gear.id === itemId ? stripGear(c) : c) });
+/* al conseguir un equipo se asigna solo al tripulante sin equipo que mejor le encaje (luego puedes cambiarlo) */
+function autoEquip(g, it){
+  if (!it.equip) return g;
+  const f = it.equip.for || 'any';
+  const free = g.crew.filter(c => !c.gear);
+  if (!free.length) return g;
+  const score = c => (f === c.style || f === c.frole ? 3 : f === 'any' ? 1.5 : 0) + (c.hp > 0 ? .5 : 0) + (c.captain ? .2 : 0);
+  const best = free.slice().sort((a, b) => score(b) - score(a))[0];
+  return equipItem(g, it.id, best.id);
+}
 function gainItem(g, it){
   let crew = g.crew, lead = g.lead;
   if (it.fx.hp) crew = crew.map(c => ({ ...c, maxHp:c.maxHp + it.fx.hp, hp: c.hp > 0 ? c.hp + it.fx.hp : 0 }));
   if (it.fx.lead) lead += it.fx.lead;
-  return { ...g, crew, lead, items:[...g.items, it] };
+  return autoEquip({ ...g, crew, lead, items:[...g.items, it] }, it);
 }
 function eat(g, id, f){
   return { ...g, crew: g.crew.map(c => {
@@ -586,7 +627,7 @@ const canSwap = (g, old, nw) => g.lead - (old.fx.lead || 0) + (nw.fx.lead || 0) 
 function removeItem(g, id){
   const it = g.items.find(i => i.id === id);
   if (!it) return g;
-  let crew = g.crew, lead = g.lead;
+  let crew = g.crew.map(c => c.gear && c.gear.id === id ? stripGear(c) : c), lead = g.lead;
   if (it.fx.hp) crew = crew.map(c => ({ ...c, maxHp:Math.max(1, c.maxHp - it.fx.hp), hp: c.hp > 0 ? Math.max(1, c.hp - it.fx.hp) : 0 }));
   if (it.fx.lead) lead -= it.fx.lead;
   return { ...g, crew, lead, items:g.items.filter(i => i.id !== id) };
@@ -734,16 +775,26 @@ function genFoes(g, node){
 }
 
 /* ---------- el combate por rondas ---------- */
-function mkAlly(c){
-  return { id:c.id, charId:c.charId, name:c.name, color:c.color, look:c.look, avatar:c.avatar, captain:!!c.captain, frole:c.frole, style:c.style, stats:c.stats, perk:c.perk || null,
-    lvl:c.lvl, hp:c.hp, maxHp:c.maxHp, atk:c.atk, haki:hakiSet(c), logia:!!(c.fruit && c.fruit.type === 'logia'), gauge:0, stun:0 };
+function mkAlly(c, m = {}){
+  const eq = (c.gear && c.gear.equip) || {}, gs = eq.stats || {}, gh = eq.haki || {};
+  const stats = { ...c.stats };
+  for (const k in gs) stats[k] = clamp((stats[k] || 0) + gs[k], 0, 12);
+  stats.spd = clamp((stats.spd || 0) + (m.spd || 0), 0, 12);
+  const hb = hakiSet(c), haki = { arm:Math.min(3, hb.arm + (gh.arm || 0)), obs:Math.min(3, hb.obs + (gh.obs || 0)), con:Math.min(3, hb.con + (gh.con || 0)) };
+  return { id:c.id, charId:c.charId, name:c.name, color:c.color, look:c.look, avatar:c.avatar, captain:!!c.captain, frole:c.frole, style:c.style, stats, perk:c.perk || null,
+    lvl:c.lvl, hp:c.hp, maxHp:c.maxHp, atk:Math.round(c.atk * (1 + (eq.atkPct || 0))), haki, logia:!!(c.fruit && c.fruit.type === 'logia'), gauge:0, stun:0,
+    acc:(eq.acc || 0) + (m.acc || 0), crit:(eq.crit || 0) + (m.crit || 0), dodgeB:(eq.dodge || 0) + (m.dodge || 0), charge:(eq.charge || 0) + (m.charge || 0),
+    guardPct:eq.guardPct || 0, aggro:eq.aggro || 1, pierce:!!eq.pierce, gearIcon:c.gear ? c.gear.icon : null };
 }
 function battleInit(g, node){
   const crew = g.crew.filter(c => c.hp > 0), H = harmony(g.crew), m = mods(g);
-  const st = { round:0, node:{ id:node.id, type:node.type, f:node.f }, allies:crew.map(mkAlly), foes:genFoes(g, node), H:H.score,
-    atkMult:1 + H.score / 100, takenMult:1 - H.score / 200, power:1 + m.power, guard:clamp(m.guard, 0, .6), shield:0, stance:'bal', over:null, rounds:0 };
+  const Hs = clamp(H.score + (m.harm || 0), -35, 35);
+  const st = { round:0, node:{ id:node.id, type:node.type, f:node.f }, allies:crew.map(c => mkAlly(c, m)), foes:genFoes(g, node), H:Hs,
+    atkMult:1 + Hs / 100, takenMult:1 - Hs / 200, power:1 + m.power, guard:clamp(m.guard, 0, .6), shield:Math.round(m.ward || 0), stance:'bal', over:null, rounds:0,
+    regen:m.regen || 0, calm:clamp(m.calm || 0, 0, .7), revive:Math.round(m.revive || 0), reviveUsed:0 };
+  if (m.ambush > 0) st.foes.forEach(f => { f.hp = Math.max(1, Math.round(f.maxHp * (1 - m.ambush * (f.boss ? .5 : 1)))); });
   st.tactician = crew.some(c => c.perk === 'tactician');
-  st.revealed = st.tactician || st.allies.some(a => a.haki.obs > 0);
+  st.revealed = st.tactician || m.reveal > 0 || st.allies.some(a => a.haki.obs > 0);
   return st;
 }
 const STANCES = { bal:{ dmg:1, taken:1, gauge:1 }, atk:{ dmg:1.25, taken:1.2, gauge:1 }, def:{ dmg:.85, taken:.72, gauge:1.5 } };
@@ -754,7 +805,7 @@ function stanceMods(st){
 const aliveA = st => st.allies.filter(a => a.hp > 0), aliveF = st => st.foes.filter(f => f.hp > 0);
 function styleMult(f, a){
   const s = a.style, tr = f.traits; let m = 1;
-  if (f.weak === s) m *= 1.4; else if (f.resist === s) m *= .65;
+  if (f.weak === s) m *= 1.4; else if (f.resist === s && !a.pierce) m *= .65;
   if (tr.includes('logia') && !a.haki.arm) m *= s === 'mind' ? .6 : .3;
   if (tr.includes('slippery') && (s === 'sword' || s === 'gun')) m *= a.haki.arm ? .8 : .35;
   if (tr.includes('swordmaster')) m *= s === 'gun' ? .7 : s === 'sword' ? .85 : 1;
@@ -778,7 +829,7 @@ function pickFoe(st, a, orders, rnd){
 }
 function weightedAlly(st, rnd){
   const as = aliveA(st);
-  const w = as.map(a => (a.frole === 'tank' ? 3 : a.frole === 'brawl' ? 1.4 : a.frole === 'support' ? .8 : 1) * (a.perk === 'bruiser' ? 1.5 : 1) * (1 + (1 - a.hp / a.maxHp) * .6));
+  const w = as.map(a => (a.frole === 'tank' ? 3 : a.frole === 'brawl' ? 1.4 : a.frole === 'support' ? .8 : 1) * (a.perk === 'bruiser' ? 1.5 : 1) * (a.aggro || 1) * (1 + (1 - a.hp / a.maxHp) * .6));
   let r = rnd() * w.reduce((x, y) => x + y, 0);
   for (let i = 0; i < as.length; i++) { r -= w[i]; if (r <= 0) return as[i]; }
   return as[as.length - 1];
@@ -796,16 +847,16 @@ function allyAttack(st, a, f, ev, rnd, o = {}){
     if (a.style === 'mind') p = .95;
     else if (a.style === 'brawl') p = .86 - .02 * f.spd + .01 * sk;
     else p = .7 + .03 * sk - .025 * f.spd;
-    p += .03 * a.haki.obs;
+    p += .03 * a.haki.obs + (a.acc || 0);
     if (f.traits.includes('swift')) p -= .22;
     if (a.perk === 'marksman' && a.style === 'gun') p = .97;
     p = clamp(p, .35, .97);
   }
   if (rnd() > p) { ev.push({ t:'miss', src:a.id, dst:f.id, side:'a' }); a.gauge = Math.min(100, a.gauge + 6); return 0; }
-  const pc = .04 + .012 * (sk - 5) + .03 * a.haki.obs + (a.perk === 'duelist' && a.style === 'sword' ? .1 : 0);
+  const pc = .04 + .012 * (sk - 5) + .03 * a.haki.obs + (a.crit || 0) + (a.perk === 'duelist' && a.style === 'sword' ? .1 : 0);
   const crit = o.crit || rnd() < pc;
   let dmg = Math.max(1, Math.round(allyBase(st, a) * (o.ignoreStyle ? 1 : styleMult(f, a)) * (.88 + rnd() * .24) * (crit ? 1.6 : 1) * mult));
-  const weak = f.weak === a.style, resist = f.resist === a.style;
+  const weak = f.weak === a.style, resist = f.resist === a.style && !a.pierce;
   damageFoe(st, f, dmg, ev, a, { crit, weak, resist, arm:a.haki.arm > 0, style:a.style, special:o.special || null });
   if (f.hp > 0 && f.traits.includes('burn') && !a.haki.arm && (a.style === 'sword' || a.style === 'brawl')) {
     const b = Math.max(1, Math.round(a.maxHp * .05)); a.hp = Math.max(0, a.hp - b);
@@ -814,11 +865,11 @@ function allyAttack(st, a, f, ev, rnd, o = {}){
   return dmg;
 }
 function foeAttack(st, f, a, ev, rnd, mult = 1){
-  const dodge = clamp(.02 * a.stats.spd + .07 * a.haki.obs + (a.logia ? .1 : 0), 0, .55);
+  const dodge = clamp(.02 * a.stats.spd + .07 * a.haki.obs + (a.logia ? .1 : 0) + (a.dodgeB || 0), 0, .6);
   if (rnd() < dodge) { ev.push({ t:'miss', src:f.id, dst:a.id, side:'f', foresee:a.haki.obs > 0 }); a.gauge = Math.min(100, a.gauge + 4); return; }
   const red = a.stats.def / (a.stats.def + 14);
   const crit = rnd() < (f.traits.includes('swordmaster') ? .25 : .06);
-  const dmg = Math.max(1, Math.round(f.atk * mult * (.85 + rnd() * .3) * (crit ? 1.5 : 1) * (1 - red) * (1 - .05 * a.haki.arm) * stanceMods(st).taken * (st.shield > 0 ? .55 : 1) * st.takenMult * (1 - st.guard)));
+  const dmg = Math.max(1, Math.round(f.atk * mult * (.85 + rnd() * .3) * (crit ? 1.5 : 1) * (1 - red) * (1 - .05 * a.haki.arm) * (1 - (a.guardPct || 0)) * stanceMods(st).taken * (st.shield > 0 ? .55 : 1) * st.takenMult * (1 - st.guard)));
   a.hp = Math.max(0, a.hp - dmg); a.gauge = Math.min(100, a.gauge + 6);
   ev.push({ t:'atk', src:f.id, dst:a.id, side:'f', dmg, crit, style:f.style, arm:f.haki.arm > 0 });
   if (f.traits.includes('dark') && f.hp > 0) { const h = Math.round(dmg * .25); f.hp = Math.min(f.maxHp, f.hp + h); ev.push({ t:'drain', id:f.id, n:h }); }
@@ -853,7 +904,7 @@ function openingHaki(st, ev, rnd){
   } else {
     fs.filter(f => f.haki.con > 0).forEach(f => {
       ev.push({ t:'haki', kind:'foecon', id:f.id });
-      as.forEach(a => { if (rnd() < (a.stats.int >= 7 ? .25 : .5)) { a.stun = Math.max(a.stun, 1); ev.push({ t:'stun', id:a.id, side:'a', haki:true }); } });
+      as.forEach(a => { if (rnd() < (a.stats.int >= 7 ? .25 : .5) * (1 - st.calm)) { a.stun = Math.max(a.stun, 1); ev.push({ t:'stun', id:a.id, side:'a', haki:true }); } });
     });
   }
 }
@@ -861,18 +912,25 @@ function foeAct(st, f, ev, rnd){
   if (f.traits.includes('pulse') && st.round % 3 === 2) {
     const conA = aliveA(st).filter(a => a.haki.con > 0);
     ev.push({ t:'pulse', id:f.id });
-    aliveA(st).forEach(a => { if (!a.haki.con && rnd() < (a.stats.int >= 7 ? .2 : .4)) { a.stun = Math.max(a.stun, 1); ev.push({ t:'stun', id:a.id, side:'a', haki:true }); } });
+    aliveA(st).forEach(a => { if (!a.haki.con && rnd() < (a.stats.int >= 7 ? .2 : .4) * (1 - st.calm)) { a.stun = Math.max(a.stun, 1); ev.push({ t:'stun', id:a.id, side:'a', haki:true }); } });
     if (conA.length) { const d = Math.round(f.maxHp * .04 * conA.reduce((s, a) => s + a.haki.con, 0)); f.hp = Math.max(1, f.hp - d); ev.push({ t:'haki', kind:'clash', id:f.id, dmg:d }); }
   }
   if (f.traits.includes('bind') && st.round % 3 === 0) {
     const t = aliveA(st).filter(a => !a.stun).sort((x, y) => y.atk - x.atk)[0];
-    if (t) { if (t.haki.obs >= 2 || t.stats.spd >= 8) ev.push({ t:'evade', id:t.id }); else { t.stun = 1; ev.push({ t:'bind', id:t.id }); } }
+    if (t) { if (t.haki.obs >= 2 || t.stats.spd >= 8 || rnd() < st.calm) ev.push({ t:'evade', id:t.id }); else { t.stun = 1; ev.push({ t:'bind', id:t.id }); } }
   }
   const n = f.traits.includes('swift') ? 2 : 1, mult = n === 2 ? .62 : 1;
   for (let i = 0; i < n && aliveA(st).length; i++) {
     const a = weightedAlly(st, rnd); foeAttack(st, f, a, ev, rnd, mult);
     if (f.traits.includes('giant') && rnd() < .35 && aliveA(st).length) foeAttack(st, f, weightedAlly(st, rnd), ev, rnd, .5);
   }
+}
+function reviveCheck(st, ev){
+  if (!st.revive || st.reviveUsed >= st.revive) return;
+  const a = st.allies.find(x => x.hp <= 0 && !x.revived);
+  if (!a) return;
+  a.revived = true; st.reviveUsed++; a.hp = Math.max(1, Math.round(a.maxHp * .35));
+  ev.push({ t:'revive', id:a.id, n:a.hp });
 }
 function endCheck(st){
   if (!aliveF(st).length) st.over = 'win'; else if (!aliveA(st).length) st.over = 'lose';
@@ -895,11 +953,13 @@ function stepRound(st, orders = {}, rnd = Math.random){
       const ready = u.gauge >= 100;
       if (ready && (orders.auto || (orders.fire || []).includes(u.id))) special(st, u, orders, ev, rnd);
       else allyAttack(st, u, pickFoe(st, u, orders, rnd), ev, rnd);
-      u.gauge = Math.min(100, u.gauge + 16 * sm.gauge);
+      u.gauge = Math.min(100, u.gauge + 16 * sm.gauge + (u.charge || 0));
     } else foeAct(st, u, ev, rnd);
+    reviveCheck(st, ev);
     endCheck(st);
   }
   if (!st.over) {
+    if (st.regen > 0) aliveA(st).forEach(a => { const hh = Math.min(a.maxHp - a.hp, Math.max(1, Math.round(a.maxHp * st.regen))); if (hh > 0) { a.hp += hh; ev.push({ t:'heal', id:a.id, n:hh, src:'regen' }); } });
     aliveA(st).filter(a => a.frole === 'support').forEach(s => {
       const t = aliveA(st).slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
       if (t && t.hp < t.maxHp) { const h = Math.min(t.maxHp - t.hp, Math.round(t.maxHp * (.05 + .006 * s.stats.int))); t.hp += h; ev.push({ t:'heal', id:t.id, n:h, src:s.id }); }
@@ -930,8 +990,8 @@ function battleResult(g, node, st){
   if (win) {
     berries = Math.round((30 + node.f * 8) * Math.pow(s.powerMult, .7) * (1 + m.berry) * (boss ? 3 : node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult));
     g2.berries += berries;
-    const free = ITEMS.filter(i => !g.items.some(o => o.id === i.id));
-    const chance = boss ? 1 : node.type === 'pirate' ? SETTINGS.dropPirate : SETTINGS.dropMarine;
+    const free = itemPool(g);
+    const chance = boss ? 1 : (node.type === 'pirate' ? SETTINGS.dropPirate : SETTINGS.dropMarine) + (m.loot || 0);
     if (free.length && Math.random() < chance) item = free[Math.floor(Math.random() * free.length)];
     if (boss) g2.bounties = [...g2.bounties, g.stage];
   }
@@ -965,6 +1025,36 @@ function sleep(g){
 const i18n = {
   en: {
     'app.tagline':'Roguelike autobattler',
+    "fx.spd":"Speed +{n}",
+    "fx.crit":"Crit +{n}%",
+    "fx.acc":"Accuracy +{n}%",
+    "fx.dodge":"Dodge +{n}%",
+    "fx.charge":"Special charge +{n}",
+    "fx.regen":"Regen {n}%/round",
+    "fx.harm":"Harmony +{n}%",
+    "fx.reveal":"Weaknesses revealed",
+    "fx.calm":"Stun resist {n}%",
+    "fx.ambush":"Enemies start −{n}% HP",
+    "fx.loot":"Item drops +{n}%",
+    "fx.ward":"Starts shielded",
+    "fx.revive":"Revives once per battle",
+    "eq.atk":"ATK {n}%",
+    "eq.hp":"HP {n}%",
+    "eq.aggro":"Draws attacks",
+    "eq.pierce":"Ignores resistances",
+    "item.equip":"Equipment",
+    "item.heldBy":"Worn by {name}",
+    "item.unequipped":"Not equipped — it does nothing until you assign it. Equip it on:",
+    "item.unequip":"Unequip",
+    "item.swapsOut":"Replaces {name}",
+    "bt.revive":"Back on their feet!",
+    "log.revive":"{a} rises again!",
+    "man.items.eq":"Equipment",
+    "man.items.eqD":"Worn by one crew member (one item each). New equipment is assigned automatically to whoever fits best, and you can change it in the Loot panel.",
+    "man.items.relic":"Relics",
+    "man.items.relicD":"Passive effects that help the whole crew while you carry them.",
+    "man.items.from":"From sea {n}",
+
     "man.btn":"Manual",
     "man.title":"Captain’s Manual",
     "man.eyebrow":"Everything you need to sail",
@@ -994,7 +1084,7 @@ const i18n = {
     "man.g.levelT":"Levels and K.O.",
     "man.g.level":"After a boss, everyone levels up (attack ×{a}, HP ×{h}) and is fully healed. Recruits join at the level of the current sea. A crew member at 0 HP is K.O.: they do not fight until you rest at a camp or beat a boss. Losing a fight with everyone K.O. ends the run.",
     "man.g.itemsT":"Items and berries",
-    "man.g.items":"You can carry up to {max} passive items; their effects apply automatically. When a fight drops an item you may take it or leave it, and if your hold is full you can swap one for it. Select an item in your inventory to discard it. Winning fights gives berries; a boss gives triple.",
+    "man.g.items":"You can carry up to {max} items. RELICS apply to the whole crew automatically. EQUIPMENT (swords, guns, armor, Haki gear…) is worn by one crew member and boosts their stats; new gear is assigned to whoever fits best, and you can change it from the Loot panel. When a fight drops an item you may take it or leave it, and if your hold is full you can swap one for it. Select an item in your inventory to equip or discard it. Winning fights gives berries; a boss gives triple.",
     "man.g.dismissT":"Dismissing a nakama",
     "man.g.dismiss":"You can dismiss crew (never the Captain), but it has a price: a severance fee in berries, a {p}% chance that another nakama leaves in indignation, any Devil Fruit they ate is lost for the run, and neither of them can be recruited again.",
     "man.g.archT":"Captain styles",
@@ -1032,7 +1122,7 @@ const i18n = {
     "man.crew.cost":"Cost {n}",
     "man.crew.captain":"Captain",
     "man.crew.count":"{n} characters",
-    "man.items.hint":"Passive items work automatically while you carry them (maximum {max}). Prices are what the black market asks.",
+    "man.items.hint":"Relics and equipment share your {max} item slots. Prices are what the black market asks; stronger items only appear in later seas.",
     "man.items.price":"Price",
     "man.fx.hp":"Max HP +{n}",
     "man.fx.lead":"Leadership +{n}",
@@ -1290,6 +1380,36 @@ const i18n = {
   },
   es: {
     'app.tagline':'Roguelike autobattler',
+    "fx.spd":"Velocidad +{n}",
+    "fx.crit":"Crítico +{n}%",
+    "fx.acc":"Precisión +{n}%",
+    "fx.dodge":"Esquiva +{n}%",
+    "fx.charge":"Carga de especial +{n}",
+    "fx.regen":"Regen. {n}%/ronda",
+    "fx.harm":"Armonía +{n}%",
+    "fx.reveal":"Debilidades reveladas",
+    "fx.calm":"Resist. aturdimiento {n}%",
+    "fx.ambush":"Enemigos empiezan −{n}% vida",
+    "fx.loot":"Objetos soltados +{n}%",
+    "fx.ward":"Empieza protegido",
+    "fx.revive":"Revive una vez por combate",
+    "eq.atk":"ATQ {n}%",
+    "eq.hp":"Vida {n}%",
+    "eq.aggro":"Atrae ataques",
+    "eq.pierce":"Ignora resistencias",
+    "item.equip":"Equipo",
+    "item.heldBy":"Lo lleva {name}",
+    "item.unequipped":"Sin equipar: no hace nada hasta que lo asignes. Equípalo a:",
+    "item.unequip":"Quitar",
+    "item.swapsOut":"Sustituye a {name}",
+    "bt.revive":"¡De pie otra vez!",
+    "log.revive":"¡{a} se levanta de nuevo!",
+    "man.items.eq":"Equipo",
+    "man.items.eqD":"Lo lleva un solo tripulante (uno por cabeza). El equipo nuevo se asigna solo a quien mejor le encaje y puedes cambiarlo en el panel de botín.",
+    "man.items.relic":"Reliquias",
+    "man.items.relicD":"Efectos pasivos que ayudan a toda la tripulación mientras los llevas.",
+    "man.items.from":"Desde el mar {n}",
+
     "man.btn":"Manual",
     "man.title":"Manual del Capitán",
     "man.eyebrow":"Todo lo necesario para navegar",
@@ -1319,7 +1439,7 @@ const i18n = {
     "man.g.levelT":"Niveles y K.O.",
     "man.g.level":"Tras un jefe todos suben de nivel (ataque ×{a}, vida ×{h}) y se curan por completo. Los reclutas entran al nivel del mar actual. Un tripulante a 0 de vida está K.O.: no lucha hasta que descanses en un camp o venzas a un jefe. Si pierdes un combate con todos K.O., la partida termina.",
     "man.g.itemsT":"Objetos y berries",
-    "man.g.items":"Puedes llevar hasta {max} objetos pasivos; sus efectos se aplican solos. Cuando un combate suelta un objeto puedes cogerlo o dejarlo, y si la bodega está llena puedes cambiarlo por otro. Selecciona un objeto de tu inventario para descartarlo. Ganar combates da berries; un jefe da el triple.",
+    "man.g.items":"Puedes llevar hasta {max} objetos. Las RELIQUIAS afectan automáticamente a toda la tripulación. El EQUIPO (espadas, armas, armaduras, objetos de Haki…) lo lleva un tripulante y mejora sus estadísticas; el equipo nuevo se asigna solo a quien mejor le encaje y puedes cambiarlo en el panel de botín. Cuando un combate suelta un objeto puedes cogerlo o dejarlo, y si la bodega está llena puedes cambiarlo por otro. Selecciona un objeto de tu inventario para equiparlo o descartarlo. Ganar combates da berries; un jefe da el triple.",
     "man.g.dismissT":"Echar a un nakama",
     "man.g.dismiss":"Puedes despedir tripulantes (nunca al Capitán), pero tiene un precio: una indemnización en berries, un {p}% de que otro nakama se marche indignado, la Fruta del Diablo que se hubiera comido se pierde durante la partida y ninguno de los dos vuelve a poder reclutarse.",
     "man.g.archT":"Estilos de Capitán",
@@ -1357,7 +1477,7 @@ const i18n = {
     "man.crew.cost":"Coste {n}",
     "man.crew.captain":"Capitán",
     "man.crew.count":"{n} personajes",
-    "man.items.hint":"Los objetos pasivos funcionan solos mientras los llevas (máximo {max}). El precio es lo que pide el mercado negro.",
+    "man.items.hint":"Las reliquias y el equipo comparten tus {max} huecos de objeto. El precio es lo que pide el mercado negro; los objetos más fuertes solo aparecen en mares avanzados.",
     "man.items.price":"Precio",
     "man.fx.hp":"Vida máx. +{n}",
     "man.fx.lead":"Liderazgo +{n}",
@@ -1700,6 +1820,16 @@ const ICONS = {
   posters:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M3.4 7.6h11.6v13H3.4z',fill:'#c9b88a'}],['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M6 5.4h11.6v13H6z',fill:'#d9c9a0'}],['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M8.6 3.2h12v13h-12z',fill:'#e9dab4'}],['path',{d:'M10.8 5.8h7.6',fill:'none',stroke:'#1a0f00',strokeWidth:1.5,strokeLinecap:'round',strokeLinejoin:'round'}],['circle',{stroke:'#1a0f00',strokeWidth:0.9,strokeLinejoin:'round',strokeLinecap:'round',cx:14.6,cy:9.6,r:2,fill:'#b8743a'}],['path',{stroke:'#1a0f00',strokeWidth:0.9,strokeLinejoin:'round',strokeLinecap:'round',d:'M11 14.4c.5-1.8 1.8-2.6 3.6-2.6s3.1.8 3.6 2.6z',fill:'#b8743a'}],['path',{d:'M4 20.6L4.2 12M5 20.6l.1-8',fill:'none',stroke:'#d8352a',strokeWidth:1,strokeLinecap:'round',strokeLinejoin:'round',opacity:0}]],
   relic:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M7.4 2.8h9.2l3 3.4v14.6H4.4V6.2z',fill:'#6b7b85'}],['path',{d:'M4.8 6.4h14.4',fill:'none',stroke:'#4a5961',strokeWidth:1,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M12 2.8l-1 3.6 1.4 2.2',fill:'none',stroke:'#1a0f00',strokeWidth:1,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M8.2 10.4h2M13.8 10.4h2M8.2 13.6h7.6M8.2 16.8h2M13.8 16.8h2',fill:'none',stroke:'#f6b73c',strokeWidth:1.5,strokeLinecap:'round',strokeLinejoin:'round'}]],
   fragment:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M12 2.6l6.4 5.2-1.4 10.2-5 3.4-5-3.4L5.6 7.8z',fill:'#ffd36b'}],['path',{stroke:'#1a0f00',strokeWidth:1,strokeLinejoin:'round',strokeLinecap:'round',d:'M5.6 7.8L12 10.4l6.4-2.6L12 2.6z',fill:'#fff3c4'}],['path',{d:'M12 10.4v11',fill:'none',stroke:'#1a0f00',strokeWidth:1,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{stroke:'#1a0f00',strokeWidth:1,strokeLinejoin:'round',strokeLinecap:'round',d:'M5.6 7.8L12 10.4 6.9 18z',fill:'#e0a526'}],['path',{d:'M19 .9v4.2M16.9 3h4.2',fill:'none',stroke:'#fff',strokeWidth:1.2,strokeLinecap:'round',strokeLinejoin:'round'}]],
+  katana:[['path',{d:'M20.5 3.5L9.5 14.5',fill:'none',stroke:'#1a0f00',strokeWidth:4.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M20.5 3.5L9.5 14.5',fill:'none',stroke:'#e6eef1',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M7.2 12.8l4 4',fill:'none',stroke:'#1a0f00',strokeWidth:4.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M7.2 12.8l4 4',fill:'none',stroke:'#f6b73c',strokeWidth:2.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M8.6 15.4L4 20',fill:'none',stroke:'#1a0f00',strokeWidth:4.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M8.6 15.4L4 20',fill:'none',stroke:'#2b2b38',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{stroke:'#1a0f00',strokeWidth:0.8,strokeLinejoin:'round',strokeLinecap:'round',d:'M4.2 21.4l-1.4-1.4 1.6-1.6 1.4 1.4z',fill:'#f6b73c'}]],
+  demonblade:[['path',{d:'M20.5 3.5L9.5 14.5',fill:'none',stroke:'#1a0f00',strokeWidth:4.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M20.5 3.5L9.5 14.5',fill:'none',stroke:'#d8352a',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M7.2 12.8l4 4',fill:'none',stroke:'#1a0f00',strokeWidth:4.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M7.2 12.8l4 4',fill:'none',stroke:'#7a3f9d',strokeWidth:2.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M8.6 15.4L4 20',fill:'none',stroke:'#1a0f00',strokeWidth:4.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M8.6 15.4L4 20',fill:'none',stroke:'#2b2b38',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M16 3v3M14.5 4.5h3M20 10v2.6M18.7 11.3h2.6',fill:'none',stroke:'#b66dff',strokeWidth:1.2,strokeLinecap:'round'}]],
+  flintlock:[['path',{d:'M3.5 9.2H16',fill:'none',stroke:'#1a0f00',strokeWidth:5,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M3.5 9.2H16',fill:'none',stroke:'#8a8f96',strokeWidth:3,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{stroke:'#1a0f00',strokeWidth:1.2,strokeLinejoin:'round',strokeLinecap:'round',d:'M13 9.8h5.4l-1.6 9h-3.8z',fill:'#8a5a33'}],['path',{d:'M14.4 6.6l2.2-3',fill:'none',stroke:'#1a0f00',strokeWidth:2.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M14.4 6.6l2.2-3',fill:'none',stroke:'#c7d0d4',strokeWidth:1.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M2.6 6.5l-1.2-1.2M2.2 9.2H.8M2.6 12l-1.2 1.2',fill:'none',stroke:'#ffe600',strokeWidth:1.1,strokeLinecap:'round'}]],
+  rifle:[['path',{d:'M3.4 17.2L21 8.4',fill:'none',stroke:'#1a0f00',strokeWidth:4.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M3.4 17.2L21 8.4',fill:'none',stroke:'#8a8f96',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{stroke:'#1a0f00',strokeWidth:1.2,strokeLinejoin:'round',strokeLinecap:'round',d:'M3.2 16l-1.4 4 5 .8 2.2-4.2z',fill:'#8a5a33'}],['path',{d:'M10.6 12.4L15.8 9.8',fill:'none',stroke:'#1a0f00',strokeWidth:3.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M10.6 12.4L15.8 9.8',fill:'none',stroke:'#5aa9ff',strokeWidth:1.6,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M11.6 14.6l.6 3',fill:'none',stroke:'#1a0f00',strokeWidth:2.4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M11.6 14.6l.6 3',fill:'none',stroke:'#2b2b38',strokeWidth:1.1,strokeLinecap:'round',strokeLinejoin:'round'}]],
+  knuckles:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M4.5 10h15v8.5H4.5z',fill:'#9aa5ab'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:7,cy:9.6,r:2.3,fill:'#c7d0d4'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:10.4,cy:9.6,r:2.3,fill:'#c7d0d4'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:13.6,cy:9.6,r:2.3,fill:'#c7d0d4'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:17,cy:9.6,r:2.3,fill:'#c7d0d4'}],['path',{d:'M6.6 6.6V4.8M10 6.6V4.2M13.2 6.6V4.2M16.6 6.6V4.8',fill:'none',stroke:'#c2301f',strokeWidth:1.6,strokeLinecap:'round'}],['path',{d:'M6 15h12',fill:'none',stroke:'#4a5961',strokeWidth:1.2,strokeLinecap:'round'}]],
+  staff:[['path',{d:'M12 21.5V9',fill:'none',stroke:'#1a0f00',strokeWidth:4.2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M12 21.5V9',fill:'none',stroke:'#8a5a33',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}],['circle',{stroke:'#1a0f00',strokeWidth:1.3,cx:12,cy:5.4,r:3.6,fill:'#7be0ff'}],['path',{stroke:'#1a0f00',strokeWidth:.8,strokeLinejoin:'round',d:'M12.8 2.8l-2.4 3.4h1.8l-.8 3 2.6-3.8h-1.8z',fill:'#ffe600'}],['circle',{stroke:'#1a0f00',strokeWidth:0.8,cx:8.6,cy:13.5,r:1.5,fill:'#5aa9ff'}],['circle',{stroke:'#1a0f00',strokeWidth:0.8,cx:15.4,cy:13.5,r:1.5,fill:'#5aa9ff'}]],
+  plate:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M6 3.6h12l3 4.2-3 2.8v9.8H6v-9.8L3 7.8z',fill:'#9aa5ab'}],['path',{d:'M12 4v16.4M7.6 12h8.8',fill:'none',stroke:'#4a5961',strokeWidth:1.2,strokeLinecap:'round'}],['circle',{stroke:'#1a0f00',strokeWidth:0.5,cx:8.2,cy:8,r:0.9,fill:'#f6b73c'}],['circle',{stroke:'#1a0f00',strokeWidth:0.5,cx:15.8,cy:8,r:0.9,fill:'#f6b73c'}],['path',{d:'M7.4 5.2l1.6 1.2',fill:'none',stroke:'#fff',strokeWidth:1,strokeLinecap:'round',opacity:.5}]],
+  strawhat:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M2.4 15.2c0-2 4.4-3.4 9.6-3.4s9.6 1.4 9.6 3.4-4.4 3.4-9.6 3.4-9.6-1.4-9.6-3.4z',fill:'#f6d98a'}],['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M6.4 13.6C6.4 8.6 8.6 5.4 12 5.4s5.6 3.2 5.6 8.2c-1.6.8-3.6 1.2-5.6 1.2s-4-.4-5.6-1.2z',fill:'#f2c25a'}],['path',{d:'M6.6 12.4c1.6.8 3.4 1.2 5.4 1.2s3.8-.4 5.4-1.2',fill:'none',stroke:'#d8352a',strokeWidth:2.6,strokeLinecap:'round'}],['path',{d:'M8.4 8.6q1-1.8 2.4-2',fill:'none',stroke:'#fff',strokeWidth:1,strokeLinecap:'round',opacity:.5}]],
+  gauntlet:[['path',{stroke:'#1a0f00',strokeWidth:1.3,strokeLinejoin:'round',strokeLinecap:'round',d:'M6.4 12.4h11.2v8.4H6.4z',fill:'#2b2b38'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:8.2,cy:11.6,r:2.1,fill:'#3a3a4c'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:11,cy:11.2,r:2.1,fill:'#3a3a4c'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:13.8,cy:11.2,r:2.1,fill:'#3a3a4c'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:16.4,cy:11.8,r:2.1,fill:'#3a3a4c'}],['path',{d:'M7.6 17.4h8.8',fill:'none',stroke:'#b66dff',strokeWidth:1.4,strokeLinecap:'round'}],['path',{d:'M8 9.6l.8-1.4M11 9l.4-1.6M13.8 9l-.2-1.6',fill:'none',stroke:'#b66dff',strokeWidth:1.1,strokeLinecap:'round',opacity:.8}],['path',{stroke:'#1a0f00',strokeWidth:1,strokeLinejoin:'round',strokeLinecap:'round',d:'M5.4 18.4h13.2v2.8H5.4z',fill:'#4a4a60'}]],
+  slingshot:[['path',{d:'M12 21.5v-8M12 13.5L7 4.6M12 13.5l5-8.9',fill:'none',stroke:'#1a0f00',strokeWidth:4,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M12 21.5v-8M12 13.5L7 4.6M12 13.5l5-8.9',fill:'none',stroke:'#8a5a33',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'}],['path',{d:'M7 4.6q5 5.4 10 0',fill:'none',stroke:'#d8352a',strokeWidth:1.3,strokeLinecap:'round'}],['circle',{stroke:'#1a0f00',strokeWidth:1,cx:12,cy:9.4,r:1.5,fill:'#7bd36b'}]],
 };
 const iconKids = n => (ICONS[n] || ICONS.treasure).map(([tag, p], i) => React.createElement(tag, { key:i, fill:'none', ...p }));
 const Ico = ({ n, size=20, sw=1.8, className='' }) => html`
@@ -1790,6 +1920,7 @@ function CrewCard({ c, onDismiss }){
         <div className=${'hp ' + tone} role="progressbar" aria-label=${t('common.hp') + ' ' + L(c.name)} aria-valuenow=${c.hp} aria-valuemin="0" aria-valuemax=${c.maxHp}><i style=${{ width: pct + '%' }}></i><span>${c.hp}/${c.maxHp}</span></div>
         <div className="flex flex-wrap items-center gap-2 mt-[6px]">
           ${c.captain ? html`<span className="cap-tag"><${Ico} n="crown" size=${12}/>${t('crew.captain')}</span>` : null}
+          ${c.gear ? html`<span className="fruit-pill" style=${{ '--fc':'#8db0b5', marginTop:0 }} title=${L(c.gear.desc)}><${Ico} n=${c.gear.icon} size=${14}/><span className="truncate">${L(c.gear.name)}</span></span>` : null}
           ${c.fruit ? html`<span className="fruit-pill" style=${{ '--fc': c.fruit.color, marginTop: 0 }}><${Ico} n="fruit" size=${14}/><span className="truncate">${L(c.fruit.name)}</span></span>` : null}
           <button type="button" className="crew-x sheet-btn" title=${t('cast.title')} onClick=${() => openSheet && openSheet(c)}><${Ico} n="zoom" size=${13} sw=${2.2}/>${t('cast.btn')}</button>
           ${!c.captain && onDismiss ? html`<button type="button" className="crew-x" title=${t('crew.dismiss')} aria-label=${t('crew.dismiss') + ' ' + L(c.name)} onClick=${() => onDismiss(c.id)}><${Ico} n="exit" size=${13} sw=${2.2}/>${t('crew.dismiss')}</button>` : null}
@@ -1851,7 +1982,7 @@ function Poster({ idx, defeated }){
       <span className="stamp">${t('poster.caught')}</span>
     </div>`;
 }
-function LootPanel({ g, onDiscard }){
+function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
   const [tip, setTip] = useState(null);
   const [sel, setSel] = useState(null);
   const [confirm, setConfirm] = useState(false);
@@ -1877,6 +2008,13 @@ function LootPanel({ g, onDiscard }){
       ${selItem ? html`
         <div className="mt-2 offer" style=${{ flexDirection:'column', alignItems:'stretch' }}>
           <div className="text-sm"><b style=${{ color:'var(--foam)' }}>${L(selItem.name)}.</b> <span style=${{ color:'var(--mist)' }}>${L(selItem.desc)}</span></div>
+          <${ItemTags} it=${selItem}/>
+          ${selItem.equip ? html`
+            <div className="flex flex-col gap-1">
+              <div className="eyebrow">${(() => { const hd = holderOf(g, selItem.id); return hd ? t('item.heldBy', { name:L(hd.name) }) : t('item.unequipped'); })()}</div>
+              <div className="flex flex-wrap gap-1">${g.crew.map(c => { const on = c.gear && c.gear.id === selItem.id; return html`<button key=${c.id} type="button" className=${'btn small ' + (on ? '' : 'ghost')} disabled=${locked || on} title=${c.gear && !on ? t('item.swapsOut', { name:L(c.gear.name) }) : ''} onClick=${() => onEquip(selItem.id, c.id)}>${L(c.name)}${c.gear && !on ? ' ↻' : ''}</button>`; })}
+              ${holderOf(g, selItem.id) ? html`<button type="button" className="btn ghost small" disabled=${locked} onClick=${() => onUnequip(selItem.id)}>${t('item.unequip')}</button>` : null}</div>
+            </div>` : null}
           ${!canDiscard(g, selItem) ? html`<div className="text-xs" style=${{ color:'var(--ember)' }}>${t('loot.discardNo')}</div>` : null}
           <div className="flex gap-2">
             ${!confirm
@@ -2254,6 +2392,7 @@ function showEvent(e, v, fx){
     case 'shield': fx.banner = { text:t('bt.shield'), color:ROLE_COLOR.tank }; v.allies.forEach(a => A(a.id, 'shield')); d = 1; break;
     case 'mark': { A(e.id, 'mark'); fx.known[e.id] = true; flt(e.id, t('bt.mark'), 'weak'); d = .4; break; }
     case 'burn': { const u = unit(e.id); if (u) { u.hp = Math.max(0, u.hp - e.dmg); flt(e.id, t('bt.burn') + ' -' + e.dmg, 'res'); A(e.id, 'hit'); } d = .6; break; }
+    case 'revive': { const u = unit(e.id); if (u) { u.hp = e.n; u.stun = 0; A(e.id, 'heal'); flt(e.id, t('bt.revive'), 'heal'); fx.banner = { text:t('bt.revive'), color:'#3dd6a0' }; fx.log.push(t('log.revive', { a:evName(v, e.id) })); } d = 1.2; break; }
     case 'drain': { const u = unit(e.id); if (u) { u.hp = Math.min(u.maxHp, u.hp + e.n); flt(e.id, t('bt.drain'), 'heal'); } d = .4; break; }
     case 'pulse': A(e.id, 'special'); fx.overlay = { kind:'foecon', text:t('bt.pulse') }; fx.log.push(t('bt.pulse')); d = 1.6; break;
     case 'bind': A(e.id, 'stun'); { const u = unit(e.id); if (u) u.stun = 1; } fx.banner = { text:t('bt.bind'), color:'#ff7a59' }; d = .9; break;
@@ -2420,7 +2559,7 @@ function CombatEvent({ g, setG, node, done }){
 
 
 function MarketEvent({ g, setG, done }){
-  const [offers] = useState(() => shuffle(ITEMS.filter(i => !g.items.some(o => o.id === i.id))).slice(0, 3));
+  const [offers] = useState(() => shuffle(itemPool(g)).slice(0, 3));
   const [bought, setBought] = useState([]);
   const [rations, setRations] = useState(0);
   const [swapFor, setSwapFor] = useState(null);
@@ -2448,7 +2587,7 @@ function MarketEvent({ g, setG, done }){
       ${offers.map(o => { const got = bought.includes(o.id); return html`
         <div key=${o.id} className="offer">
           <div className="item-slot filled" style=${{ width:46, flex:'none' }}><${Ico} n=${o.icon} size=${26}/></div>
-          <div className="min-w-0 flex-1"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'17px' }}>${L(o.name)}</div><div className="desc">${L(o.desc)}</div></div>
+          <div className="min-w-0 flex-1"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'17px' }}>${L(o.name)}</div><div className="desc">${L(o.desc)}</div><${ItemTags} it=${o}/></div>
           <button type="button" className="btn small" disabled=${got || g.berries < o.price} onClick=${() => buy(o)}>${got ? t('market.owned') : o.price + ' ฿'}</button>
         </div>`; })}
       <div className="offer">
@@ -2563,6 +2702,50 @@ function EndScreen({ g, onRestart }){
 }
 
 /* ---------- botin: coger / dejar / cambiar ---------- */
+
+/* etiquetas de efecto de un objeto (reliquia o equipo) */
+function itemTags(it){
+  const o = [], f = it.fx || {}, p = n => Math.round(n * 100);
+  if (f.power) o.push(t('fx.power', { n:p(f.power) }));
+  if (f.guard) o.push(t('fx.guard', { n:p(f.guard) }));
+  if (f.berry) o.push(t('fx.berry', { n:p(f.berry) }));
+  if (f.camp) o.push(t('fx.camp', { n:p(f.camp) }));
+  if (f.hp) o.push(t('man.fx.hp', { n:f.hp }));
+  if (f.lead) o.push(t('man.fx.lead', { n:f.lead }));
+  if (f.spd) o.push(t('fx.spd', { n:f.spd }));
+  if (f.crit) o.push(t('fx.crit', { n:p(f.crit) }));
+  if (f.acc) o.push(t('fx.acc', { n:p(f.acc) }));
+  if (f.dodge) o.push(t('fx.dodge', { n:p(f.dodge) }));
+  if (f.charge) o.push(t('fx.charge', { n:f.charge }));
+  if (f.regen) o.push(t('fx.regen', { n:Math.round(f.regen * 1000) / 10 }));
+  if (f.harm) o.push(t('fx.harm', { n:f.harm }));
+  if (f.reveal) o.push(t('fx.reveal'));
+  if (f.calm) o.push(t('fx.calm', { n:p(f.calm) }));
+  if (f.ambush) o.push(t('fx.ambush', { n:p(f.ambush) }));
+  if (f.loot) o.push(t('fx.loot', { n:p(f.loot) }));
+  if (f.ward) o.push(t('fx.ward'));
+  if (f.revive) o.push(t('fx.revive'));
+  const e = it.equip;
+  if (e) {
+    const sg = n => (n > 0 ? '+' : '−') + Math.abs(n);
+    for (const k in (e.stats || {})) o.push(t('stat.' + k) + ' ' + sg(e.stats[k]));
+    if (e.atkPct) o.push(t('eq.atk', { n:sg(p(e.atkPct)) }));
+    if (e.hpPct) o.push(t('eq.hp', { n:sg(p(e.hpPct)) }));
+    if (e.crit) o.push(t('fx.crit', { n:p(e.crit) }));
+    if (e.acc) o.push(t('fx.acc', { n:p(e.acc) }));
+    if (e.dodge) o.push(t('fx.dodge', { n:p(e.dodge) }));
+    if (e.charge) o.push(t('fx.charge', { n:e.charge }));
+    if (e.guardPct) o.push(t('fx.guard', { n:p(e.guardPct) }));
+    if (e.aggro && e.aggro > 1) o.push(t('eq.aggro'));
+    if (e.pierce) o.push(t('eq.pierce'));
+    for (const k in (e.haki || {})) o.push(t('haki.' + k) + ' +' + e.haki[k]);
+  }
+  return o;
+}
+function ItemTags({ it }){
+  const tg = itemTags(it);
+  return html`<span className="man-chips">${it.equip ? html`<span className="chip" style=${{ color:'var(--fruit, #b66dff)' }}>${t('item.equip')}</span>` : null}${tg.map((x, i) => html`<span key=${i} className="chip">${x}</span>`)}</span>`;
+}
 function SwapList({ g, item, onPick }){
   return html`
     <div className="flex flex-col gap-2">
@@ -2582,7 +2765,7 @@ function LootOffer({ g, item, choice, onTake, onLeave, onSwap }){
         <div className="min-w-0 flex-1">
           <div className="eyebrow">${t('combat.itemFound')}</div>
           <div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'18px' }}>${L(item.name)}</div>
-          <div className="desc">${L(item.desc)}</div>
+          <div className="desc">${L(item.desc)}</div><${ItemTags} it=${item}/>
         </div>
       </div>
       ${choice ? html`<p className="m-0 text-sm" style=${{ color: choice === 'took' ? 'var(--kelp)' : 'var(--mist)' }}>${choice === 'took' ? t('combat.itemTaken') : t('combat.itemLeft')}</p>`
@@ -2743,12 +2926,15 @@ function ManualScreen({ onClose }){
   };
   const Items = () => html`<${React.Fragment}>
     <p className="dim">${t('man.items.hint', { max:MAX_ITEMS })}</p>
-    <div className="man-grid">${ITEMS.slice().sort((a, b) => a.price - b.price).map(it => html`
-      <div key=${it.id} className="man-card">
-        <div className="item-slot filled" style=${{ width:48, height:48, flex:'none' }}><${Ico} n=${it.icon} size=${28}/></div>
-        <div className="min-w-0 flex-1"><div className="nm">${L(it.name)}</div><div className="tiny">${L(it.desc)}</div>
-          <div className="man-chips mt-1">${fxTags(it.fx).map((x, i) => html`<span key=${i} className="chip">${x}</span>`)}<span className="chip" style=${{ color:'var(--gold)' }}>${it.price} ฿</span></div></div>
-      </div>`)}</div>
+    ${[['eq', ITEMS.filter(i => i.equip)], ['relic', ITEMS.filter(i => !i.equip)]].map(([k, list]) => html`<${React.Fragment} key=${k}>
+      <h3>${t('man.items.' + k)} (${list.length})</h3><p className="dim">${t('man.items.' + k + 'D')}</p>
+      <div className="man-grid">${list.slice().sort((a, b) => a.price - b.price).map(it => html`
+        <div key=${it.id} className="man-card">
+          <div className="item-slot filled" style=${{ width:48, height:48, flex:'none' }}><${Ico} n=${it.icon} size=${28}/></div>
+          <div className="min-w-0 flex-1"><div className="nm">${L(it.name)}</div><div className="tiny">${L(it.desc)}</div>
+            <div className="man-chips mt-1"><${ItemTags} it=${it}/><span className="chip" style=${{ color:'var(--gold)' }}>${it.price} ฿</span>${it.minStage > 1 ? html`<span className="chip">${t('man.items.from', { n:it.minStage })}</span>` : null}</div></div>
+        </div>`)}</div>
+    <//>`)}
   <//>`;
   const Fruits = () => html`<${React.Fragment}>
     <p className="dim">${t('man.fruits.hint')}</p>
@@ -2965,7 +3151,7 @@ function App(){
         <main className="flex-1 min-h-0 grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)_320px]">
           <section className=${'panel min-h-0 min-w-0 overflow-y-auto ' + paneCls('crew')} aria-label=${t('crew.title')}><${CrewPanel} g=${g} onDismiss=${canAct ? setDismissId : null}/></section>
           <section className=${'panel min-h-0 min-w-0 ' + (tab === 'map' ? 'flex flex-col' : 'hidden') + ' lg:flex lg:flex-col'} aria-label=${L(STAGES[g.stage].name)}><${MapPanel} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${pick}/></section>
-          <section className=${'panel min-h-0 min-w-0 overflow-y-auto ' + paneCls('loot')} aria-label=${t('loot.title')}><${LootPanel} g=${g} onDiscard=${discard}/></section>
+          <section className=${'panel min-h-0 min-w-0 overflow-y-auto ' + paneCls('loot')} aria-label=${t('loot.title')}><${LootPanel} g=${g} onDiscard=${discard} locked=${!canAct} onEquip=${(i, c) => setG(cur => equipItem(cur, i, c))} onUnequip=${i => setG(cur => unequipItem(cur, i))}/></section>
         </main>
         <nav className="lg:hidden grid grid-cols-3 gap-2">
           ${[['crew', t('crew.title')], ['map', L(STAGES[g.stage].name)], ['loot', t('loot.title')]].map(([k, l]) => html`<button key=${k} type="button" className=${'navbtn truncate' + (tab === k ? ' on' : '')} onClick=${() => setTab(k)} aria-pressed=${tab === k}>${l}</button>`)}
