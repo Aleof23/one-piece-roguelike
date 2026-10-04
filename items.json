@@ -1,0 +1,275 @@
+{
+  "_help": "Passive items sold at the Black Market and dropped by enemies. fx keys: power (+% attack of the whole band, 0.10 = +10%), hp (flat max HP for everyone, applied when obtained), berry (+% berries from loot), guard (-% damage taken), camp (+% extra healing at camps), lead (+flat leadership). price is in berries. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored.",
+
+  "items": [
+    {
+      "id": "log_pose",
+      "name": { "en": "Log Pose", "es": "Log Pose" },
+      "desc": { "en": "+12% attack power for the whole band", "es": "+12% de poder de ataque para toda la banda" },
+      "icon": "compass",
+      "fx": { "power": 0.12 },
+      "price": 110
+    },
+
+    {
+      "id": "barrel_sake",
+      "name": { "en": "Sake Barrel", "es": "Barril de Sake" },
+      "desc": { "en": "+30 max HP for everyone", "es": "+30 de vida máxima para todos" },
+      "icon": "barrel",
+      "fx": { "hp": 30 },
+      "price": 120
+    },
+
+    {
+      "id": "nami_tangerine",
+      "name": { "en": "Nami's Tangerine", "es": "Mandarina de Nami" },
+      "desc": { "en": "+20% berries from every loot", "es": "+20% de berries en cada botín" },
+      "icon": "tangerine",
+      "fx": { "berry": 0.20 },
+      "price": 100
+    },
+
+    {
+      "id": "usopp_goggles",
+      "name": { "en": "Usopp's Goggles", "es": "Gafas de Usopp" },
+      "desc": { "en": "+10% attack power and +10% berries", "es": "+10% de poder de ataque y +10% de berries" },
+      "icon": "goggles",
+      "fx": { "power": 0.10, "berry": 0.10 },
+      "price": 125
+    },
+
+    {
+      "id": "sanji_cigarette",
+      "name": { "en": "Sanji's Cigarette Case", "es": "Pitillera de Sanji" },
+      "desc": { "en": "+18% attack power for the whole band", "es": "+18% de poder de ataque para toda la banda" },
+      "icon": "cigarette",
+      "fx": { "power": 0.18 },
+      "price": 160
+    },
+
+    {
+      "id": "zoro_sake",
+      "name": { "en": "Zoro's Sake Flask", "es": "Cantimplora de Sake de Zoro" },
+      "desc": { "en": "-10% damage taken in combat", "es": "-10% de daño recibido en combate" },
+      "icon": "flask",
+      "fx": { "guard": 0.10 },
+      "price": 115
+    },
+
+    {
+      "id": "chopper_medicine",
+      "name": { "en": "Chopper's Medicine", "es": "Medicina de Chopper" },
+      "desc": { "en": "Camps heal 40% extra", "es": "El campamento cura un 40% extra" },
+      "icon": "medicine",
+      "fx": { "camp": 0.40 },
+      "price": 150
+    },
+
+    {
+      "id": "robin_book",
+      "name": { "en": "Robin's Ancient Book", "es": "Libro Antiguo de Robin" },
+      "desc": { "en": "+2 permanent leadership", "es": "+2 de liderazgo permanente" },
+      "icon": "book",
+      "fx": { "lead": 2 },
+      "price": 180
+    },
+
+    {
+      "id": "franky_cola",
+      "name": { "en": "Franky's Cola", "es": "Cola de Franky" },
+      "desc": { "en": "+20% attack power and +20 max HP for everyone", "es": "+20% de poder de ataque y +20 de vida máxima para todos" },
+      "icon": "cola",
+      "fx": { "power": 0.20, "hp": 20 },
+      "price": 210
+    },
+
+    {
+      "id": "brook_violin",
+      "name": { "en": "Brook's Violin", "es": "Violín de Brook" },
+      "desc": { "en": "+15% attack power and camps heal 20% extra", "es": "+15% de poder de ataque y los campamentos curan un 20% extra" },
+      "icon": "violin",
+      "fx": { "power": 0.15, "camp": 0.20 },
+      "price": 190
+    },
+
+    {
+      "id": "jinbe_sake",
+      "name": { "en": "Jinbe's Ceremonial Sake", "es": "Sake Ceremonial de Jinbe" },
+      "desc": { "en": "-18% damage taken in combat", "es": "-18% de daño recibido en combate" },
+      "icon": "sakecup",
+      "fx": { "guard": 0.18 },
+      "price": 200
+    },
+
+    {
+      "id": "vivre_card",
+      "name": { "en": "Vivre Card", "es": "Vivre Card" },
+      "desc": { "en": "+10% attack power and +25 max HP for everyone", "es": "+10% de poder de ataque y +25 de vida máxima para todos" },
+      "icon": "vivre",
+      "fx": { "power": 0.10, "hp": 25 },
+      "price": 175
+    },
+
+    {
+      "id": "den_den_mushi",
+      "name": { "en": "Den Den Mushi", "es": "Den Den Mushi" },
+      "desc": { "en": "+2 permanent leadership", "es": "+2 de liderazgo permanente" },
+      "icon": "snail",
+      "fx": { "lead": 2 },
+      "price": 170
+    },
+
+    {
+      "id": "marine_coat",
+      "name": { "en": "Marine Coat", "es": "Abrigo de la Marina" },
+      "desc": { "en": "-12% damage taken in combat", "es": "-12% de daño recibido en combate" },
+      "icon": "coat",
+      "fx": { "guard": 0.12 },
+      "price": 135
+    },
+
+    {
+      "id": "warlord_cape",
+      "name": { "en": "Warlord's Cape", "es": "Capa de Shichibukai" },
+      "desc": { "en": "+15% attack power and +1 permanent leadership", "es": "+15% de poder de ataque y +1 de liderazgo permanente" },
+      "icon": "cape",
+      "fx": { "power": 0.15, "lead": 1 },
+      "price": 220
+    },
+
+    {
+      "id": "yonko_flag",
+      "name": { "en": "Yonko Flag", "es": "Bandera de Yonko" },
+      "desc": { "en": "+25% attack power and +2 permanent leadership", "es": "+25% de poder de ataque y +2 de liderazgo permanente" },
+      "icon": "flag",
+      "fx": { "power": 0.25, "lead": 2 },
+      "price": 300
+    },
+
+    {
+      "id": "bounty_poster",
+      "name": { "en": "Bounty Poster", "es": "Cartel de Recompensa" },
+      "desc": { "en": "+35% berries from every loot", "es": "+35% de berries en cada botín" },
+      "icon": "poster",
+      "fx": { "berry": 0.35 },
+      "price": 180
+    },
+
+    {
+      "id": "seastone_shackle",
+      "name": { "en": "Seastone Shackle", "es": "Grillete de Kairoseki" },
+      "desc": { "en": "-25% damage taken in combat", "es": "-25% de daño recibido en combate" },
+      "icon": "shackle",
+      "fx": { "guard": 0.25 },
+      "price": 280
+    },
+
+    {
+      "id": "rumble_ball",
+      "name": { "en": "Rumble Ball", "es": "Rumble Ball" },
+      "desc": { "en": "+30% attack power for the whole band", "es": "+30% de poder de ataque para toda la banda" },
+      "icon": "pill",
+      "fx": { "power": 0.30 },
+      "price": 270
+    },
+
+    {
+      "id": "black_leg_boot",
+      "name": { "en": "Black Leg", "es": "Black Leg" },
+      "desc": { "en": "+20% attack power and +10% camp healing", "es": "+20% de poder de ataque y +10% de curación en campamentos" },
+      "icon": "boot",
+      "fx": { "power": 0.20, "camp": 0.10 },
+      "price": 240
+    },
+
+    {
+      "id": "mihawk_cross",
+      "name": { "en": "Kokuto Cross", "es": "Cruz de Kokuto" },
+      "desc": { "en": "+35% attack power for the whole band", "es": "+35% de poder de ataque para toda la banda" },
+      "icon": "cross",
+      "fx": { "power": 0.35 },
+      "price": 350
+    },
+
+    {
+      "id": "flame_dial",
+      "name": { "en": "Flame Dial", "es": "Dial de Llama" },
+      "desc": { "en": "+22% attack power for the whole band", "es": "+22% de poder de ataque para toda la banda" },
+      "icon": "dialflame",
+      "fx": { "power": 0.22 },
+      "price": 210
+    },
+
+    {
+      "id": "impact_dial",
+      "name": { "en": "Impact Dial", "es": "Dial de Impacto" },
+      "desc": { "en": "+15% attack power and -8% damage taken", "es": "+15% de poder de ataque y -8% de daño recibido" },
+      "icon": "dialimpact",
+      "fx": { "power": 0.15, "guard": 0.08 },
+      "price": 230
+    },
+
+    {
+      "id": "dial_shell",
+      "name": { "en": "Breath Dial", "es": "Dial de Aliento" },
+      "desc": { "en": "Camps heal 30% extra", "es": "Los campamentos curan un 30% extra" },
+      "icon": "dialbreath",
+      "fx": { "camp": 0.30 },
+      "price": 125
+    },
+
+    {
+      "id": "revolutionary_badge",
+      "name": { "en": "Revolutionary Badge", "es": "Insignia Revolucionaria" },
+      "desc": { "en": "+18% attack power and +1 permanent leadership", "es": "+18% de poder de ataque y +1 de liderazgo permanente" },
+      "icon": "badge",
+      "fx": { "power": 0.18, "lead": 1 },
+      "price": 240
+    },
+
+    {
+      "id": "baroque_works_coin",
+      "name": { "en": "Baroque Works Coin", "es": "Moneda de Baroque Works" },
+      "desc": { "en": "+25% berries from every loot", "es": "+25% de berries en cada botín" },
+      "icon": "bwcoin",
+      "fx": { "berry": 0.25 },
+      "price": 145
+    },
+
+    {
+      "id": "marine_medal",
+      "name": { "en": "Marine Medal", "es": "Medalla de la Marina" },
+      "desc": { "en": "+40 max HP for everyone", "es": "+40 de vida máxima para todos" },
+      "icon": "medal",
+      "fx": { "hp": 40 },
+      "price": 160
+    },
+
+    {
+      "id": "wanted_poster_stack",
+      "name": { "en": "Stack of Wanted Posters", "es": "Pila de Carteles de Recompensa" },
+      "desc": { "en": "+20% berries and +1 permanent leadership", "es": "+20% de berries y +1 de liderazgo permanente" },
+      "icon": "posters",
+      "fx": { "berry": 0.20, "lead": 1 },
+      "price": 190
+    },
+
+    {
+      "id": "ancient_kingdom_relic",
+      "name": { "en": "Ancient Kingdom Relic", "es": "Reliquia del Reino Antiguo" },
+      "desc": { "en": "+20% attack power, +20 max HP and +1 permanent leadership", "es": "+20% de poder de ataque, +20 de vida máxima y +1 de liderazgo permanente" },
+      "icon": "relic",
+      "fx": { "power": 0.20, "hp": 20, "lead": 1 },
+      "price": 320
+    },
+
+    {
+      "id": "one_piece_fragment",
+      "name": { "en": "Mysterious Treasure Fragment", "es": "Fragmento de Tesoro Misterioso" },
+      "desc": { "en": "+30% berries and +10% camp healing", "es": "+30% de berries y +10% de curación en campamentos" },
+      "icon": "fragment",
+      "fx": { "berry": 0.30, "camp": 0.10 },
+      "price": 250
+    }
+  ]
+}

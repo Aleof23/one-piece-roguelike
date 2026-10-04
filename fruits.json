@@ -1,0 +1,177 @@
+{
+  "_help": "Devil Fruits found in Rare Chests. Every fruit exists once per run: once a Nakama eats it, it leaves the chest pool. Each Nakama can eat only one. atk and hp are multipliers applied permanently to the Nakama that eats it. desc is optional; when missing it is generated from atk and hp. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored.",
+
+  "_fruit_fields": {
+    "id": "unique string, required",
+    "name": "string or {en,es}",
+    "type": "logia | paramecia | zoan | ancientZoan | mythicalZoan (any other text is shown as is)",
+    "atk": "attack multiplier, e.g. 1.6",
+    "hp": "max HP multiplier, e.g. 1.2",
+    "color": "hex color of the fruit orb",
+    "desc": "optional string or {en,es}",
+    "weight": "relative chance of appearing in a chest (default 1)"
+  },
+
+  "fruits": [
+    {
+      "id": "fruit_mera_mera",
+      "name": { "en": "Flame-Flame Fruit", "es": "Fruta Mera Mera" },
+      "type": "logia",
+      "atk": 1.6,
+      "hp": 1.0,
+      "color": "#ff5a1f",
+      "desc": { "en": "Grants the power to create, control and become fire.", "es": "Otorga el poder de crear, controlar y convertirse en fuego." },
+      "weight": 1
+    },
+    {
+      "id": "fruit_gomu_gomu",
+      "name": { "en": "Gum-Gum Fruit", "es": "Fruta Gomu Gomu" },
+      "type": "paramecia",
+      "atk": 1.4,
+      "hp": 1.3,
+      "color": "#d9d9d9",
+      "desc": { "en": "Grants a rubber-like body with extraordinary elasticity.", "es": "Otorga un cuerpo de goma con una elasticidad extraordinaria." },
+      "weight": 1
+    },
+    {
+      "id": "fruit_suna_suna",
+      "name": { "en": "Sand-Sand Fruit", "es": "Fruta Suna Suna" },
+      "type": "logia",
+      "atk": 1.5,
+      "hp": 1.1,
+      "color": "#d6b36a",
+      "desc": { "en": "Grants the power to create, control and become sand.", "es": "Otorga el poder de crear, controlar y convertirse en arena." },
+      "weight": 1
+    },
+    {
+      "id": "fruit_hana_hana",
+      "name": { "en": "Flower-Flower Fruit", "es": "Fruta Hana Hana" },
+      "type": "paramecia",
+      "atk": 1.3,
+      "hp": 1.2,
+      "color": "#d86cff",
+      "desc": { "en": "Allows the user to sprout copies of their body parts anywhere within range.", "es": "Permite al usuario hacer brotar copias de partes de su cuerpo dentro de un área determinada." },
+      "weight": 1
+    },
+    {
+      "id": "fruit_bara_bara",
+      "name": { "en": "Chop-Chop Fruit", "es": "Fruta Bara Bara" },
+      "type": "paramecia",
+      "atk": 1.2,
+      "hp": 1.4,
+      "color": "#b84cff",
+      "desc": { "en": "Allows the user to split their body into separate pieces.", "es": "Permite al usuario separar su cuerpo en distintas partes." },
+      "weight": 1
+    },
+    {
+      "id": "fruit_goro_goro",
+      "name": { "en": "Rumble-Rumble Fruit", "es": "Fruta Goro Goro" },
+      "type": "logia",
+      "atk": 1.9,
+      "hp": 1.0,
+      "color": "#ffe600",
+      "desc": { "en": "Grants the power to create, control and become lightning.", "es": "Otorga el poder de crear, controlar y convertirse en electricidad." },
+      "weight": 0.8
+    },
+    {
+      "id": "fruit_yami_yami",
+      "name": { "en": "Dark-Dark Fruit", "es": "Fruta Yami Yami" },
+      "type": "logia",
+      "atk": 2.0,
+      "hp": 0.9,
+      "color": "#171717",
+      "desc": { "en": "Grants the power to create and control darkness and gravity-like attraction.", "es": "Otorga el poder de crear y controlar oscuridad y una atracción similar a la gravedad." },
+      "weight": 0.7
+    },
+    {
+      "id": "fruit_pika_pika",
+      "name": { "en": "Glint-Glint Fruit", "es": "Fruta Pika Pika" },
+      "type": "logia",
+      "atk": 1.9,
+      "hp": 1.0,
+      "color": "#fff36b",
+      "desc": { "en": "Grants the power to create, control and become light.", "es": "Otorga el poder de crear, controlar y convertirse en luz." },
+      "weight": 0.8
+    },
+    {
+      "id": "fruit_magu_magu",
+      "name": { "en": "Magma-Magma Fruit", "es": "Fruta Magu Magu" },
+      "type": "logia",
+      "atk": 2.1,
+      "hp": 1.0,
+      "color": "#e3421e",
+      "desc": { "en": "Grants the power to create, control and become magma.", "es": "Otorga el poder de crear, controlar y convertirse en magma." },
+      "weight": 0.7
+    },
+    {
+      "id": "fruit_ope_ope",
+      "name": { "en": "Op-Op Fruit", "es": "Fruta Ope Ope" },
+      "type": "paramecia",
+      "atk": 1.7,
+      "hp": 1.3,
+      "color": "#67d98a",
+      "desc": { "en": "Allows the user to manipulate everything within a special spherical operating room.", "es": "Permite manipular todo lo que se encuentra dentro de una sala de operaciones esférica." },
+      "weight": 0.8
+    },
+    {
+      "id": "fruit_ito_ito",
+      "name": { "en": "String-String Fruit", "es": "Fruta Ito Ito" },
+      "type": "paramecia",
+      "atk": 1.8,
+      "hp": 1.1,
+      "color": "#ff9bd4",
+      "desc": { "en": "Allows the user to create and control extremely strong strings.", "es": "Permite crear y controlar hilos extremadamente resistentes." },
+      "weight": 0.8
+    },
+    {
+      "id": "fruit_hito_hito_nika",
+      "name": { "en": "Human-Human Fruit, Model: Nika", "es": "Fruta Hito Hito, Modelo: Nika" },
+      "type": "mythicalZoan",
+      "atk": 2.2,
+      "hp": 1.5,
+      "color": "#f5f5f5",
+      "desc": { "en": "A Mythical Zoan granting the powers of the legendary Sun God Nika.", "es": "Una Zoan mitológica que otorga los poderes del legendario Dios del Sol Nika." },
+      "weight": 0.3
+    },
+    {
+      "id": "fruit_tori_tori_phoenix",
+      "name": { "en": "Bird-Bird Fruit, Model: Phoenix", "es": "Fruta Tori Tori, Modelo: Fénix" },
+      "type": "mythicalZoan",
+      "atk": 1.5,
+      "hp": 2.0,
+      "color": "#49bfff",
+      "desc": { "en": "Allows the user to transform into a phoenix and regenerate using blue flames.", "es": "Permite transformarse en un fénix y regenerarse mediante llamas azules." },
+      "weight": 0.4
+    },
+    {
+      "id": "fruit_uo_uo_kaido",
+      "name": { "en": "Fish-Fish Fruit, Model: Azure Dragon", "es": "Fruta Uo Uo, Modelo: Dragón Azul" },
+      "type": "mythicalZoan",
+      "atk": 2.0,
+      "hp": 2.0,
+      "color": "#248cff",
+      "desc": { "en": "Allows the user to transform into the legendary Azure Dragon.", "es": "Permite transformarse en el legendario Dragón Azul." },
+      "weight": 0.3
+    },
+    {
+      "id": "fruit_hito_hito_chopper",
+      "name": { "en": "Human-Human Fruit", "es": "Fruta Hito Hito" },
+      "type": "zoan",
+      "atk": 1.2,
+      "hp": 1.6,
+      "color": "#c98bff",
+      "desc": { "en": "A Zoan fruit that grants the abilities of a human.", "es": "Una fruta Zoan que otorga las capacidades de un humano." },
+      "weight": 1
+    },
+    {
+      "id": "fruit_neko_neko_leopard",
+      "name": { "en": "Cat-Cat Fruit, Model: Leopard", "es": "Fruta Neko Neko, Modelo: Leopardo" },
+      "type": "zoan",
+      "atk": 1.7,
+      "hp": 1.3,
+      "color": "#d9a441",
+      "desc": { "en": "Allows the user to transform into a leopard or a human-leopard hybrid.", "es": "Permite transformarse en un leopardo o en un híbrido humano-leopardo." },
+      "weight": 0.9
+    }
+  ]
+}
