@@ -7,6 +7,8 @@
   "dismissFeePerCost": 20,
   "dismissLeaveChance": 0.15,
   "leadershipPerStage": 1,
+    "rewardMarine": 1, "rewardPirate": 1.35, "rewardBoss": 2.5, "rewardExp": 0.45,
+    "marketInflation": 0.2, "rationPrice": 45, "rationInflation": 0.2,
   "startBerries": 120,
   "levelUpAtkMult": 1.3,
   "levelUpHpMult": 1.2,
@@ -163,7 +165,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_doflamingo",
-   "powerMult": 3.4,
+   "powerMult": 3.57,
    "sea": [
     "#0f5a70",
     "#06222b"
@@ -199,7 +201,7 @@
    },
    "bossRank": "admiral",
    "bossId": "boss_kizaru",
-   "powerMult": 4.85,
+   "powerMult": 5.189,
    "sea": [
     "#4a1d2a",
     "#150610"
@@ -235,7 +237,7 @@
    },
    "bossRank": "admiral",
    "bossId": "boss_akainu",
-   "powerMult": 6.49,
+   "powerMult": 7.009,
    "sea": [
     "#8a2a4a",
     "#2a0a18"
@@ -271,7 +273,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_big_mom",
-   "powerMult": 8.69,
+   "powerMult": 9.385,
    "sea": [
     "#8a3a6b",
     "#2a0c20"
@@ -307,7 +309,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_kaido",
-   "powerMult": 11.24,
+   "powerMult": 11.69,
    "sea": [
     "#5a2d6b",
     "#1a0c24"
@@ -343,7 +345,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_shanks",
-   "powerMult": 14.24,
+   "powerMult": 14.667,
    "sea": [
     "#1d5a5a",
     "#071f26"
@@ -379,7 +381,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_blackbeard",
-   "powerMult": 17.71,
+   "powerMult": 18.241,
    "sea": [
     "#6b5a14",
     "#201a05"

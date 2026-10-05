@@ -357,7 +357,7 @@ const RANKS = {
   admiral:     { icon:'anchor', color:'#5aa9ff', bounty:0 },
   yonko:       { icon:'crown',  color:'#f6b73c', bounty:4.5e9 },
 };
-const DEFAULT_SETTINGS = { foeHpK:3.0, foeAtkK:.32, marineMult:1.2, pirateMult:1.4, normalRamp:.15, dropMarine:.22, dropPirate:.32, dismissFeePerCost:20, dismissLeaveChance:.15, floors:6, crewSlots:6, leadership:7, leadershipPerStage:1, startBerries:120, levelUpAtkMult:1.3, levelUpHpMult:1.2 };
+const DEFAULT_SETTINGS = { rewardMarine:1, rewardPirate:1.35, rewardBoss:3, rewardExp:.6, marketInflation:.2, rationPrice:45, rationInflation:.2, foeHpK:3.0, foeAtkK:.32, marineMult:1.2, pirateMult:1.4, normalRamp:.15, dropMarine:.22, dropPirate:.32, dismissFeePerCost:20, dismissLeaveChance:.15, floors:6, crewSlots:6, leadership:7, leadershipPerStage:1, startBerries:120, levelUpAtkMult:1.3, levelUpHpMult:1.2 };
 
 /* Tipos de nodo. La etiqueta de cada uno vive en i18n (type.<clave>). */
 const TYPES = {
@@ -431,7 +431,7 @@ function buildData(raw){
     need(x && x.id, 'items.json: items[' + i + '] needs an "id"');
     const id = String(x && x.id); seen(iids, id, 'items.json');
     const eq = x.equip && typeof x.equip === 'object' ? x.equip : null;
-    return { id, name:x.name || id, desc:x.desc || '', icon:x.icon || 'treasure', fx:x.fx || {}, equip:eq, minStage:Math.max(1, Math.round(num(x.minStage, 1))), price:num(x.price, 100) };
+    return { id, name:x.name || id, desc:x.desc || '', icon:x.icon || 'treasure', fx:x.fx || {}, equip:eq, minStage:Math.max(1, Math.round(num(x.minStage, 1))), bossDrop:x.bossDrop ? Math.round(num(x.bossDrop, 0)) : 0, price:num(x.price, 100) };
   });
 
   const settings = { ...DEFAULT_SETTINGS, ...(st.settings || {}) };
@@ -576,7 +576,11 @@ function newGame(captainId, opts = {}){
 const mods = g => g.items.reduce((m, it) => { for (const k in it.fx) m[k] = (m[k] || 0) + it.fx[k]; return m; },
   { power:0, berry:0, guard:0, camp:0, spd:0, crit:0, dodge:0, acc:0, charge:0, regen:0, harm:0, reveal:0, calm:0, ambush:0, loot:0, ward:0, revive:0 });
 /* objetos que aun pueden aparecer (no los tienes y ya has llegado al mar minimo) */
-const itemPool = g => ITEMS.filter(i => !g.items.some(o => o.id === i.id) && (i.minStage || 1) <= g.stage + 1);
+const itemPool = g => ITEMS.filter(i => !i.bossDrop && !g.items.some(o => o.id === i.id) && (i.minStage || 1) <= g.stage + 1);
+/* economia: el Mercado negro sube los precios a medida que navegas; los jefes avanzados sueltan un trofeo fijo */
+const itemPrice = (g, it) => Math.max(5, Math.round(it.price * (1 + SETTINGS.marketInflation * g.stage) / 5) * 5);
+const rationPrice = g => Math.round(SETTINGS.rationPrice * (1 + SETTINGS.rationInflation * g.stage));
+const bossTrophy = g => ITEMS.find(i => i.bossDrop === g.stage + 1 && !g.items.some(o => o.id === i.id)) || null;
 const crewPower = g => g.crew.filter(c => c.hp > 0).reduce((s, c) => s + c.atk, 0) * (1 + mods(g).power);
 const availableIds = g => g.pos ? g.map.byId[g.pos].next : g.map.floors[0].map(n => n.id);
 
@@ -988,11 +992,12 @@ function battleResult(g, node, st){
   const g2 = { ...g, crew:g.crew.map((c, i) => ({ ...c, hp:rows[i].to })) };
   let berries = 0, item = null;
   if (win) {
-    berries = Math.round((30 + node.f * 8) * Math.pow(s.powerMult, .7) * (1 + m.berry) * (boss ? 3 : node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult));
+    berries = Math.round((30 + node.f * 8) * Math.pow(s.powerMult, SETTINGS.rewardExp) * (1 + m.berry) * (boss ? SETTINGS.rewardBoss : node.type === 'pirate' ? SETTINGS.rewardPirate : SETTINGS.rewardMarine));
     g2.berries += berries;
     const free = itemPool(g);
     const chance = boss ? 1 : (node.type === 'pirate' ? SETTINGS.dropPirate : SETTINGS.dropMarine) + (m.loot || 0);
-    if (free.length && Math.random() < chance) item = free[Math.floor(Math.random() * free.length)];
+    if (boss && bossTrophy(g)) item = bossTrophy(g);
+    else if (free.length && Math.random() < chance) item = free[Math.floor(Math.random() * free.length)];
     if (boss) g2.bounties = [...g2.bounties, g.stage];
   }
   return { win, boss, ep:enemyPower(g, node), rows, berries, item, rounds:st.rounds, g:g2 };
@@ -1025,6 +1030,10 @@ function sleep(g){
 const i18n = {
   en: {
     'app.tagline':'Roguelike autobattler',
+    "man.items.trophy":"Boss trophies",
+    "man.items.trophyD":"Unique rewards from the 5th boss onwards. Each Route Boss from sea 5 to 9 always drops its own trophy, and every one is better than the last. They cannot be bought.",
+    "man.items.drop":"Boss {n} trophy",
+
     "fx.spd":"Speed +{n}",
     "fx.crit":"Crit +{n}%",
     "fx.acc":"Accuracy +{n}%",
@@ -1074,7 +1083,7 @@ const i18n = {
     "man.g.nodesT":"Node types",
     "man.n.marine":"A fight against a marine squad (2–3 enemies). Moderate berries. It may drop a passive item.",
     "man.n.pirate":"A fight against a rival pirate ship. Harder than marines, but pays more and drops items more often.",
-    "man.n.market":"Buy passive items with berries (3 offers) or buy rations (45 ฿) that heal 35% of everyone’s HP.",
+    "man.n.market":"Buy items with berries (3 offers) or rations that heal 35% of everyone’s HP. Prices rise {p}% for every sea you have sailed.",
     "man.n.recruit":"Two candidates are on offer. Recruit those you can afford in leadership. They join at your current level.",
     "man.n.camp":"Rest: heals {pct}% of max HP (plus camp bonuses) and revives K.O. crew members with 30% HP.",
     "man.n.chest":"A rare chest with a Devil Fruit to give to one crew member who does not have one yet.",
@@ -1115,14 +1124,14 @@ const i18n = {
     "man.c.traitsT":"Boss traits",
     "man.c.traitsD":"Route Bosses have special abilities. Read their traits in the Bosses tab before facing them.",
     "man.c.lootT":"Rewards",
-    "man.c.loot":"Marines drop an item {m}% of the time and pirates {p}%; bosses always do. Marine fights pay ×{mm} berries and pirate fights ×{pm} the base amount, bosses ×3.",
+    "man.c.loot":"Marines drop an item {m}% of the time and pirates {p}%. From the 5th boss onwards, each Route Boss always drops a unique trophy, better than the last. Pirates pay ×{pm} berries compared to marines and bosses ×{bm}.",
     "man.crew.hint":"Tap a name to open the full character sheet. Stats are on a 1–10 scale at level 1; ATK and HP grow with level.",
     "man.crew.filter":"Filter by role",
     "man.crew.all":"All",
     "man.crew.cost":"Cost {n}",
     "man.crew.captain":"Captain",
     "man.crew.count":"{n} characters",
-    "man.items.hint":"Relics and equipment share your {max} item slots. Prices are what the black market asks; stronger items only appear in later seas.",
+    "man.items.hint":"Relics and equipment share your {max} item slots. The price shown is the base price: the Black Market charges more in later seas, and the strongest items only appear in advanced seas.",
     "man.items.price":"Price",
     "man.fx.hp":"Max HP +{n}",
     "man.fx.lead":"Leadership +{n}",
@@ -1142,6 +1151,8 @@ const i18n = {
     'start.pickCaptain':'Choose your Captain',
     'start.solo':'You set sail alone. Every other crew slot fills up by recruiting at island nodes along the map.',
     'start.go':'Start Voyage',
+    'save.continue':'Continue voyage (sea {s} · {n} crew · {b} ฿)',
+    'save.discard':'Delete save',
     'start.counts':'{n} nakamas · {b} bosses · {f} fruits · {s} stages',
     'load.loading':'Reading the sea charts…',
     'load.errorTitle':'The charts are damaged',
@@ -1380,6 +1391,10 @@ const i18n = {
   },
   es: {
     'app.tagline':'Roguelike autobattler',
+    "man.items.trophy":"Trofeos de jefe",
+    "man.items.trophyD":"Recompensas únicas desde el 5.º jefe. Cada Jefe de Ruta del mar 5 al 9 suelta siempre su propio trofeo, y cada uno es mejor que el anterior. No se pueden comprar.",
+    "man.items.drop":"Trofeo del jefe {n}",
+
     "fx.spd":"Velocidad +{n}",
     "fx.crit":"Crítico +{n}%",
     "fx.acc":"Precisión +{n}%",
@@ -1429,7 +1444,7 @@ const i18n = {
     "man.g.nodesT":"Tipos de nodo",
     "man.n.marine":"Combate contra un escuadrón de marines (2–3 enemigos). Berries moderados. Puede soltar un objeto pasivo.",
     "man.n.pirate":"Combate contra un barco pirata rival. Más duro que los marines, pero paga más y suelta objetos más a menudo.",
-    "man.n.market":"Compra objetos pasivos con berries (3 ofertas) o raciones (45 ฿) que curan el 35% de la vida de todos.",
+    "man.n.market":"Compra objetos con berries (3 ofertas) o raciones que curan el 35% de la vida de todos. Los precios suben un {p}% por cada mar recorrido.",
     "man.n.recruit":"Hay dos candidatos. Recluta a los que te permita el liderazgo. Se unen a tu nivel actual.",
     "man.n.camp":"Descanso: cura el {pct}% de la vida máxima (más bonus de camp) y revive a los K.O. con el 30% de vida.",
     "man.n.chest":"Un cofre raro con una Fruta del Diablo para dársela a un tripulante que aún no tenga ninguna.",
@@ -1470,14 +1485,14 @@ const i18n = {
     "man.c.traitsT":"Rasgos de los jefes",
     "man.c.traitsD":"Los Jefes de Ruta tienen habilidades especiales. Consulta sus rasgos en la pestaña Jefes antes de enfrentarte a ellos.",
     "man.c.lootT":"Recompensas",
-    "man.c.loot":"Los marines sueltan un objeto el {m}% de las veces y los piratas el {p}%; los jefes siempre. Los marines pagan ×{mm} berries y los piratas ×{pm} sobre la cantidad base, los jefes ×3.",
+    "man.c.loot":"Los marines sueltan un objeto el {m}% de las veces y los piratas el {p}%. Desde el 5.º jefe, cada Jefe de Ruta suelta siempre un trofeo único, mejor que el anterior. Los piratas pagan ×{pm} berries respecto a los marines y los jefes ×{bm}.",
     "man.crew.hint":"Toca un nombre para abrir la ficha completa. Las estadísticas van de 1 a 10 en el nivel 1; ATQ y vida crecen con el nivel.",
     "man.crew.filter":"Filtrar por rol",
     "man.crew.all":"Todos",
     "man.crew.cost":"Coste {n}",
     "man.crew.captain":"Capitán",
     "man.crew.count":"{n} personajes",
-    "man.items.hint":"Las reliquias y el equipo comparten tus {max} huecos de objeto. El precio es lo que pide el mercado negro; los objetos más fuertes solo aparecen en mares avanzados.",
+    "man.items.hint":"Las reliquias y el equipo comparten tus {max} huecos de objeto. El precio mostrado es el base: el Mercado negro cobra más en los mares avanzados, y los objetos más fuertes solo aparecen en mares avanzados.",
     "man.items.price":"Precio",
     "man.fx.hp":"Vida máx. +{n}",
     "man.fx.lead":"Liderazgo +{n}",
@@ -1497,6 +1512,8 @@ const i18n = {
     'start.pickCaptain':'Elige a tu Capitán',
     'start.solo':'Zarpas en solitario. El resto de huecos de la tripulación se llenan reclutando en los nodos de isla del mapa.',
     'start.go':'Zarpar',
+    'save.continue':'Continuar viaje (mar {s} · {n} tripulantes · {b} ฿)',
+    'save.discard':'Borrar partida',
     'start.counts':'{n} nakamas · {b} jefes · {f} frutas · {s} etapas',
     'load.loading':'Leyendo las cartas de navegación…',
     'load.errorTitle':'Las cartas están dañadas',
@@ -2564,14 +2581,14 @@ function MarketEvent({ g, setG, done }){
   const [rations, setRations] = useState(0);
   const [swapFor, setSwapFor] = useState(null);
   const buy = o => {
-    if (g.berries < o.price || bought.includes(o.id)) return;
+    if (g.berries < itemPrice(g, o) || bought.includes(o.id)) return;
     if (g.items.length >= MAX_ITEMS){ setSwapFor(o); return; }
-    setG(gainItem({ ...g, berries: g.berries - o.price }, o)); setBought([...bought, o.id]);
+    setG(gainItem({ ...g, berries: g.berries - itemPrice(g, o) }, o)); setBought([...bought, o.id]);
   };
-  const doSwap = old => { setG(swapItem(g, old.id, swapFor, swapFor.price)); setBought([...bought, swapFor.id]); setSwapFor(null); };
+  const doSwap = old => { setG(swapItem(g, old.id, swapFor, itemPrice(g, swapFor))); setBought([...bought, swapFor.id]); setSwapFor(null); };
   const ration = () => {
-    if (g.berries < 45) return;
-    setG({ ...g, berries: g.berries - 45, crew: g.crew.map(c => c.hp > 0 ? { ...c, hp: Math.min(c.maxHp, c.hp + Math.round(c.maxHp * .35)) } : c) });
+    if (g.berries < rationPrice(g)) return;
+    setG({ ...g, berries: g.berries - rationPrice(g), crew: g.crew.map(c => c.hp > 0 ? { ...c, hp: Math.min(c.maxHp, c.hp + Math.round(c.maxHp * .35)) } : c) });
     setRations(rations + 1);
   };
   if (swapFor) return html`
@@ -2588,12 +2605,12 @@ function MarketEvent({ g, setG, done }){
         <div key=${o.id} className="offer">
           <div className="item-slot filled" style=${{ width:46, flex:'none' }}><${Ico} n=${o.icon} size=${26}/></div>
           <div className="min-w-0 flex-1"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'17px' }}>${L(o.name)}</div><div className="desc">${L(o.desc)}</div><${ItemTags} it=${o}/></div>
-          <button type="button" className="btn small" disabled=${got || g.berries < o.price} onClick=${() => buy(o)}>${got ? t('market.owned') : o.price + ' ฿'}</button>
+          <button type="button" className="btn small" disabled=${got || g.berries < itemPrice(g, o)} onClick=${() => buy(o)}>${got ? t('market.owned') : itemPrice(g, o) + ' ฿'}</button>
         </div>`; })}
       <div className="offer">
         <div className="item-slot filled" style=${{ width:46, flex:'none', color:'var(--kelp)' }}><${Ico} n="heart" size=${26}/></div>
         <div className="min-w-0 flex-1"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'17px' }}>${t('market.ration')}</div><div className="desc">${t('market.rationDesc')}${rations ? ' ' + t('market.bought', { n: rations }) : ''}</div></div>
-        <button type="button" className="btn small" disabled=${g.berries < 45} onClick=${ration}>45 ฿</button>
+        <button type="button" className="btn small" disabled=${g.berries < rationPrice(g)} onClick=${ration}>${rationPrice(g)} ฿</button>
       </div>
       <button type="button" className="btn ghost" onClick=${done}>${t('common.sail')}</button>
     <//>`;
@@ -2869,7 +2886,7 @@ function ManualScreen({ onClose }){
     <h3>${t('man.g.nodesT')}</h3>
     <div className="man-sub">${['marine', 'pirate', 'market', 'recruit', 'camp', 'chest', 'boss'].map(k => html`
       <div key=${k} className="man-card"><span style=${{ color:TYPES[k].color, flex:'none' }}><${Ico} n=${TYPES[k].icon} size=${34}/></span>
-        <div><div className="nm">${t('type.' + k)}</div><div className="tiny">${t('man.n.' + k, { pct:Math.round(60), n:SETTINGS.leadershipPerStage })}</div></div></div>`)}</div>
+        <div><div className="nm">${t('type.' + k)}</div><div className="tiny">${t('man.n.' + k, { pct:Math.round(60), n:SETTINGS.leadershipPerStage, p:Math.round(SETTINGS.marketInflation * 100) })}</div></div></div>`)}</div>
     <h3>${t('man.g.crewT')}</h3><p>${t('man.g.crew', { slots:SETTINGS.crewSlots, lead:SETTINGS.leadership, n:SETTINGS.leadershipPerStage })}</p>
     <h3>${t('man.g.levelT')}</h3><p>${t('man.g.level', { a:SETTINGS.levelUpAtkMult, h:SETTINGS.levelUpHpMult })}</p>
     <h3>${t('man.g.itemsT')}</h3><p>${t('man.g.items', { max:MAX_ITEMS })}</p>
@@ -2901,7 +2918,7 @@ function ManualScreen({ onClose }){
     <div className="man-sub">${['arm', 'obs', 'con'].map(k => html`<div key=${k} className="man-card"><span className="haki-chip" style=${{ '--hc':HAKI_META[k].color, flex:'none' }}>${HAKI_META[k].glyph}</span><div><div className="nm">${t('haki.' + k)}</div><div className="tiny">${t('haki.' + k + 'D')}</div></div></div>`)}</div>
     <h3>${t('man.c.traitsT')}</h3><p className="dim">${t('man.c.traitsD')}</p>
     <div className="man-sub">${['logia', 'slippery', 'swordmaster', 'giant', 'swift', 'burn', 'dark', 'bind', 'pulse'].map(k => html`<div key=${k} className="man-card" style=${{ flexDirection:'column' }}><div className="nm">${t('trait.' + k)}</div><div className="tiny">${t('trait.' + k + 'D')}</div></div>`)}</div>
-    <h3>${t('man.c.lootT')}</h3><p>${t('man.c.loot', { m:pct(SETTINGS.dropMarine), p:pct(SETTINGS.dropPirate), mm:SETTINGS.marineMult, pm:SETTINGS.pirateMult })}</p>
+    <h3>${t('man.c.lootT')}</h3><p>${t('man.c.loot', { m:pct(SETTINGS.dropMarine), p:pct(SETTINGS.dropPirate), pm:SETTINGS.rewardPirate, bm:SETTINGS.rewardBoss })}</p>
   <//>`;
   const Crew = () => {
     const roles = ['all', 'sword', 'gun', 'brawl', 'tank', 'support', 'mind'];
@@ -2926,13 +2943,13 @@ function ManualScreen({ onClose }){
   };
   const Items = () => html`<${React.Fragment}>
     <p className="dim">${t('man.items.hint', { max:MAX_ITEMS })}</p>
-    ${[['eq', ITEMS.filter(i => i.equip)], ['relic', ITEMS.filter(i => !i.equip)]].map(([k, list]) => html`<${React.Fragment} key=${k}>
+    ${[['eq', ITEMS.filter(i => i.equip && !i.bossDrop)], ['relic', ITEMS.filter(i => !i.equip && !i.bossDrop)], ['trophy', ITEMS.filter(i => i.bossDrop)]].map(([k, list]) => html`<${React.Fragment} key=${k}>
       <h3>${t('man.items.' + k)} (${list.length})</h3><p className="dim">${t('man.items.' + k + 'D')}</p>
-      <div className="man-grid">${list.slice().sort((a, b) => a.price - b.price).map(it => html`
+      <div className="man-grid">${list.slice().sort((a, b) => (a.bossDrop || 0) - (b.bossDrop || 0) || a.price - b.price).map(it => html`
         <div key=${it.id} className="man-card">
           <div className="item-slot filled" style=${{ width:48, height:48, flex:'none' }}><${Ico} n=${it.icon} size=${28}/></div>
           <div className="min-w-0 flex-1"><div className="nm">${L(it.name)}</div><div className="tiny">${L(it.desc)}</div>
-            <div className="man-chips mt-1"><${ItemTags} it=${it}/><span className="chip" style=${{ color:'var(--gold)' }}>${it.price} ฿</span>${it.minStage > 1 ? html`<span className="chip">${t('man.items.from', { n:it.minStage })}</span>` : null}</div></div>
+            <div className="man-chips mt-1"><${ItemTags} it=${it}/>${it.bossDrop ? html`<span className="chip" style=${{ color:'var(--gold)' }}>${t('man.items.drop', { n:it.bossDrop })}</span>` : html`<span className="chip" style=${{ color:'var(--gold)' }}>${it.price} ฿</span>`}${it.minStage > 1 ? html`<span className="chip">${t('man.items.from', { n:it.minStage })}</span>` : null}</div></div>
         </div>`)}</div>
     <//>`)}
   <//>`;
@@ -2973,7 +2990,7 @@ function ManualScreen({ onClose }){
     </div>`;
 }
 
-function StartScreen({ captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
+function StartScreen({ saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
   const caps = NAKAMAS.filter(n => n.captain);
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
   const arch = ARCHETYPES.find(a => a.id === archId) || ARCHETYPES[0];
@@ -3029,13 +3046,29 @@ function StartScreen({ captainId, setCaptainId, avatarId, setAvatarId, archId, s
         <p className="text-sm mt-3 mb-0" style=${{ color:'var(--mist)' }}>${t('start.solo')}</p>
       </div>
       <div className="flex flex-col items-center gap-2">
-        <button type="button" className="btn big" onClick=${onStart}>${t('start.go')}</button>
+        ${saved ? html`<div className="flex gap-2 flex-wrap justify-center items-center mb-2">
+          <button type="button" className="btn big" onClick=${onContinue}>${t('save.continue', { s:saved.stage + 1, n:saved.crew.length, b:saved.berries })}</button>
+          <button type="button" className="btn ghost small" onClick=${onDiscardSave}>${t('save.discard')}</button>
+        </div>` : null}
+        <button type="button" className=${'btn big' + (saved ? ' ghost' : '')} onClick=${onStart}>${t('start.go')}</button>
         <span className="text-xs" style=${{ color:'var(--mist)' }}>${t('start.counts', { n:NAKAMAS.length, b:BOSSES.length, f:FRUITS.length, s:STAGES.length })}</span>
       </div>
     </div>`;
 }
 
 /* ---------- el puente de mando ---------- */
+/* progreso guardado en el navegador (localStorage): cada jugador, en su propio navegador, conserva su partida */
+const SAVE_KEY = 'lp-save-v1';
+function readSave(){
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+    if (!s || !s.g || !s.g.map || !s.g.crew || !s.g.crew.length || s.g.over || !STAGES[s.g.stage]) return null;
+    return s;
+  } catch (e) { return null; }
+}
+function writeSave(g){ try { if (g.over) localStorage.removeItem(SAVE_KEY); else localStorage.setItem(SAVE_KEY, JSON.stringify({ g, auto:BATTLE_PREFS.auto, fast:BATTLE_PREFS.fast })); } catch (e) {} }
+function clearSave(){ try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
+
 function App(){
   const [lang, setLangState] = useState(() => { try { return localStorage.getItem('lp-lang') === 'es' ? 'es' : 'en'; } catch (e) { return 'en'; } });
   LANG = lang;
@@ -3059,8 +3092,10 @@ function App(){
   const [zoom, setZoom] = useState(null);
   const [burst, setBurst] = useState(null);
   const [hover, setHover] = useState(null);
+  const [saved, setSaved] = useState(null);
 
   const goStart = () => {
+    const sv = readSave(); setSaved(sv ? sv.g : null);
     const first = NAKAMAS.find(n => n.captain);
     setCaptainId(first ? first.id : null); setAvatarId(AVATARS[0] ? AVATARS[0].id : null); setArchId(ARCHETYPES[0] ? ARCHETYPES[0].id : null); setSheet(null); setG(null); setModal(null); setBurst(null); setHover(null); setTab('map'); setDismissId(null); setZoom(null); setPhase('start');
   };
@@ -3092,6 +3127,10 @@ function App(){
   };
 
   const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(captainId, { avatarId, archetypeId:archId })); setTab('map'); setPhase('play'); };
+
+  const continueSave = () => { const sv = readSave(); if (!sv) { setSaved(null); return; } BATTLE_PREFS.auto = !!sv.auto; BATTLE_PREFS.fast = !!sv.fast; setG(sv.g); setModal(null); setTab('map'); setPhase('play'); };
+  const discardSave = () => { clearSave(); setSaved(null); };
+  useEffect(() => { if (phase === 'play' && g && !modal) writeSave(g); }, [g, modal, phase]);
 
   const pick = node => {
     if (modal || burst || g.over) return;
@@ -3145,7 +3184,7 @@ function App(){
           </div>
         </main>` : null}
 
-      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} onStart=${start}/></main>` : null}
+      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
 
       ${playing ? html`
         <main className="flex-1 min-h-0 grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)_320px]">

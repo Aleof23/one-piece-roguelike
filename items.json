@@ -1,5 +1,5 @@
 {
- "_help": "items = everything you can find or buy. Two kinds: RELICS (a \"fx\" block, apply to the whole crew while carried) and EQUIPMENT (an \"equip\" block, worn by ONE crew member). fx keys: power, guard, berry, camp (fractions, 0.1 = 10%), hp (flat max HP), lead (leadership), spd (Speed to all), crit/acc/dodge (fractions), charge (special gauge per action), regen (fraction of max HP per round), harm (Harmony points), reveal (1 = weaknesses visible), calm (stun resistance, fraction), ambush (enemy HP lost at start, fraction), loot (extra drop chance), ward (rounds of starting shield), revive (1 = once per battle). equip keys: for (sword|gun|brawl|mind|tank|support|any = who it is auto-assigned to), stats {str,spd,swd,aim,int,def}, atkPct, hpPct, crit, acc, dodge, charge, guardPct, aggro (attack-draw multiplier), pierce (1 = ignores resistances), haki {arm,obs,con} (+levels). Optional: minStage (first sea where it can appear). name/desc accept {en,es}. icon: any built-in icon name.",
+ "_help": "items = everything you can find or buy. Two kinds: RELICS (a \"fx\" block, apply to the whole crew while carried) and EQUIPMENT (an \"equip\" block, worn by ONE crew member). fx keys: power, guard, berry, camp (fractions, 0.1 = 10%), hp (flat max HP), lead (leadership), spd (Speed to all), crit/acc/dodge (fractions), charge (special gauge per action), regen (fraction of max HP per round), harm (Harmony points), reveal (1 = weaknesses visible), calm (stun resistance, fraction), ambush (enemy HP lost at start, fraction), loot (extra drop chance), ward (rounds of starting shield), revive (1 = once per battle). equip keys: for (sword|gun|brawl|mind|tank|support|any = who it is auto-assigned to), stats {str,spd,swd,aim,int,def}, atkPct, hpPct, crit, acc, dodge, charge, guardPct, aggro (attack-draw multiplier), pierce (1 = ignores resistances), haki {arm,obs,con} (+levels). Optional: minStage (first sea where it can appear). name/desc accept {en,es}. icon: any built-in icon name. Items with \"bossDrop\": N are never sold or dropped at random: they are the guaranteed trophy of the boss of sea N (each better than the last). \"price\" is the base price; the Black Market multiplies it as you sail (settings.marketInflation).",
  "items": [
   {
    "id": "log_pose",
@@ -180,11 +180,11 @@
     "es": "Una vez por combate, el primer luchador que cae se levanta con el 35% de vida."
    },
    "icon": "vivre",
-   "price": 260,
+   "price": 450,
    "fx": {
     "revive": 1
    },
-   "minStage": 2
+   "minStage": 3
   },
   {
    "id": "den_den_mushi",
@@ -213,13 +213,13 @@
     "es": "Presencia de mando: más poder, mejor armonía y más liderazgo."
    },
    "icon": "cape",
-   "price": 230,
+   "price": 420,
    "fx": {
     "power": 0.4,
     "harm": 5,
     "lead": 1
    },
-   "minStage": 3
+   "minStage": 4
   },
   {
    "id": "yonko_flag",
@@ -232,12 +232,12 @@
     "es": "Una bandera que aterra: mucho más poder y liderazgo."
    },
    "icon": "flag",
-   "price": 300,
+   "price": 800,
    "fx": {
     "power": 0.59,
     "lead": 2
    },
-   "minStage": 5
+   "minStage": 6
   },
   {
    "id": "seastone_shackle",
@@ -250,11 +250,11 @@
     "es": "Los enemigos empiezan cada combate debilitados (la mitad contra jefes)."
    },
    "icon": "shackle",
-   "price": 260,
+   "price": 420,
    "fx": {
     "ambush": 0.4
    },
-   "minStage": 3
+   "minStage": 4
   },
   {
    "id": "rumble_ball",
@@ -267,12 +267,12 @@
     "es": "Un impulso arriesgado: más poder y velocidad para toda la banda."
    },
    "icon": "pill",
-   "price": 250,
+   "price": 400,
    "fx": {
     "power": 0.49,
     "spd": 3
    },
-   "minStage": 3
+   "minStage": 4
   },
   {
    "id": "bounty_poster",
@@ -285,7 +285,7 @@
     "es": "La fama paga: más berries y más objetos soltados."
    },
    "icon": "poster",
-   "price": 170,
+   "price": 200,
    "fx": {
     "berry": 0.35,
     "loot": 0.12
@@ -323,7 +323,7 @@
     "es": "La mejor hoja del mundo. Gran mejora de esgrima y ATQ."
    },
    "icon": "cross",
-   "price": 340,
+   "price": 700,
    "fx": {},
    "equip": {
     "for": "sword",
@@ -333,7 +333,7 @@
     },
     "atkPct": 0.4
    },
-   "minStage": 4
+   "minStage": 5
   },
   {
    "id": "sandai_kitetsu",
@@ -346,7 +346,7 @@
     "es": "Una hoja maldita: ATQ y críticos enormes, pero resta vida al portador."
    },
    "icon": "demonblade",
-   "price": 240,
+   "price": 360,
    "fx": {},
    "equip": {
     "for": "sword",
@@ -354,7 +354,7 @@
     "hpPct": -0.24,
     "crit": 0.11
    },
-   "minStage": 2
+   "minStage": 3
   },
   {
    "id": "flintlock",
@@ -388,7 +388,7 @@
     "es": "Pop Greens incluidos. Más puntería y críticos."
    },
    "icon": "slingshot",
-   "price": 210,
+   "price": 260,
    "fx": {},
    "equip": {
     "for": "gun",
@@ -410,7 +410,7 @@
     "es": "Balas que encuentran el hueco: ignora las resistencias enemigas."
    },
    "icon": "rifle",
-   "price": 300,
+   "price": 600,
    "fx": {},
    "equip": {
     "for": "gun",
@@ -420,7 +420,7 @@
     "atkPct": 0.26,
     "pierce": 1
    },
-   "minStage": 3
+   "minStage": 4
   },
   {
    "id": "iron_knuckles",
@@ -454,7 +454,7 @@
     "es": "Patadas de fuego. Fuerza, Velocidad y críticos."
    },
    "icon": "boot",
-   "price": 200,
+   "price": 240,
    "fx": {},
    "equip": {
     "for": "brawl",
@@ -476,7 +476,7 @@
     "es": "El clima como arma. Más Inteligencia y los especiales se cargan mucho antes."
    },
    "icon": "staff",
-   "price": 220,
+   "price": 280,
    "fx": {},
    "equip": {
     "for": "mind",
@@ -484,7 +484,8 @@
      "int": 4
     },
     "charge": 14
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "marine_vest",
@@ -519,7 +520,7 @@
     "es": "Atrae los ataques enemigos hacia el portador. Mucha Defensa y vida."
    },
    "icon": "plate",
-   "price": 240,
+   "price": 380,
    "fx": {},
    "equip": {
     "for": "tank",
@@ -529,7 +530,7 @@
     "hpPct": 0.36,
     "aggro": 2
    },
-   "minStage": 2
+   "minStage": 3
   },
   {
    "id": "straw_hat",
@@ -542,7 +543,7 @@
     "es": "Una promesa preciada. Mejora al portador en todo."
    },
    "icon": "strawhat",
-   "price": 330,
+   "price": 900,
    "fx": {},
    "equip": {
     "for": "any",
@@ -554,7 +555,7 @@
     "hpPct": 0.16,
     "charge": 10
    },
-   "minStage": 4
+   "minStage": 6
   },
   {
    "id": "armament_gauntlet",
@@ -567,7 +568,7 @@
     "es": "Enseña al portador el Haki de Armamento (+1 nivel)."
    },
    "icon": "gauntlet",
-   "price": 280,
+   "price": 480,
    "fx": {},
    "equip": {
     "for": "any",
@@ -578,7 +579,7 @@
      "arm": 1
     }
    },
-   "minStage": 3
+   "minStage": 4
   },
   {
    "id": "haki_spyglass",
@@ -591,7 +592,7 @@
     "es": "Enseña al portador el Haki de Observación (+1 nivel)."
    },
    "icon": "spyglass",
-   "price": 260,
+   "price": 420,
    "fx": {},
    "equip": {
     "for": "any",
@@ -600,7 +601,7 @@
     },
     "dodge": 0.09
    },
-   "minStage": 3
+   "minStage": 4
   },
   {
    "id": "conqueror_crest",
@@ -613,7 +614,7 @@
     "es": "Despierta el Haki del Rey (+1 nivel) en el portador: los enemigos débiles se aturden al empezar el combate."
    },
    "icon": "badge",
-   "price": 420,
+   "price": 1200,
    "fx": {},
    "equip": {
     "for": "any",
@@ -621,7 +622,106 @@
      "con": 1
     }
    },
-   "minStage": 5
+   "minStage": 7
+  },
+  {
+   "id": "yata_mirror",
+   "name": {
+    "en": "Yata Mirror",
+    "es": "Espejo Yata"
+   },
+   "desc": {
+    "en": "Trophy of the 5th boss. Light bends around the crew: power, speed and dodge.",
+    "es": "Trofeo del 5.º jefe. La luz se curva alrededor de la banda: poder, velocidad y esquiva."
+   },
+   "icon": "relic",
+   "price": 0,
+   "fx": {
+    "power": 0.12,
+    "spd": 1,
+    "dodge": 0.04
+   },
+   "bossDrop": 5
+  },
+  {
+   "id": "magma_core",
+   "name": {
+    "en": "Magma Core",
+    "es": "Núcleo de magma"
+   },
+   "desc": {
+    "en": "Trophy of the 6th boss. Molten power and faster specials, plus some protection.",
+    "es": "Trofeo del 6.º jefe. Poder fundido y especiales más rápidos, con algo de protección."
+   },
+   "icon": "dialflame",
+   "price": 0,
+   "fx": {
+    "power": 0.18,
+    "guard": 0.06,
+    "charge": 4
+   },
+   "bossDrop": 6
+  },
+  {
+   "id": "soul_cookie",
+   "name": {
+    "en": "Homies' Heart",
+    "es": "Corazón de los Homies"
+   },
+   "desc": {
+    "en": "Trophy of the 7th boss. A crew that fights as one: power, regeneration, harmony and leadership.",
+    "es": "Trofeo del 7.º jefe. Una banda que lucha como una: poder, regeneración, armonía y liderazgo."
+   },
+   "icon": "heart",
+   "price": 0,
+   "fx": {
+    "power": 0.24,
+    "regen": 0.015,
+    "harm": 5,
+    "lead": 1
+   },
+   "bossDrop": 7
+  },
+  {
+   "id": "dragon_scale",
+   "name": {
+    "en": "Dragon Scale",
+    "es": "Escama de dragón"
+   },
+   "desc": {
+    "en": "Trophy of the 8th boss. Start shielded, resist stuns and hit much harder.",
+    "es": "Trofeo del 8.º jefe. Empiezas protegido, resistes aturdimientos y golpeas mucho más fuerte."
+   },
+   "icon": "shield",
+   "price": 0,
+   "fx": {
+    "power": 0.3,
+    "guard": 0.08,
+    "ward": 1,
+    "calm": 0.2
+   },
+   "bossDrop": 8
+  },
+  {
+   "id": "emperor_haori",
+   "name": {
+    "en": "Emperor's Haori",
+    "es": "Haori del Emperador"
+   },
+   "desc": {
+    "en": "Trophy of the 9th boss. The mark of a true Emperor: huge power, protection, crits, a second chance and leadership.",
+    "es": "Trofeo del 9.º jefe. La marca de un verdadero Emperador: poder enorme, protección, críticos, una segunda oportunidad y liderazgo."
+   },
+   "icon": "crown",
+   "price": 0,
+   "fx": {
+    "power": 0.36,
+    "guard": 0.1,
+    "crit": 0.04,
+    "revive": 1,
+    "lead": 1
+   },
+   "bossDrop": 9
   }
  ]
 }
