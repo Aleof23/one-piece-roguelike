@@ -55,6 +55,8 @@
 @keyframes pulse{50%{filter:brightness(1.6)}}
 .sp-btn{font:700 11px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:2px solid #000;border-radius:3px;background:#ffd36b;color:#2a1700;cursor:pointer}.sp-btn.on{background:#ff7a59;color:#fff}
 .foe-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.prot-tag{position:absolute;top:-6px;left:6px;font-size:18px}
+.prot-btn{margin-top:2px;padding:2px 6px;font:600 11px var(--font-ui);letter-spacing:.05em;text-transform:uppercase;border:2px solid #000;border-radius:4px;background:rgba(61,214,160,.14);color:var(--foam);cursor:pointer}.prot-btn.on{background:#3dd6a0;color:#04201a}.prot-btn:disabled{opacity:.4;cursor:not-allowed}
 .stun-tag{position:absolute;top:-6px;right:6px;font-size:18px;animation:spin 1.2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .float{position:absolute;left:50%;top:6px;transform:translateX(-50%);font:700 22px var(--font-display);color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:floatup 1.1s ease-out forwards;pointer-events:none;white-space:nowrap;z-index:5}
@@ -956,6 +958,7 @@ function allyAttack(st, a, f, ev, rnd, o = {}){
   return dmg;
 }
 function foeAttack(st, f, a, ev, rnd, mult = 1){
+  if (a.prot) { ev.push({ t:'block', src:f.id, dst:a.id }); return; }
   const dodge = clamp(.02 * a.stats.spd + .07 * a.haki.obs + (a.logia ? .1 : 0) + (a.dodgeB || 0), 0, .6);
   if (rnd() < dodge) { ev.push({ t:'miss', src:f.id, dst:a.id, side:'f', foresee:a.haki.obs > 0 }); a.gauge = Math.min(100, a.gauge + 4); return; }
   const red = a.stats.def / (a.stats.def + 14);
@@ -1003,11 +1006,11 @@ function foeAct(st, f, ev, rnd){
   if (f.traits.includes('pulse') && st.round % 3 === 2) {
     const conA = aliveA(st).filter(a => a.haki.con > 0);
     ev.push({ t:'pulse', id:f.id });
-    aliveA(st).forEach(a => { if (!a.haki.con && rnd() < (a.stats.int >= 7 ? .2 : .4) * (1 - st.calm)) { a.stun = Math.max(a.stun, 1); ev.push({ t:'stun', id:a.id, side:'a', haki:true }); } });
+    aliveA(st).forEach(a => { if (!a.prot && !a.haki.con && rnd() < (a.stats.int >= 7 ? .2 : .4) * (1 - st.calm)) { a.stun = Math.max(a.stun, 1); ev.push({ t:'stun', id:a.id, side:'a', haki:true }); } });
     if (conA.length) { const d = Math.round(f.maxHp * .04 * conA.reduce((s, a) => s + a.haki.con, 0)); f.hp = Math.max(1, f.hp - d); ev.push({ t:'haki', kind:'clash', id:f.id, dmg:d }); }
   }
   if (f.traits.includes('bind') && st.round % 3 === 0) {
-    const t = aliveA(st).filter(a => !a.stun).sort((x, y) => y.atk - x.atk)[0];
+    const t = aliveA(st).filter(a => !a.stun && !a.prot).sort((x, y) => y.atk - x.atk)[0];
     if (t) { if (t.haki.obs >= 2 || t.stats.spd >= 8 || rnd() < st.calm) ev.push({ t:'evade', id:t.id }); else { t.stun = 1; ev.push({ t:'bind', id:t.id }); } }
   }
   let n = f.traits.includes('swift') ? 2 : 1;
@@ -1041,6 +1044,9 @@ function stepRound(st, orders = {}, rnd = Math.random){
   const ev = []; st.round++; st.rounds = st.round;
   if (orders.stance) st.stance = orders.stance;
   ev.push({ t:'round', n:st.round, stance:st.stance });
+  st.allies.forEach(a => { a.prot = false; });
+  const pu = orders.protect && st.allies.find(a => a.id === orders.protect);
+  if (pu && pu.hp > 0 && !(pu.stun > 0) && pu.protLast !== st.round - 1) { pu.prot = true; pu.protLast = st.round; ev.push({ t:'protect', id:pu.id }); }
   if (st.round === 1) openingHaki(st, ev, rnd);
   if (st.round === 1) endCheck(st);
   const actors = [...st.allies.map(u => ({ u, side:'a', k:u.stats.spd + rnd() * 3 })), ...st.foes.map(u => ({ u, side:'f', k:u.spd + rnd() * 3 }))].sort((x, y) => y.k - x.k);
@@ -1051,7 +1057,8 @@ function stepRound(st, orders = {}, rnd = Math.random){
     if (u.stun > 0) { u.stun--; if (u.stunImm > 0 && side === 'f') u.stunImm--; ev.push({ t:'skip', id:u.id, side }); continue; }
     if (side === 'a') {
       const ready = u.gauge >= 100;
-      if (ready && (orders.auto || (orders.fire || []).includes(u.id))) special(st, u, orders, ev, rnd);
+      if (u.prot) { /* se protege: no ataca ni lanza especial */ }
+      else if (ready && (orders.auto || (orders.fire || []).includes(u.id))) special(st, u, orders, ev, rnd);
       else allyAttack(st, u, pickFoe(st, u, orders, rnd), ev, rnd);
       u.gauge = Math.min(100, u.gauge + 16 * sm.gauge + (u.charge || 0));
     } else foeAct(st, u, ev, rnd);
@@ -1064,6 +1071,7 @@ function stepRound(st, orders = {}, rnd = Math.random){
       const t = aliveA(st).slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
       if (t && t.hp < t.maxHp) { const h = Math.min(t.maxHp - t.hp, Math.round(t.maxHp * (.05 + .006 * s.stats.int))); t.hp += h; ev.push({ t:'heal', id:t.id, n:h, src:s.id }); }
     });
+    st.allies.forEach(a => { a.prot = false; });
     st.shield = Math.max(0, st.shield - 1); st.foes.forEach(f => { if (f.vuln > 0) f.vuln--; });
     if (st.round >= MAX_ROUNDS) st.over = 'lose';
   }
@@ -1090,7 +1098,12 @@ function smartOrders(st){
     if (a.frole === 'tank') return !!boss || ar < .75;
     return true;
   }).map(a => a.id);
-  return { stance, focus, fire };
+  let protect = null;
+  if (boss || fs.length >= 2) {
+    const wk = as.filter(a => a.protLast !== st.round && a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    if (wk && as.length > 1) protect = wk.id;
+  }
+  return { stance, focus, fire: fire.filter(id => id !== protect), protect };
 }
 const cloneSt = st => JSON.parse(JSON.stringify(st));
 function autoBattle(g, node, st0){
@@ -1227,7 +1240,7 @@ const i18n = {
     "man.g.tips4":"Rest at camps when your crew is hurt, and heal with rations before a boss.",
     "man.c.flowT":"How a fight works",
     "man.c.flow":"A fight is a real battle played in rounds. Before it starts you see the enemies and an estimated win chance. In each round every living fighter acts once, in order of Speed (with a little luck). Allies attack a foe; foes attack random allies, favouring tanks and brawlers. The fight ends when all enemies fall (victory) or all allies are K.O. (defeat). After {r} rounds the crew is overwhelmed, which counts as defeat.",
-    "man.c.orders":"Your orders: pick a stance each round, tap an enemy to focus everyone on it, and tap a charged special to fire it. Or press Auto to let the crew decide, Fast to speed up the animation, and Resolve now to skip to the end.",
+    "man.c.orders":"Your orders: pick a stance each round, tap an enemy to focus everyone on it, and tap a charged special to fire it. Press Protect on a nakama to make them skip their attack and avoid all damage that round (never two rounds in a row). Or press Auto to let the crew decide, Fast to speed up the animation, and Resolve now to skip to the end.",
     "man.c.dmgT":"Damage, hits and crits",
     "man.c.dmg1":"An attack’s power comes from the fighter’s ATK, boosted by the skill stat of their fighting style (Swordsmanship for blades, Marksmanship for guns, Strength for blows, Intelligence for arcane).",
     "man.c.dmg2":"Swords and guns can miss (more likely against fast enemies); blows are more reliable; arcane attacks almost never miss. Crits deal ×1.6.",
@@ -1442,7 +1455,8 @@ const i18n = {
     "bt.fast":"Fast",
     "bt.skip":"Resolve now",
     "bt.focus":"Focus",
-    "bt.focusHelp":"Tap an enemy to focus it. Tap a charged special to fire it.",
+    "bt.focusHelp":"Tap an enemy to focus it. Tap a charged special to fire it. Use Protect to shield a nakama this round.",
+    "bt.protect":"Protect", "bt.protectOn":"Protecting", "bt.protectCd":"Can't protect twice in a row", "bt.protectTip":"This nakama doesn't act this round and takes no damage if targeted. Can't be used two rounds in a row.", "bt.blocked":"Blocked!", "bt.protecting":"Shielded", "log.protect":"{a} braces and protects", "log.block":"{b} blocks {a}'s attack",
     "bt.noFocus":"No focus — crew picks its own targets",
     "bt.ready":"READY",
     "bt.stun":"Stunned",
@@ -1604,7 +1618,7 @@ const i18n = {
     "man.g.tips4":"Descansa en los camps cuando estés herido y cura con raciones antes de un jefe.",
     "man.c.flowT":"Cómo funciona un combate",
     "man.c.flow":"Un combate es una batalla real por rondas. Antes de empezar ves a los enemigos y la probabilidad estimada de victoria. En cada ronda actúa una vez cada luchador vivo, por orden de Velocidad (con algo de suerte). Los aliados atacan a un enemigo; los enemigos atacan a aliados al azar, con preferencia por los tanques y luchadores. Termina cuando caen todos los enemigos (victoria) o todos los aliados quedan K.O. (derrota). Tras {r} rondas la tripulación se ve desbordada, y cuenta como derrota.",
-    "man.c.orders":"Tus órdenes: elige una postura cada ronda, toca a un enemigo para que todos le ataquen y toca un especial cargado para lanzarlo. O pulsa Auto para que la tripulación decida, Rápido para acelerar y Resolver ya para saltar al final.",
+    "man.c.orders":"Tus órdenes: elige una postura cada ronda, toca a un enemigo para que todos le ataquen y toca un especial cargado para lanzarlo. Pulsa Proteger en un nakama para que no ataque y esquive todo el daño esa ronda (nunca dos rondas seguidas). O pulsa Auto para que la tripulación decida, Rápido para acelerar y Resolver ya para saltar al final.",
     "man.c.dmgT":"Daño, aciertos y críticos",
     "man.c.dmg1":"La fuerza de un ataque sale del ATQ del luchador, potenciado por la estadística de su estilo (Esgrima para espadas, Puntería para armas de fuego, Fuerza para golpes, Inteligencia para lo arcano).",
     "man.c.dmg2":"Las espadas y las armas pueden fallar (más contra enemigos rápidos); los golpes son más fiables; lo arcano casi nunca falla. Un crítico hace ×1,6.",
@@ -1819,7 +1833,8 @@ const i18n = {
     "bt.fast":"Rápido",
     "bt.skip":"Resolver ya",
     "bt.focus":"Objetivo",
-    "bt.focusHelp":"Toca un enemigo para fijarlo. Toca un especial cargado para lanzarlo.",
+    "bt.focusHelp":"Toca un enemigo para fijarlo. Toca un especial cargado para lanzarlo. Usa Proteger para resguardar a un nakama esta ronda.",
+    "bt.protect":"Proteger", "bt.protectOn":"Protegiendo", "bt.protectCd":"No puede proteger dos rondas seguidas", "bt.protectTip":"Este nakama no actúa esta ronda y no recibe daño si es el objetivo. No se puede usar dos rondas seguidas.", "bt.blocked":"¡Bloqueado!", "bt.protecting":"Protegido", "log.protect":"{a} se cubre y se protege", "log.block":"{b} bloquea el ataque de {a}",
     "bt.noFocus":"Sin objetivo: la tripulación elige sola",
     "bt.ready":"LISTO",
     "bt.stun":"Aturdido",
@@ -2528,7 +2543,7 @@ function FoeFace({ f, size }){
   const col = marine ? '#5aa9ff' : '#ff5d47';
   return html`<span className="foe-face" style=${{ width:size, height:size, '--fc':col }}><${Ico} n=${marine ? 'shield' : 'skull'} size=${size * .62} sw=${1.8}/></span>`;
 }
-function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire }){
+function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire, canProtect, protectOn, protectCd, onProtect }){
   const dead = u.hp <= 0, pct = Math.max(0, u.hp / u.maxHp * 100), tone = pct > 55 ? '' : pct > 25 ? 'mid' : 'low';
   const cls = ['bunit', side, dead ? 'dead' : '', anim && anim[u.id] ? 'a-' + anim[u.id] : '', u.stun > 0 ? 'stunned' : '', focus === u.id ? 'focus' : '', u.haki && u.haki.arm ? 'has-arm' : '', u.haki && u.haki.obs ? 'has-obs' : '', u.haki && u.haki.con ? 'has-con' : ''].join(' ');
   const weakK = side === 'f' && (st.revealed || known[u.id]);
@@ -2537,6 +2552,7 @@ function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firi
       <div className="bface">
         ${side === 'a' ? html`<${Face} look=${u.look} color=${u.color} size=${54} avatar=${u.avatar}/>` : html`<${FoeFace} f=${u} size=${u.boss ? 66 : 54}/>`}
         ${u.stun > 0 && !dead ? html`<span className="stun-tag">💫</span>` : null}
+        ${u.prot && !dead ? html`<span className="prot-tag">🛡</span>` : null}
         ${(floats || []).filter(x => x.id === u.id).map(x => html`<span key=${x.k} className=${'float ' + x.cls}>${x.text}</span>`)}
       </div>
       <div className="bname truncate">${side === 'f' ? (u.boss ? bossName(STAGES[0] && STAGES.map(s => s.boss).find(b => b.id === u.bossId)) : L(u.name)) : L(u.name)}</div>
@@ -2544,7 +2560,8 @@ function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firi
       ${side === 'a' ? html`
         <div className=${'gauge' + (u.gauge >= 100 ? ' full' : '')}><i style=${{ width:Math.min(100, u.gauge) + '%' }}></i></div>
         <div className="flex items-center justify-between"><${HakiChips} h=${u.haki} small=${true}/>
-          ${!dead && fireable ? html`<button type="button" className=${'sp-btn' + (firing ? ' on' : '')} onClick=${e => { e.stopPropagation(); onFire(u.id); }}>${t('bt.ready')} · ${t('sp.' + u.frole)}</button>` : null}</div>`
+          ${!dead && fireable ? html`<button type="button" className=${'sp-btn' + (firing ? ' on' : '')} onClick=${e => { e.stopPropagation(); onFire(u.id); }}>${t('bt.ready')} · ${t('sp.' + u.frole)}</button>` : null}</div>
+        ${!dead && canProtect ? html`<button type="button" disabled=${protectCd} title=${protectCd ? t('bt.protectCd') : t('bt.protectTip')} className=${'prot-btn' + (protectOn ? ' on' : '')} onClick=${e => { e.stopPropagation(); onProtect(u.id); }}>🛡 ${protectOn ? t('bt.protectOn') : t('bt.protect')}</button>` : null}`
       : html`<div className="foe-tags">
           ${weakK ? html`${u.weak ? html`<span className="tg weak" title=${t('bt.weak')}>▲ ${t('style.' + u.weak)}</span>` : null}${u.resist ? html`<span className="tg res" title=${t('bt.resist')}>▼ ${t('style.' + u.resist)}</span>` : null}` : html`<span className="tg unk" title=${t('bt.unknown')}>? ?</span>`}
           ${u.traits.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}
@@ -2590,6 +2607,8 @@ function showEvent(e, v, fx){
     case 'roar': A(e.id, 'special'); fx.banner = { text:t('bt.roar'), color:'#ff5d47' }; fx.log.push(t('bt.roar')); d = 1.1; break;
     case 'enrage': A(e.id, 'special'); fx.banner = { text:t('bt.enrage'), color:'#ff5d47' }; fx.log.push(t('bt.enrage')); d = 1.2; break;
     case 'bind': A(e.id, 'stun'); { const u = unit(e.id); if (u) u.stun = 1; } fx.banner = { text:t('bt.bind'), color:'#ff7a59' }; d = .9; break;
+    case 'protect': { const u = unit(e.id); if (u) u.prot = true; A(e.id, 'shield'); flt(e.id, t('bt.protecting'), 'obs'); fx.log.push(t('log.protect', { a:evName(v, e.id) })); d = .8; break; }
+    case 'block': A(e.dst, 'shield'); A(e.src, 'act'); flt(e.dst, t('bt.blocked'), 'heal'); fx.log.push(t('log.block', { a:evName(v, e.src), b:evName(v, e.dst) })); d = .9; break;
     case 'evade': flt(e.id, t('bt.evade'), 'obs'); d = .6; break;
     case 'haki': {
       if (e.kind === 'con') { fx.overlay = { kind:'con', text:t('bt.hakiCon') }; fx.log.push(t('bt.hakiCon')); d = 2.6; }
@@ -2612,6 +2631,7 @@ function BattleArena({ init, onEnd, boss }){
   const [stance, setStance] = useState('bal');
   const [focus, setFocus] = useState(null);
   const [fire, setFire] = useState([]);
+  const [protect, setProtect] = useState(null);
   const [auto, setAutoS] = useState(() => !boss && BATTLE_PREFS.auto);
   const [fast, setFastS] = useState(() => !boss && BATTLE_PREFS.fast);
   const setAuto = fn => setAutoS(a => { const v = typeof fn === 'function' ? fn(a) : fn; if (!boss) BATTLE_PREFS.auto = v; return v; });
@@ -2629,8 +2649,8 @@ function BattleArena({ init, onEnd, boss }){
   const play = (forceAuto) => {
     if (busy || st.over) return;
     const next = cloneSt(st);
-    const ev = stepRound(next, forceAuto ? { ...autoOrders(next), focus } : { stance, focus, fire, auto });
-    setBusy(true); setFire([]);
+    const ev = stepRound(next, forceAuto ? { ...autoOrders(next), focus } : { stance, focus, fire: fire.filter(x => x !== protect), protect, auto });
+    setBusy(true); setFire([]); setProtect(null);
     const v = cloneSt(st), kn = { ...known };
     let i = 0; const base = fast ? 260 : 520;
     const tick = () => {
@@ -2648,6 +2668,7 @@ function BattleArena({ init, onEnd, boss }){
   };
   useEffect(() => { if (auto && !busy && !st.over) { const id = setTimeout(() => play(false), fast ? 150 : 450); return () => clearTimeout(id); } }, [auto, busy, st, fast]);
   const resolveNow = () => { if (busy) return; const fin = cloneSt(st); let n = 0; while (!fin.over && n++ < MAX_ROUNDS + 2) stepRound(fin, { ...autoOrders(fin), focus }); setSt(fin); setView(fin); onEnd(fin); };
+  const toggleProtect = id => setProtect(p => p === id ? null : id);
   const toggleFire = id => setFire(f => f.includes(id) ? f.filter(x => x !== id) : [...f, id]);
   const pickFocus = id => setFocus(f => f === id ? null : id);
   const over = st.over && !busy;
@@ -2662,7 +2683,7 @@ function BattleArena({ init, onEnd, boss }){
         <div className="side crew-side"><div className="side-title">${t('bt.crew')} · ${t('harm.title')} ${st.H > 0 ? '+' : ''}${st.H}%</div>
           <div className="units">${view.allies.map(a => {
             const real = st.allies.find(x => x.id === a.id) || a;
-            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire}/>`; })}</div></div>
+            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${real.protLast === st.round} onProtect=${toggleProtect}/>`; })}</div></div>
       </div>
       <div className="battle-log" aria-live="polite">${log.slice(-5).map((l, i, arr) => html`<div key=${log.length - arr.length + i} className=${i === arr.length - 1 ? 'last' : ''}>${l}</div>`)}${log.length === 0 ? html`<div>${t('bt.focusHelp')}</div>` : null}</div>
       ${!st.over ? html`
