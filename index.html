@@ -890,10 +890,11 @@ function battleInit(g, node){
   st.revealed = st.tactician || m.reveal > 0 || st.allies.some(a => a.haki.obs > 0);
   return st;
 }
-const STANCES = { bal:{ dmg:1, taken:1, gauge:1 }, atk:{ dmg:1.25, taken:1.2, gauge:1 }, def:{ dmg:.85, taken:.72, gauge:1.5 } };
+/* ataque: equilibrado / rapido (menos daño, actua antes, carga mas el especial y esquiva mas) / poderoso (mas daño, actua despues, carga menos) */
+const STANCES = { bal:{ dmg:1, taken:1, gauge:1, init:0, dodge:0 }, fast:{ dmg:.8, taken:1, gauge:1.35, init:4, dodge:.08 }, pow:{ dmg:1.35, taken:1, gauge:.8, init:-4, dodge:0 } };
 function stanceMods(st){
   const b = STANCES[st.stance] || STANCES.bal, k = st.tactician ? 1.5 : 1;
-  return { dmg:1 + (b.dmg - 1) * k, taken:1 + (b.taken - 1) * k, gauge:b.gauge };
+  return { dmg:1 + (b.dmg - 1) * k, taken:1 + (b.taken - 1) * k, gauge:b.gauge, init:b.init * k, dodge:b.dodge * k };
 }
 const aliveA = st => st.allies.filter(a => a.hp > 0), aliveF = st => st.foes.filter(f => f.hp > 0);
 function styleMult(f, a){
@@ -959,7 +960,7 @@ function allyAttack(st, a, f, ev, rnd, o = {}){
 }
 function foeAttack(st, f, a, ev, rnd, mult = 1){
   if (a.prot) { ev.push({ t:'block', src:f.id, dst:a.id }); return; }
-  const dodge = clamp(.02 * a.stats.spd + .07 * a.haki.obs + (a.logia ? .1 : 0) + (a.dodgeB || 0), 0, .6);
+  const dodge = clamp(.02 * a.stats.spd + .07 * a.haki.obs + (a.logia ? .1 : 0) + (a.dodgeB || 0) + stanceMods(st).dodge, 0, .6);
   if (rnd() < dodge) { ev.push({ t:'miss', src:f.id, dst:a.id, side:'f', foresee:a.haki.obs > 0 }); a.gauge = Math.min(100, a.gauge + 4); return; }
   const red = a.stats.def / (a.stats.def + 14);
   const crit = rnd() < (f.traits.includes('swordmaster') ? .25 : .06);
@@ -1049,7 +1050,7 @@ function stepRound(st, orders = {}, rnd = Math.random){
   if (pu && pu.hp > 0 && !(pu.stun > 0) && pu.protLast !== st.round - 1) { pu.prot = true; pu.protLast = st.round; ev.push({ t:'protect', id:pu.id }); }
   if (st.round === 1) openingHaki(st, ev, rnd);
   if (st.round === 1) endCheck(st);
-  const actors = [...st.allies.map(u => ({ u, side:'a', k:u.stats.spd + rnd() * 3 })), ...st.foes.map(u => ({ u, side:'f', k:u.spd + rnd() * 3 }))].sort((x, y) => y.k - x.k);
+  const actors = [...st.allies.map(u => ({ u, side:'a', k:u.stats.spd + rnd() * 3 + stanceMods(st).init })), ...st.foes.map(u => ({ u, side:'f', k:u.spd + rnd() * 3 }))].sort((x, y) => y.k - x.k);
   const sm = stanceMods(st);
   for (const { u, side } of actors) {
     if (st.over) break;
@@ -1081,7 +1082,7 @@ function stepRound(st, orders = {}, rnd = Math.random){
 function autoOrders(st){
   const ar = aliveA(st).reduce((s, a) => s + a.hp, 0) / Math.max(1, st.allies.reduce((s, a) => s + a.maxHp, 0));
   const fr = aliveF(st).reduce((s, f) => s + f.hp, 0) / Math.max(1, st.foes.reduce((s, f) => s + f.maxHp, 0));
-  return { stance: ar < .4 && fr > .3 ? 'def' : fr < .45 || ar > .75 ? 'atk' : 'bal', auto:true };
+  return { stance: ar < .4 && fr > .3 ? 'fast' : fr < .45 || ar > .75 ? 'pow' : 'bal', auto:true };
 }
 /* ordenes de un jugador atento: postura segun el estado, foco en el enemigo mas debil y especiales con criterio */
 function smartOrders(st){
@@ -1090,7 +1091,7 @@ function smartOrders(st){
   const fr = fs.reduce((s, f) => s + f.hp, 0) / Math.max(1, st.foes.reduce((s, f) => s + f.maxHp, 0));
   const boss = fs.find(f => f.boss);
   const roarNext = boss && ((st.round + 1) % SETTINGS.bossRoarEvery === 0);
-  const stance = ar < .4 && fr > .25 ? 'def' : (roarNext && ar < .8) ? 'def' : fr < .5 || ar > .8 ? 'atk' : 'bal';
+  const stance = ar < .4 && fr > .25 ? 'fast' : (roarNext && ar < .8) ? 'fast' : fr < .5 || ar > .8 ? 'pow' : 'bal';
   const focus = fs.length > 1 ? fs.slice().sort((x, y) => x.hp - y.hp)[0].id : null;
   const fire = as.filter(a => a.gauge >= 100).filter(a => {
     if (a.frole === 'support') return ar < .7;
@@ -1236,7 +1237,7 @@ const i18n = {
     "man.g.tips1":"Mix roles: a balanced crew gains a Harmony bonus; stacking the same role is penalized.",
     "man.g.tips2":"Check the matchup before a fight: the estimated win chance and each enemy’s weakness (Observation Haki reveals them).",
     "bt.roar":"ROAR! The boss hits everyone","bt.enrage":"ENRAGED!",
-    "man.g.tips3":"Bosses hit several times per round, roar at the whole crew every third round. Brace (Defend) before the roar and focus the weak spot. Enemies grow with the size of your crew, so recruit for balance, not for numbers.",
+    "man.g.tips3":"Bosses hit several times per round, roar at the whole crew every third round. Use Protect on a wounded nakama before the roar and focus the weak spot. Enemies grow with the size of your crew, so recruit for balance, not for numbers.",
     "man.g.tips4":"Rest at camps when your crew is hurt, and heal with rations before a boss.",
     "man.c.flowT":"How a fight works",
     "man.c.flow":"A fight is a real battle played in rounds. Before it starts you see the enemies and an estimated win chance. In each round every living fighter acts once, in order of Speed (with a little luck). Allies attack a foe; foes attack random allies, favouring tanks and brawlers. The fight ends when all enemies fall (victory) or all allies are K.O. (defeat). After {r} rounds the crew is overwhelmed, which counts as defeat.",
@@ -1403,11 +1404,11 @@ const i18n = {
     "trait.bindD":"Binds your strongest fighter every 3rd round.",
     "trait.pulseD":"Conqueror's pulse stuns the crew every 3rd round unless they have Conqueror's Haki or high Intelligence.",
     "stance.bal":"Balanced",
-    "stance.atk":"All-out",
-    "stance.def":"Guarded",
+    "stance.fast":"Quick attack",
+    "stance.pow":"Power attack",
     "stance.balD":"Normal damage dealt and taken.",
-    "stance.atkD":"+25% damage dealt, +20% damage taken.",
-    "stance.defD":"−15% damage dealt, −28% damage taken, specials charge faster.",
+    "stance.fastD":"−20% damage, but your crew strikes first, dodges more and charges specials faster.",
+    "stance.powD":"+35% damage, but your crew strikes last and charges specials slower.",
     "harm.title":"Harmony",
     "harm.div":"Variety of roles",
     "harm.syn":"Front line + back line",
@@ -1614,7 +1615,7 @@ const i18n = {
     "man.g.tips1":"Mezcla roles: un equipo equilibrado gana bonus de Armonía; repetir el mismo rol se penaliza.",
     "man.g.tips2":"Mira el enfrentamiento antes de luchar: la probabilidad de victoria y la debilidad de cada enemigo (el Haki de Observación las revela).",
     "bt.roar":"¡RUGIDO! El jefe golpea a todos","bt.enrage":"¡ENFURECIDO!",
-    "man.g.tips3":"Los jefes golpean varias veces por ronda y rugen contra toda la banda cada tres rondas. Defiéndete antes del rugido y céntrate en el punto débil. Los enemigos crecen con el tamaño de tu banda: recluta por equilibrio, no por cantidad.",
+    "man.g.tips3":"Los jefes golpean varias veces por ronda y rugen contra toda la banda cada tres rondas. Protege a un herido antes del rugido y céntrate en el punto débil. Los enemigos crecen con el tamaño de tu banda: recluta por equilibrio, no por cantidad.",
     "man.g.tips4":"Descansa en los camps cuando estés herido y cura con raciones antes de un jefe.",
     "man.c.flowT":"Cómo funciona un combate",
     "man.c.flow":"Un combate es una batalla real por rondas. Antes de empezar ves a los enemigos y la probabilidad estimada de victoria. En cada ronda actúa una vez cada luchador vivo, por orden de Velocidad (con algo de suerte). Los aliados atacan a un enemigo; los enemigos atacan a aliados al azar, con preferencia por los tanques y luchadores. Termina cuando caen todos los enemigos (victoria) o todos los aliados quedan K.O. (derrota). Tras {r} rondas la tripulación se ve desbordada, y cuenta como derrota.",
@@ -1781,11 +1782,11 @@ const i18n = {
     "trait.bindD":"Ata a tu mejor luchador cada 3 rondas.",
     "trait.pulseD":"Un pulso del Haki del Rey aturde a la tripulación cada 3 rondas, salvo con Haki del Rey o mucha Inteligencia.",
     "stance.bal":"Equilibrada",
-    "stance.atk":"Ofensiva",
-    "stance.def":"Defensiva",
+    "stance.fast":"Ataque rápido",
+    "stance.pow":"Ataque poderoso",
     "stance.balD":"Daño normal dado y recibido.",
-    "stance.atkD":"+25% de daño dado, +20% de daño recibido.",
-    "stance.defD":"−15% de daño dado, −28% de daño recibido, los especiales cargan más rápido.",
+    "stance.fastD":"−20% de daño, pero tu banda golpea primero, esquiva más y carga antes los especiales.",
+    "stance.powD":"+35% de daño, pero tu banda golpea la última y carga más despacio los especiales.",
     "harm.title":"Armonía",
     "harm.div":"Variedad de roles",
     "harm.syn":"Vanguardia + retaguardia",
@@ -2688,7 +2689,7 @@ function BattleArena({ init, onEnd, boss }){
       <div className="battle-log" aria-live="polite">${log.slice(-5).map((l, i, arr) => html`<div key=${log.length - arr.length + i} className=${i === arr.length - 1 ? 'last' : ''}>${l}</div>`)}${log.length === 0 ? html`<div>${t('bt.focusHelp')}</div>` : null}</div>
       ${!st.over ? html`
         <div className="ctl">
-          <div className="stances" role="radiogroup">${['bal', 'atk', 'def'].map(k => html`<button key=${k} type="button" role="radio" aria-checked=${stance === k} disabled=${busy} className=${'stance' + (stance === k ? ' on' : '')} title=${t('stance.' + k + 'D')} onClick=${() => setStance(k)}><b>${t('stance.' + k)}</b><small>${t('stance.' + k + 'D')}</small></button>`)}</div>
+          <div className="stances" role="radiogroup">${['bal', 'fast', 'pow'].map(k => html`<button key=${k} type="button" role="radio" aria-checked=${stance === k} disabled=${busy} className=${'stance' + (stance === k ? ' on' : '')} title=${t('stance.' + k + 'D')} onClick=${() => setStance(k)}><b>${t('stance.' + k)}</b><small>${t('stance.' + k + 'D')}</small></button>`)}</div>
           <div className="flex flex-wrap gap-2 items-center">
             <button type="button" className="btn" disabled=${busy || auto} onClick=${() => play(false)}>${t('bt.next')}</button>
             <button type="button" className=${'btn ghost small'} aria-pressed=${auto} onClick=${() => setAuto(a => !a)}>${auto ? t('bt.autoOn') : t('bt.auto')}</button>
@@ -3114,7 +3115,7 @@ function ManualScreen({ onClose }){
     <div className="man-sub">${['sword', 'gun', 'brawl', 'tank', 'support', 'mind'].map(r => html`<div key=${r} className="man-card" style=${{ flexDirection:'column' }}><div className="man-chips"><${RoleChip} role=${r}/><span className="tiny">${t('style.' + ROLE_STYLE[r])}</span></div><div className="tiny"><b style=${{ color:'var(--gold)' }}>${t('sp.' + r)}</b> · ${t('spd.' + r)}</div></div>`)}</div>
     <h3>${t('man.c.styleT')}</h3><p>${t('man.c.style')}</p>
     <h3>${t('man.c.stanceT')}</h3>
-    <div className="man-sub">${['bal', 'atk', 'def'].map(k => html`<div key=${k} className="man-card" style=${{ flexDirection:'column' }}><div className="nm">${t('stance.' + k)}</div><div className="tiny">${t('stance.' + k + 'D')}</div></div>`)}</div>
+    <div className="man-sub">${['bal', 'fast', 'pow'].map(k => html`<div key=${k} className="man-card" style=${{ flexDirection:'column' }}><div className="nm">${t('stance.' + k)}</div><div className="tiny">${t('stance.' + k + 'D')}</div></div>`)}</div>
     <h3>${t('man.c.specialT')}</h3><p>${t('man.c.special')}</p>
     <h3>${t('man.c.harmT')}</h3><p>${t('man.c.harm1')}</p><p>${t('man.c.harm2', { p:STACK_PEN })}</p>
     <p className="dim">${t('man.c.harm3', ROLE_CAP)}</p>
