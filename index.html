@@ -115,6 +115,16 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 @media (max-width:640px){.man-wrap{padding:0}.man{max-height:100%;border-radius:0}.man-head h2{font-size:26px}}
 
 /* ===== pulido visual v6 ===== */
+.hc-toggle{display:flex;gap:10px;align-items:center;justify-content:center;padding:8px 12px;margin-bottom:10px;border:2px dashed #b3261a;border-radius:4px;color:var(--foam);cursor:pointer;font-size:14px}
+.hc-toggle input{width:18px;height:18px;accent-color:#ff5d47;flex:none}
+.hc-toggle b{color:#ff8a78}
+.gear-card{padding:8px;border:2px solid #000;border-radius:4px;background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(0,0,0,.28));box-shadow:inset 0 0 0 1px var(--line)}
+.gear-card .man-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.gear-who{padding:0;border:2px solid #000;border-radius:4px;background:none;cursor:pointer;opacity:.6;line-height:0;transition:opacity .12s,transform .12s}
+.gear-who .face{display:block;border-radius:2px}
+.gear-who:hover:not(:disabled){opacity:1;transform:translateY(-1px)}
+.gear-who.on{opacity:1;box-shadow:0 0 0 2px var(--gold)}
+.hc-chip{font:700 12px var(--font-ui);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:#b3261a;border:2px solid #000;border-radius:3px;padding:0 6px}
 .panel{background:radial-gradient(ellipse at 50% -10%,#14405a 0,transparent 55%),linear-gradient(180deg,var(--hull),#081d28);box-shadow:inset 0 0 0 2px var(--line),inset 0 1px 0 rgba(255,255,255,.07),0 10px 28px rgba(0,0,0,.45)}
 .crew-card{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(0,0,0,.28));transition:transform .15s,box-shadow .15s}
 .crew-card:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px var(--gold),0 4px 12px rgba(0,0,0,.4)}
@@ -467,7 +477,7 @@ function buildData(raw){
       const r = RANKS[s.bossRank] || RANKS.pirate;
       boss = { id:'placeholder_' + id, rank:s.bossRank, name:null, title:'', bounty:r.bounty, powerMult:1, traits:[], haki:[], speed:5, desc:null, color:r.color, look:(i * 5 + 1) % 6, avatar:null, placeholder:true };
     }
-    return { id, name:s.name || id, bossRank:s.bossRank, boss, powerMult:num(s.powerMult, 1 + i * .7), sea:Array.isArray(s.sea) && s.sea.length >= 2 ? s.sea : ['#0d4a5c', '#06222d'], enemies:s.enemies || null };
+    return { id, name:s.name || id, bossRank:s.bossRank, boss, powerMult:num(s.powerMult, 1 + i * .7), bossMult:s.bossMult != null ? num(s.bossMult, 1) : null, rewardMult:s.rewardMult != null ? num(s.rewardMult, 1) : null, sea:Array.isArray(s.sea) && s.sea.length >= 2 ? s.sea : ['#0d4a5c', '#06222d'], enemies:s.enemies || null };
   });
   if (errors.length) return { errors };
   const common = st.commonEnemies || {};
@@ -587,7 +597,7 @@ function newGame(captainId, opts = {}){
   const over = {};
   if (arch) Object.assign(over, { baseHp:arch.baseHp, baseAtk:arch.baseAtk, frole:arch.frole, style:arch.style, stats:arch.stats, hakiBase:arch.hakiBase, perk:arch.perk, role:arch.name, desc:arch.desc, archetype:arch.id });
   if (av && av.avatar) over.avatar = av.avatar;
-  const g = { seed, stage:0, pos:null, visited:[], crew:[makeMember(cap, 1, 'c0', over)], items:[], berries:SETTINGS.startBerries, bounties:[], lead:SETTINGS.leadership, over:null, uid:100, dismissed:[], lostFruits:[] };
+  const g = { seed, stage:0, pos:null, visited:[], crew:[makeMember(cap, 1, 'c0', over)], items:[], berries:SETTINGS.startBerries, bounties:[], lead:SETTINGS.leadership, over:null, uid:100, dismissed:[], lostFruits:[], hardcore:!!opts.hardcore };
   g.map = genMap(seed, 0, ctxOf(g));
   return g;
 }
@@ -643,7 +653,8 @@ function eat(g, id, f){
   }) };
 }
 /* ---------- inventario: limite, descartar y cambiar objetos ---------- */
-const MAX_ITEMS = 8;
+const MAX_RELICS = 6, MAX_GEAR = 6;
+const slotFull = (g, it) => g.items.filter(i => !!i.equip === !!it.equip).length >= (it.equip ? MAX_GEAR : MAX_RELICS);
 const canDiscard = (g, it) => g.lead - (it.fx.lead || 0) >= usedLead(g);
 const canSwap = (g, old, nw) => g.lead - (old.fx.lead || 0) + (nw.fx.lead || 0) >= usedLead(g);
 function removeItem(g, id){
@@ -771,7 +782,7 @@ const BOSS_WEAK = { logia:'mind', slippery:'brawl', swordmaster:'brawl', giant:'
 
 function enemyPower(g, node){
   const s = STAGES[g.stage], boss = node.type === 'boss';
-  const k = boss ? 1.5 * (s.boss.powerMult || 1) : (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage);
+  const k = boss ? 1.5 * (s.boss.powerMult || 1) * (s.bossMult != null ? s.bossMult / s.powerMult : 1) : (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage);
   const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n;
   return Math.round((12 + node.f * 3.2) * s.powerMult * k * crewK);
 }
@@ -1038,9 +1049,18 @@ function battleResult(g, node, st){
   const hpOf = {}; st.allies.forEach(a => { hpOf[a.id] = Math.max(0, a.hp); });
   const rows = g.crew.map(c => ({ c, from:c.hp, to: hpOf[c.id] || 0 }));
   const g2 = { ...g, crew:g.crew.map((c, i) => ({ ...c, hp:rows[i].to })) };
-  let berries = 0, item = null;
+  let berries = 0, item = null, fallen = [];
+  if (win && g.hardcore) {
+    fallen = g.crew.filter(c => (hpOf[c.id] || 0) <= 0);
+    if (fallen.length) {
+      g2.crew = g2.crew.filter(c => (hpOf[c.id] || 0) > 0);
+      g2.lostFruits = [...(g2.lostFruits || []), ...fallen.filter(c => c.fruit).map(c => c.fruit.id)];
+      if (fallen.some(c => c.captain)) g2.over = 'lose';
+      else g2.items.filter(i => i.equip && !g2.crew.some(c => c.gear && c.gear.id === i.id)).forEach(i => { Object.assign(g2, autoEquip(g2, i)); });
+    }
+  }
   if (win) {
-    berries = Math.round((30 + node.f * 8) * Math.pow(s.powerMult, SETTINGS.rewardExp) * (1 + m.berry) * (boss ? SETTINGS.rewardBoss : node.type === 'pirate' ? SETTINGS.rewardPirate : SETTINGS.rewardMarine));
+    berries = Math.round((30 + node.f * 8) * Math.pow(s.rewardMult != null ? s.rewardMult : s.powerMult, SETTINGS.rewardExp) * (1 + m.berry) * (boss ? SETTINGS.rewardBoss : node.type === 'pirate' ? SETTINGS.rewardPirate : SETTINGS.rewardMarine));
     g2.berries += berries;
     const free = itemPool(g);
     const chance = boss ? 1 : (node.type === 'pirate' ? SETTINGS.dropPirate : SETTINGS.dropMarine) + (m.loot || 0);
@@ -1048,7 +1068,7 @@ function battleResult(g, node, st){
     else if (free.length && Math.random() < chance) item = free[Math.floor(Math.random() * free.length)];
     if (boss) g2.bounties = [...g2.bounties, g.stage];
   }
-  return { win, boss, ep:enemyPower(g, node), rows, berries, item, rounds:st.rounds, g:g2 };
+  return { win, boss, ep:enemyPower(g, node), rows, berries, item, fallen, rounds:st.rounds, g:g2 };
 }
 function fight(g, node, st){ return battleResult(g, node, st && st.over ? st : autoBattle(g, node, st)); }
 /* Estimacion Monte Carlo del enfrentamiento: [clave, color, %victoria, %vida perdida media] */
@@ -1141,7 +1161,7 @@ const i18n = {
     "man.g.levelT":"Levels and K.O.",
     "man.g.level":"After a boss, everyone levels up (attack ×{a}, HP ×{h}) and is fully healed. Recruits join at the level of the current sea. A crew member at 0 HP is K.O.: they do not fight until you rest at a camp or beat a boss. Losing a fight with everyone K.O. ends the run.",
     "man.g.itemsT":"Items and berries",
-    "man.g.items":"You can carry up to {max} items. RELICS apply to the whole crew automatically. EQUIPMENT (swords, guns, armor, Haki gear…) is worn by one crew member and boosts their stats; new gear is assigned to whoever fits best, and you can change it from the Loot panel. When a fight drops an item you may take it or leave it, and if your hold is full you can swap one for it. Select an item in your inventory to equip or discard it. Winning fights gives berries; a boss gives triple.",
+    "man.g.items":"Passive relics (up to {max}) give bonuses to the whole crew. Equipment (up to {gear}) is worn by ONE crew member: tap their face in the Equipment list to assign it. Discard or swap when full.",
     "man.g.dismissT":"Dismissing a nakama",
     "man.g.dismiss":"You can dismiss crew (never the Captain), but it has a price: a severance fee in berries, a {p}% chance that another nakama leaves in indignation, any Devil Fruit they ate is lost for the run, and neither of them can be recruited again.",
     "man.g.archT":"Captain styles",
@@ -1180,7 +1200,7 @@ const i18n = {
     "man.crew.cost":"Cost {n}",
     "man.crew.captain":"Captain",
     "man.crew.count":"{n} characters",
-    "man.items.hint":"Relics and equipment share your {max} item slots. The price shown is the base price: the Black Market charges more in later seas, and the strongest items only appear in advanced seas.",
+    "man.items.hint":"You can carry {max} passive relics and {gear} pieces of equipment. The price shown is the base price: the Black Market charges more in later seas, and the strongest items only appear in advanced seas.",
     "man.items.price":"Price",
     "man.fx.hp":"Max HP +{n}",
     "man.fx.lead":"Leadership +{n}",
@@ -1214,6 +1234,8 @@ const i18n = {
     'data.counts.characters':'{n} nakamas · {b} bosses', 'data.counts.fruits':'{n} fruits', 'data.counts.stages':'{n} stages', 'data.counts.items':'{n} items',
     'data.invalidJson':'{name} is not valid JSON.',
     'nav.crew':'Crew', 'nav.map':'Map', 'nav.loot':'Loot',
+    'loot.relics':'Passive relics', 'loot.gear':'Equipment', 'loot.noGear':'No equipment yet. Swords, guns and gear drop from fights and the market.', 'loot.equipTo':'Tap a crew member’s face to equip the item to them.',
+    'hc.name':'Hardcore', 'hc.desc':'A nakama who falls in battle is gone for good. If the Captain falls, the voyage ends.', 'hc.fell':'{name} fell and is lost forever', 'hc.chip':'Hardcore',
     'crew.eyebrow':'Main deck', 'crew.title':'Your Crew', 'crew.captain':'Captain', 'crew.slot':'Slot {n}',
     'crew.empty':'Empty slot', 'crew.emptyHint':'Recruit at an island node',
     'crew.lead':'Band leadership',
@@ -1504,7 +1526,7 @@ const i18n = {
     "man.g.levelT":"Niveles y K.O.",
     "man.g.level":"Tras un jefe todos suben de nivel (ataque ×{a}, vida ×{h}) y se curan por completo. Los reclutas entran al nivel del mar actual. Un tripulante a 0 de vida está K.O.: no lucha hasta que descanses en un camp o venzas a un jefe. Si pierdes un combate con todos K.O., la partida termina.",
     "man.g.itemsT":"Objetos y berries",
-    "man.g.items":"Puedes llevar hasta {max} objetos. Las RELIQUIAS afectan automáticamente a toda la tripulación. El EQUIPO (espadas, armas, armaduras, objetos de Haki…) lo lleva un tripulante y mejora sus estadísticas; el equipo nuevo se asigna solo a quien mejor le encaje y puedes cambiarlo en el panel de botín. Cuando un combate suelta un objeto puedes cogerlo o dejarlo, y si la bodega está llena puedes cambiarlo por otro. Selecciona un objeto de tu inventario para equiparlo o descartarlo. Ganar combates da berries; un jefe da el triple.",
+    "man.g.items":"Las reliquias pasivas (hasta {max}) dan bonos a toda la banda. El equipo (hasta {gear}) lo lleva UN tripulante: toca su cara en la lista de Equipo para asignarlo. Descarta o cambia cuando esté lleno.",
     "man.g.dismissT":"Echar a un nakama",
     "man.g.dismiss":"Puedes despedir tripulantes (nunca al Capitán), pero tiene un precio: una indemnización en berries, un {p}% de que otro nakama se marche indignado, la Fruta del Diablo que se hubiera comido se pierde durante la partida y ninguno de los dos vuelve a poder reclutarse.",
     "man.g.archT":"Estilos de Capitán",
@@ -1543,7 +1565,7 @@ const i18n = {
     "man.crew.cost":"Coste {n}",
     "man.crew.captain":"Capitán",
     "man.crew.count":"{n} personajes",
-    "man.items.hint":"Las reliquias y el equipo comparten tus {max} huecos de objeto. El precio mostrado es el base: el Mercado negro cobra más en los mares avanzados, y los objetos más fuertes solo aparecen en mares avanzados.",
+    "man.items.hint":"Puedes llevar {max} reliquias pasivas y {gear} piezas de equipo. El precio mostrado es el base: el Mercado negro cobra más en los mares avanzados, y los objetos más fuertes solo aparecen en mares avanzados.",
     "man.items.price":"Precio",
     "man.fx.hp":"Vida máx. +{n}",
     "man.fx.lead":"Liderazgo +{n}",
@@ -1577,6 +1599,8 @@ const i18n = {
     'data.counts.characters':'{n} nakamas · {b} jefes', 'data.counts.fruits':'{n} frutas', 'data.counts.stages':'{n} etapas', 'data.counts.items':'{n} objetos',
     'data.invalidJson':'{name} no es un JSON válido.',
     'nav.crew':'Banda', 'nav.map':'Mapa', 'nav.loot':'Botín',
+    'loot.relics':'Reliquias pasivas', 'loot.gear':'Equipo', 'loot.noGear':'Aún sin equipo. Espadas, armas y demás caen en combates y en el mercado.', 'loot.equipTo':'Toca la cara de un tripulante para equiparle el objeto.',
+    'hc.name':'Hardcore', 'hc.desc':'Un nakama que cae en combate se pierde para siempre. Si cae el Capitán, termina el viaje.', 'hc.fell':'{name} ha caído y se pierde para siempre', 'hc.chip':'Hardcore',
     'crew.eyebrow':'Cubierta principal', 'crew.title':'Tu Tripulación', 'crew.captain':'Capitán', 'crew.slot':'Hueco {n}',
     'crew.empty':'Hueco libre', 'crew.emptyHint':'Recluta en un nodo de isla',
     'crew.lead':'Liderazgo de la banda',
@@ -2018,7 +2042,7 @@ function CrewPanel({ g, onDismiss }){
   const empties = Math.max(0, SETTINGS.crewSlots - g.crew.length);
   return html`
     <div>
-      <div className="panel-head"><span className="eyebrow">${t('crew.eyebrow')}</span><h2 className="ptitle m-0">${t('crew.title')}</h2></div>
+      <div className="panel-head"><span className="eyebrow">${t('crew.eyebrow')} ${g.hardcore ? html`<span className="hc-chip">${t('hc.chip')}</span>` : null}</span><h2 className="ptitle m-0">${t('crew.title')}</h2></div>
       <ul className="flex flex-col gap-2 p-0 m-0">
         ${g.crew.map(c => html`<${CrewCard} key=${c.id} c=${c} onDismiss=${onDismiss}/>`)}
         ${Array.from({ length: empties }).map((_, i) => html`
@@ -2057,7 +2081,8 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
   const [confirm, setConfirm] = useState(false);
   const selItem = sel ? g.items.find(i => i.id === sel) : null;
   const m = mods(g);
-  const slots = Array.from({ length: MAX_ITEMS }).map((_, i) => g.items[i] || null);
+  const relics = g.items.filter(i => !i.equip), gear = g.items.filter(i => i.equip);
+  const [gconfirm, setGconfirm] = useState(null);
   const fruited = g.crew.filter(c => c.fruit);
   const tags = [];
   if (m.power) tags.push(t('fx.power', { n: Math.round(m.power * 100) }));
@@ -2068,26 +2093,20 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
     <div>
       <div className="panel-head"><span className="eyebrow">${t('loot.eyebrow')}</span><h2 className="ptitle m-0">${t('loot.title')}</h2></div>
 
-      <div className="sect-title" style=${{ marginTop: 0 }}>${t('loot.items')} <span style=${{ color:'var(--mist)' }}>${g.items.length}/${MAX_ITEMS}</span></div>
-      <div className="grid grid-cols-4 gap-2">
-        ${slots.map((it, i) => it
-          ? html`<button key=${it.id} type="button" className=${'item-slot filled' + (sel === it.id ? ' sel' : '')} aria-pressed=${sel === it.id} title=${L(it.name) + ': ' + L(it.desc)} onClick=${() => { setSel(sel === it.id ? null : it.id); setConfirm(false); }} onMouseEnter=${() => setTip(it)} onFocus=${() => setTip(it)} onMouseLeave=${() => setTip(null)} onBlur=${() => setTip(null)}><${Ico} n=${it.icon} size=${28}/></button>`
-          : html`<div key=${'e' + i} className="item-slot empty"><${Ico} n="treasure" size=${20} sw=${1.4}/></div>`)}
+      <div className="sect-title" style=${{ marginTop: 0 }}>${t('loot.relics')} <span style=${{ color:'var(--mist)' }}>${relics.length}/${MAX_RELICS}</span></div>
+      <div className="grid grid-cols-6 gap-2">
+        ${Array.from({ length: MAX_RELICS }).map((_, i) => { const it = relics[i]; return it
+          ? html`<button key=${it.id} type="button" className=${'item-slot filled' + (sel === it.id ? ' sel' : '')} aria-pressed=${sel === it.id} title=${L(it.name) + ': ' + L(it.desc)} onClick=${() => { setSel(sel === it.id ? null : it.id); setConfirm(false); }} onMouseEnter=${() => setTip(it)} onFocus=${() => setTip(it)} onMouseLeave=${() => setTip(null)} onBlur=${() => setTip(null)}><${Ico} n=${it.icon} size=${24}/></button>`
+          : html`<div key=${'e' + i} className="item-slot empty"><${Ico} n="treasure" size=${18} sw=${1.4}/></div>`; })}
       </div>
       ${selItem ? html`
         <div className="mt-2 offer" style=${{ flexDirection:'column', alignItems:'stretch' }}>
           <div className="text-sm"><b style=${{ color:'var(--foam)' }}>${L(selItem.name)}.</b> <span style=${{ color:'var(--mist)' }}>${L(selItem.desc)}</span></div>
           <${ItemTags} it=${selItem}/>
-          ${selItem.equip ? html`
-            <div className="flex flex-col gap-1">
-              <div className="eyebrow">${(() => { const hd = holderOf(g, selItem.id); return hd ? t('item.heldBy', { name:L(hd.name) }) : t('item.unequipped'); })()}</div>
-              <div className="flex flex-wrap gap-1">${g.crew.map(c => { const on = c.gear && c.gear.id === selItem.id; return html`<button key=${c.id} type="button" className=${'btn small ' + (on ? '' : 'ghost')} disabled=${locked || on} title=${c.gear && !on ? t('item.swapsOut', { name:L(c.gear.name) }) : ''} onClick=${() => onEquip(selItem.id, c.id)}>${L(c.name)}${c.gear && !on ? ' ↻' : ''}</button>`; })}
-              ${holderOf(g, selItem.id) ? html`<button type="button" className="btn ghost small" disabled=${locked} onClick=${() => onUnequip(selItem.id)}>${t('item.unequip')}</button>` : null}</div>
-            </div>` : null}
           ${!canDiscard(g, selItem) ? html`<div className="text-xs" style=${{ color:'var(--ember)' }}>${t('loot.discardNo')}</div>` : null}
           <div className="flex gap-2">
             ${!confirm
-              ? html`<button type="button" className="btn ghost small" disabled=${!canDiscard(g, selItem)} onClick=${() => setConfirm(true)}>${t('loot.discard')}</button>`
+              ? html`<button type="button" className="btn ghost small" disabled=${locked || !canDiscard(g, selItem)} onClick=${() => setConfirm(true)}>${t('loot.discard')}</button>`
               : html`<button type="button" className="btn danger small" onClick=${() => { onDiscard(selItem.id); setSel(null); setConfirm(false); setTip(null); }}>${t('loot.discardConfirm')}</button><button type="button" className="btn ghost small" onClick=${() => setConfirm(false)}>${t('loot.cancel')}</button>`}
           </div>
         </div>`
@@ -2097,6 +2116,32 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
                 : tags.length ? html`<span className="flex flex-wrap gap-1">${tags.map(x => html`<span key=${x} className="chip">${x}</span>`)}</span>`
                 : null}
         </div>`}
+
+      <div className="sect">
+        <div className="sect-title">${t('loot.gear')} <span style=${{ color:'var(--mist)' }}>${gear.length}/${MAX_GEAR}</span></div>
+        ${gear.length === 0 ? html`<div className="slot-empty slim">${t('loot.noGear')}</div>` : html`<p className="m-0 mb-2 text-xs" style=${{ color:'var(--mist)' }}>${t('loot.equipTo')}</p>`}
+        <div className="flex flex-col gap-2">
+          ${gear.map(it => { const hd = holderOf(g, it.id); return html`
+            <div key=${it.id} className="gear-card">
+              <div className="flex gap-2 items-start">
+                <div className="item-slot filled" style=${{ width:38, height:38, flex:'none' }}><${Ico} n=${it.icon} size=${22}/></div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold leading-tight" style=${{ fontFamily:'var(--font-ui)', fontSize:'16px' }}>${L(it.name)}</div>
+                  <div className="text-xs" style=${{ color:'var(--mist)' }}>${L(it.desc)}</div>
+                  <${ItemTags} it=${it}/>
+                </div>
+              </div>
+              <div className="eyebrow mt-1">${hd ? t('item.heldBy', { name:L(hd.name) }) : t('item.unequipped')}</div>
+              <div className="flex flex-wrap gap-1 items-center">
+                ${g.crew.map(c => { const on = c.gear && c.gear.id === it.id; return html`<button key=${c.id} type="button" className=${'gear-who' + (on ? ' on' : '')} disabled=${locked} title=${L(c.name) + (c.gear && !on ? ' · ' + t('item.swapsOut', { name:L(c.gear.name) }) : '')} onClick=${() => on ? onUnequip(it.id) : onEquip(it.id, c.id)}><${Face} look=${c.look} color=${c.color} size=${30} avatar=${c.avatar}/></button>`; })}
+                <span style=${{ flex:1 }}></span>
+                ${gconfirm === it.id
+                  ? html`<button type="button" className="btn danger small" onClick=${() => { onDiscard(it.id); setGconfirm(null); }}>${t('loot.discardConfirm')}</button><button type="button" className="btn ghost small" onClick=${() => setGconfirm(null)}>${t('loot.cancel')}</button>`
+                  : html`<button type="button" className="btn ghost small" disabled=${locked || !canDiscard(g, it)} onClick=${() => setGconfirm(it.id)}>${t('loot.discard')}</button>`}
+              </div>
+            </div>`; })}
+        </div>
+      </div>
 
       <div className="sect">
         <div className="sect-title">${t('loot.fruits')}</div>
@@ -2616,6 +2661,7 @@ function CombatEvent({ g, setG, node, done }){
   return html`
     <${Modal} tone=${rep.win ? '#f6b73c' : '#ff5d47'} eyebrow=${rep.win ? t('combat.resolved') : t('combat.end')} title=${rep.win ? (boss ? t('combat.bossDown') : t('combat.victory')) : t('combat.sunk')} icon=${rep.win ? 'crown' : 'skull'}>
       <div className="flex flex-col gap-2">${rep.rows.map(r => html`<${MiniHp} key=${r.c.id} c=${r.c} from=${r.from} to=${r.to}/>`)}</div>
+      ${rep.fallen && rep.fallen.length ? html`<div className="flex flex-col gap-1">${rep.fallen.map(c => html`<p key=${c.id} className="m-0 text-sm" style=${{ color:'var(--ember)' }}><b>☠ ${t('hc.fell', { name:L(c.name) })}</b></p>`)}</div>` : null}
       ${rep.win ? html`
         <div className="flex flex-wrap gap-2">
           <span className="chip" style=${{ color:'var(--gold)' }}>${t('combat.berries', { n:rep.berries })}</span>
@@ -2636,7 +2682,7 @@ function MarketEvent({ g, setG, done }){
   const [swapFor, setSwapFor] = useState(null);
   const buy = o => {
     if (g.berries < itemPrice(g, o) || bought.includes(o.id)) return;
-    if (g.items.length >= MAX_ITEMS){ setSwapFor(o); return; }
+    if (slotFull(g, o)){ setSwapFor(o); return; }
     setG(gainItem({ ...g, berries: g.berries - itemPrice(g, o) }, o)); setBought([...bought, o.id]);
   };
   const doSwap = old => { setG(swapItem(g, old.id, swapFor, itemPrice(g, swapFor))); setBought([...bought, swapFor.id]); setSwapFor(null); };
@@ -2820,7 +2866,7 @@ function ItemTags({ it }){
 function SwapList({ g, item, onPick }){
   return html`
     <div className="flex flex-col gap-2">
-      ${g.items.map(o => { const ok = canSwap(g, o, item); return html`
+      ${g.items.filter(o => !!o.equip === !!item.equip).map(o => { const ok = canSwap(g, o, item); return html`
         <button key=${o.id} type="button" className="offer" disabled=${!ok} style=${{ cursor: ok ? 'pointer' : 'not-allowed', textAlign:'left', opacity: ok ? 1 : .5 }} onClick=${() => ok && onPick(o)}>
           <div className="item-slot filled" style=${{ width:40, flex:'none' }}><${Ico} n=${o.icon} size=${24}/></div>
           <div className="min-w-0 flex-1"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'16px' }}>${L(o.name)}</div><div className="desc">${L(o.desc)}</div></div>
@@ -2828,7 +2874,7 @@ function SwapList({ g, item, onPick }){
     </div>`;
 }
 function LootOffer({ g, item, choice, onTake, onLeave, onSwap }){
-  const full = g.items.length >= MAX_ITEMS;
+  const full = slotFull(g, item);
   return html`
     <div className="flex flex-col gap-2">
       <div className="offer" style=${{ boxShadow:'inset 0 0 0 2px var(--fruit)' }}>
@@ -2943,7 +2989,7 @@ function ManualScreen({ onClose }){
         <div><div className="nm">${t('type.' + k)}</div><div className="tiny">${t('man.n.' + k, { pct:Math.round(60), n:SETTINGS.leadershipPerStage, p:Math.round(SETTINGS.marketInflation * 100) })}</div></div></div>`)}</div>
     <h3>${t('man.g.crewT')}</h3><p>${t('man.g.crew', { slots:SETTINGS.crewSlots, lead:SETTINGS.leadership, n:SETTINGS.leadershipPerStage })}</p>
     <h3>${t('man.g.levelT')}</h3><p>${t('man.g.level', { a:SETTINGS.levelUpAtkMult, h:SETTINGS.levelUpHpMult })}</p>
-    <h3>${t('man.g.itemsT')}</h3><p>${t('man.g.items', { max:MAX_ITEMS })}</p>
+    <h3>${t('man.g.itemsT')}</h3><p>${t('man.g.items', { max:MAX_RELICS, gear:MAX_GEAR })}</p>
     <h3>${t('man.g.dismissT')}</h3><p>${t('man.g.dismiss', { p:pct(SETTINGS.dismissLeaveChance) })}</p>
     <h3>${t('man.g.archT')}</h3>
     <div className="man-grid">${ARCHETYPES.map(a => html`
@@ -2996,7 +3042,7 @@ function ManualScreen({ onClose }){
     <//>`;
   };
   const Items = () => html`<${React.Fragment}>
-    <p className="dim">${t('man.items.hint', { max:MAX_ITEMS })}</p>
+    <p className="dim">${t('man.items.hint', { max:MAX_RELICS, gear:MAX_GEAR })}</p>
     ${[['eq', ITEMS.filter(i => i.equip && !i.bossDrop)], ['relic', ITEMS.filter(i => !i.equip && !i.bossDrop)], ['trophy', ITEMS.filter(i => i.bossDrop)]].map(([k, list]) => html`<${React.Fragment} key=${k}>
       <h3>${t('man.items.' + k)} (${list.length})</h3><p className="dim">${t('man.items.' + k + 'D')}</p>
       <div className="man-grid">${list.slice().sort((a, b) => (a.bossDrop || 0) - (b.bossDrop || 0) || a.price - b.price).map(it => html`
@@ -3044,7 +3090,7 @@ function ManualScreen({ onClose }){
     </div>`;
 }
 
-function StartScreen({ saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
+function StartScreen({ hardcore, setHardcore, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
   const caps = NAKAMAS.filter(n => n.captain);
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
   const arch = ARCHETYPES.find(a => a.id === archId) || ARCHETYPES[0];
@@ -3100,6 +3146,7 @@ function StartScreen({ saved, onContinue, onDiscardSave, captainId, setCaptainId
         <p className="text-sm mt-3 mb-0" style=${{ color:'var(--mist)' }}>${t('start.solo')}</p>
       </div>
       <div className="flex flex-col items-center gap-2">
+        <label className="hc-toggle" htmlFor="hc"><input id="hc" type="checkbox" checked=${hardcore} onChange=${e => setHardcore(e.target.checked)}/><span><b>${t('hc.name')}</b> · ${t('hc.desc')}</span></label>
         ${saved ? html`<div className="flex gap-2 flex-wrap justify-center items-center mb-2">
           <button type="button" className="btn big" onClick=${onContinue}>${t('save.continue', { s:saved.stage + 1, n:saved.crew.length, b:saved.berries })}</button>
           <button type="button" className="btn ghost small" onClick=${onDiscardSave}>${t('save.discard')}</button>
@@ -3147,6 +3194,7 @@ function App(){
   const [burst, setBurst] = useState(null);
   const [hover, setHover] = useState(null);
   const [saved, setSaved] = useState(null);
+  const [hardcore, setHardcore] = useState(false);
 
   const goStart = () => {
     const sv = readSave(); setSaved(sv ? sv.g : null);
@@ -3180,7 +3228,7 @@ function App(){
     setErrors([]); installData(res.data); goStart();
   };
 
-  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(captainId, { avatarId, archetypeId:archId })); setTab('map'); setPhase('play'); };
+  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(captainId, { avatarId, archetypeId:archId, hardcore })); setTab('map'); setPhase('play'); };
 
   const continueSave = () => { const sv = readSave(); if (!sv) { setSaved(null); return; } BATTLE_PREFS.auto = !!sv.auto; BATTLE_PREFS.fast = !!sv.fast; setG(sv.g); setModal(null); setTab('map'); setPhase('play'); };
   const discardSave = () => { clearSave(); setSaved(null); };
@@ -3238,7 +3286,7 @@ function App(){
           </div>
         </main>` : null}
 
-      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
+      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} hardcore=${hardcore} setHardcore=${setHardcore} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
 
       ${playing ? html`
         <main className="flex-1 min-h-0 grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)_320px]">

@@ -64,7 +64,7 @@
    "icon": "cigarette",
    "price": 150,
    "fx": {
-    "power": 0.26,
+    "power": 0.2,
     "charge": 8
    }
   },
@@ -81,8 +81,8 @@
    "icon": "flask",
    "price": 115,
    "fx": {
-    "calm": 0.49,
-    "guard": 0.2
+    "calm": 0.35,
+    "guard": 0.12
    }
   },
   {
@@ -98,8 +98,8 @@
    "icon": "medicine",
    "price": 150,
    "fx": {
-    "regen": 0.07,
-    "camp": 0.4
+    "regen": 0.04,
+    "camp": 0.35
    }
   },
   {
@@ -148,8 +148,8 @@
    "icon": "violin",
    "price": 180,
    "fx": {
-    "regen": 0.08,
-    "calm": 0.35
+    "regen": 0.04,
+    "calm": 0.25
    }
   },
   {
@@ -166,7 +166,7 @@
    "price": 200,
    "fx": {
     "ward": 1,
-    "guard": 0.26
+    "guard": 0.16
    }
   },
   {
@@ -215,7 +215,7 @@
    "icon": "cape",
    "price": 420,
    "fx": {
-    "power": 0.4,
+    "power": 0.26,
     "harm": 5,
     "lead": 1
    },
@@ -234,8 +234,8 @@
    "icon": "flag",
    "price": 800,
    "fx": {
-    "power": 0.59,
-    "lead": 2
+    "power": 0.36,
+    "lead": 1
    },
    "minStage": 6
   },
@@ -269,8 +269,8 @@
    "icon": "pill",
    "price": 400,
    "fx": {
-    "power": 0.49,
-    "spd": 3
+    "power": 0.3,
+    "spd": 2
    },
    "minStage": 4
   },

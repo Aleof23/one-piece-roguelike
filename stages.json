@@ -86,11 +86,13 @@
    },
    "bossRank": "pirate",
    "bossId": "boss_buggy",
-   "powerMult": 0.852,
+   "powerMult": 0.663,
    "sea": [
     "#0d4a5c",
     "#06222d"
-   ]
+   ],
+   "bossMult": 0.932,
+   "rewardMult": 0.852
   },
   {
    "id": "alabasta",
@@ -100,7 +102,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_crocodile",
-   "powerMult": 1.485,
+   "powerMult": 1.699,
    "sea": [
     "#6b4a14",
     "#241705"
@@ -126,7 +128,9 @@
      "en": "Rain Dinners Agent",
      "es": "Agente de Rain Dinners"
     }
-   ]
+   ],
+   "bossMult": 1.551,
+   "rewardMult": 1.485
   },
   {
    "id": "skypiea",
@@ -136,7 +140,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_mihawk",
-   "powerMult": 2.204,
+   "powerMult": 3.499,
    "sea": [
     "#2a5a8c",
     "#0b1f3a"
@@ -162,7 +166,9 @@
      "en": "Upper Yard Guardian",
      "es": "Guardián del Upper Yard"
     }
-   ]
+   ],
+   "bossMult": 1.76,
+   "rewardMult": 2.204
   },
   {
    "id": "water_7",
@@ -172,7 +178,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_doflamingo",
-   "powerMult": 3.348,
+   "powerMult": 5.393,
    "sea": [
     "#0f5a70",
     "#06222b"
@@ -198,7 +204,9 @@
      "en": "Sea Train Guard",
      "es": "Guardia del Tren Marino"
     }
-   ]
+   ],
+   "bossMult": 2.365,
+   "rewardMult": 3.348
   },
   {
    "id": "marineford",
@@ -208,7 +216,7 @@
    },
    "bossRank": "admiral",
    "bossId": "boss_kizaru",
-   "powerMult": 3.958,
+   "powerMult": 8.294,
    "sea": [
     "#4a1d2a",
     "#150610"
@@ -234,7 +242,9 @@
      "en": "Vice Admiral Guard",
      "es": "Guardia de Vicealmirante"
     }
-   ]
+   ],
+   "bossMult": 2.805,
+   "rewardMult": 3.958
   },
   {
    "id": "dressrosa",
@@ -244,7 +254,7 @@
    },
    "bossRank": "admiral",
    "bossId": "boss_akainu",
-   "powerMult": 5.448,
+   "powerMult": 11.924,
    "sea": [
     "#8a2a4a",
     "#2a0a18"
@@ -270,7 +280,9 @@
      "en": "Elite Pirate",
      "es": "Pirata de Élite"
     }
-   ]
+   ],
+   "bossMult": 3.752,
+   "rewardMult": 5.448
   },
   {
    "id": "whole_cake",
@@ -280,7 +292,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_big_mom",
-   "powerMult": 7.656,
+   "powerMult": 16.229,
    "sea": [
     "#8a3a6b",
     "#2a0c20"
@@ -306,7 +318,9 @@
      "en": "Living Food",
      "es": "Comida Viviente"
     }
-   ]
+   ],
+   "bossMult": 5.034,
+   "rewardMult": 7.656
   },
   {
    "id": "wano",
@@ -316,7 +330,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_kaido",
-   "powerMult": 8.322,
+   "powerMult": 51.583,
    "sea": [
     "#5a2d6b",
     "#1a0c24"
@@ -342,7 +356,9 @@
      "en": "Numbers Warrior",
      "es": "Guerrero Numbers"
     }
-   ]
+   ],
+   "bossMult": 5.819,
+   "rewardMult": 8.322
   },
   {
    "id": "egghead",
@@ -352,7 +368,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_shanks",
-   "powerMult": 12.816,
+   "powerMult": 108.03,
    "sea": [
     "#1d5a5a",
     "#071f26"
@@ -378,7 +394,9 @@
      "en": "Egghead Security Unit",
      "es": "Unidad de Seguridad de Egghead"
     }
-   ]
+   ],
+   "bossMult": 8.595,
+   "rewardMult": 12.816
   },
   {
    "id": "laugh_tale",
@@ -388,7 +406,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_blackbeard",
-   "powerMult": 17.836,
+   "powerMult": 213.856,
    "sea": [
     "#6b5a14",
     "#201a05"
@@ -414,7 +432,9 @@
      "en": "Final Voyage Raider",
      "es": "Asaltante del Viaje Final"
     }
-   ]
+   ],
+   "bossMult": 13.109,
+   "rewardMult": 17.836
   }
  ]
 }

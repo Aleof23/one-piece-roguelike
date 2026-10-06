@@ -7,7 +7,7 @@ const html = fs.readFileSync(dir + '/index.html', 'utf8');
 const code = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const G = new Function(code + `
 return { buildData, installData, newGame, mods, crewPower, enemyPower, availableIds, gainItem, eat, advance, projectRisk, fight, sleep, makeMember,
-  recruitCandidates, availableFruits, harmony, itemPool, itemPrice, rationPrice, equipItem, swapItem, canSwap, removeItem, autoBattle, battleInit, get ARCHETYPES(){return ARCHETYPES}, get AVATARS(){return AVATARS}, canRecruit, leadRoom, usedLead, shuffle, weightedPick,
+  recruitCandidates, availableFruits, harmony, itemPool, slotFull, stepRound, smartOrders, autoOrders, itemPrice, rationPrice, equipItem, swapItem, canSwap, removeItem, autoBattle, battleInit, get ARCHETYPES(){return ARCHETYPES}, get AVATARS(){return AVATARS}, canRecruit, leadRoom, usedLead, shuffle, weightedPick,
   get STAGES(){return STAGES}, get ITEMS(){return ITEMS}, get SETTINGS(){return SETTINGS}, get NAKAMAS(){return NAKAMAS} };`)();
 
 const raw = {};
@@ -34,8 +34,8 @@ const crewQ = g => { const h = G.harmony(g.crew).score; return g.crew.reduce((x,
 const PROFILES = {
   novice:  { name:'Novato (aleatorio)',  path:'random', buy:'random', recruit:'random', fruit:'random', ration:0 },
   casual:  { name:'Casual',              path:'greedy1', buy:'ok',     recruit:'ok',     fruit:'atk',    ration:.5 },
-  veteran: { name:'Veterano',            path:'look',    buy:'good',   recruit:'good',   fruit:'best',   ration:.9 },
-  expert:  { name:'Experto (optimo)',    path:'dfs',     buy:'best',   recruit:'best',   fruit:'best',   ration:1 },
+  veteran: { name:'Veterano',            orders:'smart', path:'look',    buy:'good',   recruit:'good',   fruit:'best',   ration:.9 },
+  expert:  { name:'Experto (optimo)',    orders:'smart', path:'dfs',     buy:'best',   recruit:'best',   fruit:'best',   ration:1 },
 };
 
 function itemScore(g, it){
@@ -90,7 +90,7 @@ function doMarket(g, P, rnd){
   else if (P.buy === 'ok') list = list.sort((a, b) => (b.fx.power || 0) + (b.fx.guard || 0) - (a.fx.power || 0) - (a.fx.guard || 0));
   else list = list.sort((a, b) => itemScore(g, b) / G.itemPrice(g, b) - itemScore(g, a) / G.itemPrice(g, a));
   for (const o of list) {
-    if (g.berries < G.itemPrice(g, o) || g.items.length >= 8) continue;
+    if (g.berries < G.itemPrice(g, o) || G.slotFull(g, o)) continue;
     if (P.buy === 'best' && itemScore(g, o) < 0.06) continue;
     g = G.gainItem({ ...g, berries: g.berries - G.itemPrice(g, o) }, o);
   }
@@ -118,7 +118,7 @@ function doRecruit(g, P, rnd){
     if (P.recruit === 'ok' && d.baseAtk * d.baseHp < 700) continue;
     if (P.recruit === 'best') {
       // no gastes liderazgo en reclutas flojos: exige mejorar Q al menos 12% por cada recluta
-      if (val(d) / Q(g.crew, G.mods(g)) < 1.12 && g.crew.length > 1) continue;
+      if (val(d) / Q(g.crew, G.mods(g)) < 1.04 && g.crew.length > 1) continue;
     }
     g = { ...g, crew: [...g.crew, mk(d)], uid: g.uid + 1 };
   }
@@ -140,8 +140,8 @@ function doChest(g, P, rnd){
 
 function takeDrop(g, it, P){
   if (P.buy === 'random' && Math.random() < .3) return g;
-  if (g.items.length < 8) return G.gainItem(g, it);
-  const worst = g.items.slice().sort((a, b) => itemScore(g, a) - itemScore(g, b))[0];
+  if (!G.slotFull(g, it)) return G.gainItem(g, it);
+  const worst = g.items.filter(o => !!o.equip === !!it.equip).sort((a, b) => itemScore(g, a) - itemScore(g, b))[0];
   if (P.buy !== 'random' && itemScore(g, it) > itemScore(g, worst) && G.canSwap(g, worst, it)) return G.swapItem(g, worst.id, it);
   return g;
 }
@@ -159,12 +159,14 @@ function playRun(P, seed){
         // el jugador no puede huir: se entra y se pelea
         if (node.type === 'boss') (globalThis.__br = globalThis.__br || []).push([g.stage, riskOf(g, node)]);
         if (node.type === 'boss') (globalThis.__bs = globalThis.__bs || {})[g.stage] = ((globalThis.__bs || {})[g.stage] || [0, 0]);
-        const r = G.fight(g, node);
+        let r;
+        { const st = G.battleInit(g, node); let k = 0; while (!st.over && k++ < 40) G.stepRound(st, P.orders === 'smart' ? G.smartOrders(st) : G.autoOrders(st)); r = G.fight(g, node, st); }
         if (node.type === 'boss') { const e = globalThis.__bs[g.stage]; e[0]++; if (r.win) e[1]++; }
+        if (node.type !== 'boss') { const f0 = r.rows.reduce((a, x) => a + x.from, 0), t0 = r.rows.reduce((a, x) => a + x.to, 0); const nl = (globalThis.__nl = globalThis.__nl || {}); (nl[g.stage] = nl[g.stage] || []).push(1 - t0 / Math.max(1, f0)); }
         g = r.g;
         if (r.win && r.item) g = takeDrop(g, r.item, P);
         if (!r.win) { g = { ...g, over: 'lose' }; log.cause = node.type + '@f' + node.f; break; }
-        if (r.boss) { g = G.advance(g); const b=(globalThis.__bb=globalThis.__bb||{}); (b[g.stage]=b[g.stage]||[]).push(g.berries); }
+        if (r.boss) { g = G.advance(g); const b=(globalThis.__bb=globalThis.__bb||{}); (b[g.stage]=b[g.stage]||[]).push(g.berries); (globalThis.__bc=globalThis.__bc||{}); (globalThis.__bc[g.stage]=globalThis.__bc[g.stage]||[]).push(g.crew.length); }
       } else if (node.type === 'market') g = doMarket(g, P, rnd);
       else if (node.type === 'recruit') g = doRecruit(g, P, rnd);
       else if (node.type === 'camp') g = G.sleep(g).g;
@@ -189,6 +191,8 @@ for (const [k, P] of Object.entries(PROFILES)) {
   }
   if (process.env.BS) console.log('BS ' + JSON.stringify(Object.keys(globalThis.__bs).sort((a,b)=>a-b).map(k => globalThis.__bs[k][0] ? +(globalThis.__bs[k][1] / globalThis.__bs[k][0]).toFixed(3) : null)));
   if (process.env.BB) console.log('   berries al entrar al mar (media):', Object.keys(globalThis.__bb).map(k=>(+k+1)+':'+Math.round(globalThis.__bb[k].reduce((a,b)=>a+b,0)/globalThis.__bb[k].length)).join('  '));
+  if (process.env.BB) console.log('   crew al entrar al mar:', Object.keys(globalThis.__bc||{}).map(k=>(+k+1)+':'+(globalThis.__bc[k].reduce((a,b)=>a+b,0)/globalThis.__bc[k].length).toFixed(1)).join('  ')); globalThis.__bc={};
+  if (process.env.NL) { console.log('   pérdida media de vida por combate normal:', Object.keys(globalThis.__nl||{}).map(k=>(+k+1)+':'+Math.round(100*globalThis.__nl[k].reduce((a,b)=>a+b,0)/globalThis.__nl[k].length)+'%').join('  ')); } globalThis.__nl={};
   const dist = reach.map(x => (x / RUNS * 100).toFixed(0).padStart(3)).join(' ');
   if (process.env.BR) { const by = {}; globalThis.__br.forEach(([st, r]) => (by[st] = by[st] || []).push(r)); console.log('   riesgo al llegar al jefe (mediana / p90) por etapa:', Object.keys(by).map(st => { const a = by[st].sort((x, y) => x - y); return (+st + 1) + ':' + a[Math.floor(a.length * .5)].toFixed(2) + '/' + a[Math.floor(a.length * .9)].toFixed(2); }).join('  ')); }
   console.log(`${P.name.padEnd(22)} winrate ${(wins / RUNS * 100).toFixed(1).padStart(5)}%  | muere en etapa 1..10,WIN: ${dist} | crew medio ${(crewSum / RUNS).toFixed(1)} | causa ${JSON.stringify(causes)}`);
