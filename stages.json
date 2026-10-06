@@ -2,13 +2,18 @@
  "_help": "The run is this list of stages, played in order. Each stage is one map that ends in a Route Boss. bossRank must be pirate | shichibukai | admiral | yonko, and the ranks should climb. bossId points to an id in characters.json bosses. powerMult is the difficulty of the whole stage (enemies and rewards). sea is two hex colors for the map gradient. enemies (optional per stage) overrides commonEnemies. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored.",
  "settings": {
   "floors": 6,
-  "crewSlots": 6,
-  "leadership": 7,
+  "crewSlots": 9,
+  "leadership": 10,
   "dismissFeePerCost": 20,
   "dismissLeaveChance": 0.15,
-  "leadershipPerStage": 1,
-    "rewardMarine": 1, "rewardPirate": 1.35, "rewardBoss": 2.5, "rewardExp": 0.45,
-    "marketInflation": 0.2, "rationPrice": 45, "rationInflation": 0.2,
+  "leadershipPerStage": 3,
+  "rewardMarine": 1,
+  "rewardPirate": 1.35,
+  "rewardBoss": 2.5,
+  "rewardExp": 0.45,
+  "marketInflation": 0.2,
+  "rationPrice": 45,
+  "rationInflation": 0.2,
   "startBerries": 120,
   "levelUpAtkMult": 1.3,
   "levelUpHpMult": 1.2,
@@ -18,7 +23,9 @@
   "dropMarine": 0.22,
   "dropPirate": 0.32,
   "foeHpK": 3.0,
-  "foeAtkK": 0.32
+  "foeAtkK": 0.32,
+  "allyHpK": 0.8,
+  "allyAtkK": 0.72
  },
  "commonEnemies": {
   "marine": [
@@ -79,7 +86,7 @@
    },
    "bossRank": "pirate",
    "bossId": "boss_buggy",
-   "powerMult": 0.81,
+   "powerMult": 0.852,
    "sea": [
     "#0d4a5c",
     "#06222d"
@@ -93,7 +100,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_crocodile",
-   "powerMult": 1.28,
+   "powerMult": 1.485,
    "sea": [
     "#6b4a14",
     "#241705"
@@ -129,7 +136,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_mihawk",
-   "powerMult": 2.19,
+   "powerMult": 2.204,
    "sea": [
     "#2a5a8c",
     "#0b1f3a"
@@ -165,7 +172,7 @@
    },
    "bossRank": "shichibukai",
    "bossId": "boss_doflamingo",
-   "powerMult": 3.57,
+   "powerMult": 3.348,
    "sea": [
     "#0f5a70",
     "#06222b"
@@ -201,7 +208,7 @@
    },
    "bossRank": "admiral",
    "bossId": "boss_kizaru",
-   "powerMult": 5.189,
+   "powerMult": 3.958,
    "sea": [
     "#4a1d2a",
     "#150610"
@@ -237,7 +244,7 @@
    },
    "bossRank": "admiral",
    "bossId": "boss_akainu",
-   "powerMult": 7.009,
+   "powerMult": 5.448,
    "sea": [
     "#8a2a4a",
     "#2a0a18"
@@ -273,7 +280,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_big_mom",
-   "powerMult": 9.385,
+   "powerMult": 7.656,
    "sea": [
     "#8a3a6b",
     "#2a0c20"
@@ -309,7 +316,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_kaido",
-   "powerMult": 11.69,
+   "powerMult": 8.322,
    "sea": [
     "#5a2d6b",
     "#1a0c24"
@@ -345,7 +352,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_shanks",
-   "powerMult": 14.667,
+   "powerMult": 12.816,
    "sea": [
     "#1d5a5a",
     "#071f26"
@@ -381,7 +388,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_blackbeard",
-   "powerMult": 18.241,
+   "powerMult": 17.836,
    "sea": [
     "#6b5a14",
     "#201a05"

@@ -31,8 +31,8 @@
 .haki-card.on{opacity:1;background:color-mix(in srgb,var(--hc) 22%,#071c27);box-shadow:inset 0 0 0 1px var(--hc),0 0 14px color-mix(in srgb,var(--hc) 45%,transparent)}
 .haki-card b{font:700 15px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--foam)}
 .haki-glyph{font:700 26px var(--font-display);width:38px;height:38px;border:2px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--hc) 60%,#000);color:#fff}
-.avatar-pick{flex-direction:column;align-items:center;text-align:center}
-.avatar-pick .face{width:150px;height:150px}
+.avatar-pick{flex-direction:row;align-items:center;justify-content:center;text-align:left;gap:16px}
+.avatar-pick .face{width:96px;height:96px}
 .arch-pick{gap:8px}
 .mini-ally{display:flex;gap:8px;align-items:center;padding:4px 8px;border:2px solid #000;border-radius:4px;background:rgba(0,0,0,.28);cursor:pointer;color:var(--foam);text-align:left}
 .mini-ally small{display:block;color:var(--mist);font:500 11px var(--font-ui);letter-spacing:.08em;text-transform:uppercase}
@@ -113,6 +113,18 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 .man-menu-card{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border:3px solid #000;border-radius:4px;background:linear-gradient(90deg,rgba(246,183,60,.18),rgba(0,0,0,.2));box-shadow:inset 0 0 0 2px var(--gold)}
 .btn.man-open{background:linear-gradient(#7be0ff,#3aa9d6);color:#06222d}
 @media (max-width:640px){.man-wrap{padding:0}.man{max-height:100%;border-radius:0}.man-head h2{font-size:26px}}
+
+/* ===== pulido visual v6 ===== */
+.panel{background:radial-gradient(ellipse at 50% -10%,#14405a 0,transparent 55%),linear-gradient(180deg,var(--hull),#081d28);box-shadow:inset 0 0 0 2px var(--line),inset 0 1px 0 rgba(255,255,255,.07),0 10px 28px rgba(0,0,0,.45)}
+.crew-card{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(0,0,0,.28));transition:transform .15s,box-shadow .15s}
+.crew-card:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px var(--gold),0 4px 12px rgba(0,0,0,.4)}
+.pick-card{transition:transform .15s,box-shadow .15s,background .15s}
+.pick-card:hover{transform:translateY(-2px);background:rgba(246,183,60,.07)}
+.ptitle{text-shadow:0 2px 0 #000,0 0 18px rgba(246,183,60,.25)}
+.sect{margin-top:14px}
+.panel-head{margin-bottom:10px}
+*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 <title>One Piece Like - One Piece Roguelike</title>
 <meta name="description" content="One Piece Like is a free One Piece roguelike game playable directly in your browser.">
@@ -200,6 +212,7 @@ button{font-family:inherit;color:inherit}
 .cap-tag{display:inline-flex;align-items:center;gap:3px;font:700 11px var(--font-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:2px solid var(--gold);border-radius:3px;padding:0 5px;white-space:nowrap}
 .ko-tag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);font:700 15px var(--font-ui);background:var(--ember);color:#fff;border:2px solid #000;padding:0 6px;letter-spacing:.1em}
 .fruit-pill{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font:600 12px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:color-mix(in srgb,var(--fc) 35%,#000);border:2px solid var(--fc);padding:1px 7px;border-radius:99px;max-width:100%}
+.slot-empty.slim{min-height:32px;padding:4px 8px;font-size:12px;letter-spacing:.05em;border-width:1px}
 .slot-empty{display:flex;align-items:center;justify-content:center;text-align:center;min-height:62px;padding:8px;border:2px dashed var(--line);border-radius:4px;color:var(--mist);font:500 13px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;list-style:none}
 .lead-pips{display:flex;gap:3px}
 .lead-pips i{flex:1;height:14px;border:2px solid #000;background:#06151d;border-radius:2px;box-shadow:inset 0 0 0 1px var(--line)}
@@ -221,8 +234,11 @@ button{font-family:inherit;color:inherit}
 .poster .pname{font:700 14px var(--font-ui);text-transform:uppercase;letter-spacing:.04em;margin-top:5px;line-height:1.1;overflow-wrap:anywhere}
 .poster .pb{font:700 13px var(--font-ui);letter-spacing:.03em;margin-top:3px;font-variant-numeric:tabular-nums}
 .poster .stamp{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%) rotate(-16deg);font:700 20px var(--font-ui);letter-spacing:.12em;color:#b3261a;border:3px solid #b3261a;padding:0 6px;opacity:.82;background:rgba(233,218,180,.35);text-transform:uppercase;white-space:nowrap}
-.poster.ghost{background:transparent;box-shadow:none;border:2px dashed rgba(233,218,180,.5);color:rgba(233,218,180,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:132px}
-.poster.ghost .q{font-family:var(--font-display);font-size:38px;line-height:1}
+.poster h4{font-size:13px}
+.poster .pname{font-size:12px}
+.poster .stamp{font-size:14px;border-width:2px}
+.poster.ghost{background:transparent;box-shadow:none;border:2px dashed rgba(233,218,180,.5);color:rgba(233,218,180,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px}
+.poster.ghost .q{font-family:var(--font-display);font-size:24px;line-height:1}
 
 /* mapa */
 .sea-wrap{border:3px solid #000;box-shadow:inset 0 0 0 2px var(--line);border-radius:6px;overflow:hidden;background:var(--abyss)}
@@ -357,7 +373,7 @@ const RANKS = {
   admiral:     { icon:'anchor', color:'#5aa9ff', bounty:0 },
   yonko:       { icon:'crown',  color:'#f6b73c', bounty:4.5e9 },
 };
-const DEFAULT_SETTINGS = { rewardMarine:1, rewardPirate:1.35, rewardBoss:3, rewardExp:.6, marketInflation:.2, rationPrice:45, rationInflation:.2, foeHpK:3.0, foeAtkK:.32, marineMult:1.2, pirateMult:1.4, normalRamp:.15, dropMarine:.22, dropPirate:.32, dismissFeePerCost:20, dismissLeaveChance:.15, floors:6, crewSlots:6, leadership:7, leadershipPerStage:1, startBerries:120, levelUpAtkMult:1.3, levelUpHpMult:1.2 };
+const DEFAULT_SETTINGS = { allyHpK:.8, allyAtkK:.72, crewScaleBase:.5, crewScaleK:.1, bossExtraFrom:3, bossRoarEvery:3, bossRoar:.4, bossEnrage:.5, bossEnrageAtk:1.2, rewardMarine:1, rewardPirate:1.35, rewardBoss:3, rewardExp:.6, marketInflation:.2, rationPrice:45, rationInflation:.2, foeHpK:3.0, foeAtkK:.32, marineMult:1.2, pirateMult:1.4, normalRamp:.15, dropMarine:.22, dropPirate:.32, dismissFeePerCost:20, dismissLeaveChance:.15, floors:6, crewSlots:9, leadership:10, leadershipPerStage:3, startBerries:120, levelUpAtkMult:1.3, levelUpHpMult:1.2 };
 
 /* Tipos de nodo. La etiqueta de cada uno vive en i18n (type.<clave>). */
 const TYPES = {
@@ -539,6 +555,8 @@ function genMap(seed, si, ctx){
   if (cnt('camp') === 0) conv(mid.filter(n => n.type !== 'chest'), 'camp');
   // el Capitan empieza solo: siempre hay al menos un reclutamiento al alcance de las primeras paradas
   if (ctx.recruit && cnt('recruit') === 0) conv(flat.filter(n => n.f <= Math.min(2, F - 3) && ['marine', 'pirate', 'market'].includes(n.type)), 'recruit');
+  // con hasta 9 huecos, cada mar ofrece al menos dos reclutamientos
+  if (ctx.recruit) while (cnt('recruit') < 2 && flat.some(n => n.f >= 1 && n.f <= F - 3 && ['marine', 'pirate', 'market'].includes(n.type))) conv(flat.filter(n => n.f >= 1 && n.f <= F - 3 && ['marine', 'pirate', 'market'].includes(n.type)), 'recruit');
   flat.filter(n => n.type === 'chest').slice(2).forEach(n => n.type = 'marine');
   const E = STAGES[si].enemies || {};
   const pickName = list => list.length ? list[Math.floor(rnd() * list.length)] : null;
@@ -555,8 +573,8 @@ function genMap(seed, si, ctx){
 /* ---------- estado de la run ---------- */
 function makeMember(def, lvl, id, over){
   const o = over || {};
-  const atk = Math.round((o.baseAtk || def.baseAtk) * Math.pow(SETTINGS.levelUpAtkMult, lvl - 1));
-  const maxHp = Math.round((o.baseHp || def.baseHp) * Math.pow(SETTINGS.levelUpHpMult, lvl - 1));
+  const atk = Math.max(1, Math.round((o.baseAtk || def.baseAtk) * SETTINGS.allyAtkK * Math.pow(SETTINGS.levelUpAtkMult, lvl - 1)));
+  const maxHp = Math.max(5, Math.round((o.baseHp || def.baseHp) * SETTINGS.allyHpK * Math.pow(SETTINGS.levelUpHpMult, lvl - 1)));
   return { id, charId:def.id, name:def.name, role:o.role || def.role, color:def.color, look:def.look, avatar:o.avatar !== undefined ? o.avatar : def.avatar, cost:def.cost, captain:def.captain, lvl, atk, maxHp, hp:maxHp, fruit:null,
     frole:o.frole || def.frole, style:o.style || def.style, stats:o.stats || def.stats, groups:def.groups || [], desc:o.desc || def.desc, hakiBase:o.hakiBase || def.hakiBase, perk:o.perk || null, powerSource:def.powerSource || null, archetype:o.archetype || null };
 }
@@ -754,7 +772,8 @@ const BOSS_WEAK = { logia:'mind', slippery:'brawl', swordmaster:'brawl', giant:'
 function enemyPower(g, node){
   const s = STAGES[g.stage], boss = node.type === 'boss';
   const k = boss ? 1.5 * (s.boss.powerMult || 1) : (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage);
-  return Math.round((12 + node.f * 3.2) * s.powerMult * k);
+  const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n;
+  return Math.round((12 + node.f * 3.2) * s.powerMult * k * crewK);
 }
 function genFoes(g, node){
   const s = STAGES[g.stage], ep = enemyPower(g, node), boss = node.type === 'boss';
@@ -765,10 +784,10 @@ function genFoes(g, node){
     return [{ id:'f0', boss:true, bossId:b.id, name:b.name, kind:b.id, style:tr.includes('swordmaster') ? 'sword' : tr.includes('giant') ? 'brawl' : tr.includes('dark') || tr.includes('bind') ? 'mind' : 'brawl',
       weak:BOSS_WEAK[tr.find(x => BOSS_WEAK[x])] || null, resist:null, traits:tr, spd:b.speed || 5,
       haki:{ arm:hk.includes('arm') ? lv : 0, obs:hk.includes('obs') ? lv : 0, con:hk.includes('con') ? lv : 0 },
-      hp:0, maxHp:Math.round(ep * SETTINGS.foeHpK * (tr.includes('giant') ? 1.3 : 1)), atk:Math.round(ep * SETTINGS.foeAtkK * 10) / 10, stun:0, vuln:0, stunImm:0 }].map(f => ({ ...f, hp:f.maxHp }));
+      tier:g.stage, hp:0, maxHp:Math.round(ep * SETTINGS.foeHpK * (tr.includes('giant') ? 1.3 : 1)), atk:Math.round(ep * SETTINGS.foeAtkK * 10) / 10, stun:0, vuln:0, stunImm:0 }].map(f => ({ ...f, hp:f.maxHp }));
   }
   const kinds = FOE_KINDS[node.type] || FOE_KINDS.marine;
-  const count = clamp(2 + (node.f >= 3 ? 1 : 0) + (rnd() < .25 ? 1 : 0), 2, 3);
+  const count = clamp(2 + (node.f >= 3 ? 1 : 0) + (rnd() < .25 ? 1 : 0) + (g.crew.length >= 7 ? 1 : 0), 2, 4);
   const picks = shuffle(kinds, rnd).slice(0, count);
   const sh = picks.reduce((a, k) => a + k.hp, 0), sa = picks.reduce((a, k) => a + k.atk, 0);
   return picks.map((k, i) => {
@@ -923,7 +942,19 @@ function foeAct(st, f, ev, rnd){
     const t = aliveA(st).filter(a => !a.stun).sort((x, y) => y.atk - x.atk)[0];
     if (t) { if (t.haki.obs >= 2 || t.stats.spd >= 8 || rnd() < st.calm) ev.push({ t:'evade', id:t.id }); else { t.stun = 1; ev.push({ t:'bind', id:t.id }); } }
   }
-  const n = f.traits.includes('swift') ? 2 : 1, mult = n === 2 ? .62 : 1;
+  let n = f.traits.includes('swift') ? 2 : 1;
+  if (f.boss) {
+    const enraged = f.hp < f.maxHp * SETTINGS.bossEnrage;
+    if (enraged && !f.enraged) { f.enraged = true; ev.push({ t:'enrage', id:f.id }); }
+    if (f.tier >= SETTINGS.bossExtraFrom - 1) n++;
+    if (aliveA(st).length >= 7) n++;
+    if (enraged) n++;
+    if (st.round % SETTINGS.bossRoarEvery === 0) {
+      ev.push({ t:'roar', id:f.id });
+      aliveA(st).forEach(a => { if (a.hp > 0) foeAttack(st, f, a, ev, rnd, SETTINGS.bossRoar * (f.enraged ? SETTINGS.bossEnrageAtk : 1)); });
+    }
+  }
+  const mult = n >= 2 ? (f.boss ? .72 : .62) * (f.enraged ? SETTINGS.bossEnrageAtk : 1) : 1;
   for (let i = 0; i < n && aliveA(st).length; i++) {
     const a = weightedAlly(st, rnd); foeAttack(st, f, a, ev, rnd, mult);
     if (f.traits.includes('giant') && rnd() < .35 && aliveA(st).length) foeAttack(st, f, weightedAlly(st, rnd), ev, rnd, .5);
@@ -978,6 +1009,23 @@ function autoOrders(st){
   const ar = aliveA(st).reduce((s, a) => s + a.hp, 0) / Math.max(1, st.allies.reduce((s, a) => s + a.maxHp, 0));
   const fr = aliveF(st).reduce((s, f) => s + f.hp, 0) / Math.max(1, st.foes.reduce((s, f) => s + f.maxHp, 0));
   return { stance: ar < .4 && fr > .3 ? 'def' : fr < .45 || ar > .75 ? 'atk' : 'bal', auto:true };
+}
+/* ordenes de un jugador atento: postura segun el estado, foco en el enemigo mas debil y especiales con criterio */
+function smartOrders(st){
+  const as = aliveA(st), fs = aliveF(st);
+  const ar = as.reduce((s, a) => s + a.hp, 0) / Math.max(1, st.allies.reduce((s, a) => s + a.maxHp, 0));
+  const fr = fs.reduce((s, f) => s + f.hp, 0) / Math.max(1, st.foes.reduce((s, f) => s + f.maxHp, 0));
+  const boss = fs.find(f => f.boss);
+  const roarNext = boss && ((st.round + 1) % SETTINGS.bossRoarEvery === 0);
+  const stance = ar < .4 && fr > .25 ? 'def' : (roarNext && ar < .8) ? 'def' : fr < .5 || ar > .8 ? 'atk' : 'bal';
+  const focus = fs.length > 1 ? fs.slice().sort((x, y) => x.hp - y.hp)[0].id : null;
+  const fire = as.filter(a => a.gauge >= 100).filter(a => {
+    if (a.frole === 'support') return ar < .7;
+    if (a.frole === 'sword') return fs.length >= 2 || !!boss;
+    if (a.frole === 'tank') return !!boss || ar < .75;
+    return true;
+  }).map(a => a.id);
+  return { stance, focus, fire };
 }
 const cloneSt = st => JSON.parse(JSON.stringify(st));
 function autoBattle(g, node, st0){
@@ -1100,7 +1148,8 @@ const i18n = {
     "man.g.tipsT":"Tips",
     "man.g.tips1":"Mix roles: a balanced crew gains a Harmony bonus; stacking the same role is penalized.",
     "man.g.tips2":"Check the matchup before a fight: the estimated win chance and each enemy’s weakness (Observation Haki reveals them).",
-    "man.g.tips3":"Don’t waste leadership on weak recruits; a strong Captain plus 3–4 good nakamas beats a crowded deck.",
+    "bt.roar":"ROAR! The boss hits everyone","bt.enrage":"ENRAGED!",
+    "man.g.tips3":"Bosses hit several times per round, roar at the whole crew every third round and become enraged below half health. Brace (Defend) before the roar and focus the weak spot. Enemies grow with the size of your crew, so recruit for balance, not for numbers.",
     "man.g.tips4":"Rest at camps when your crew is hurt, and heal with rations before a boss.",
     "man.c.flowT":"How a fight works",
     "man.c.flow":"A fight is a real battle played in rounds. Before it starts you see the enemies and an estimated win chance. In each round every living fighter acts once, in order of Speed (with a little luck). Allies attack a foe; foes attack random allies, favouring tanks and brawlers. The fight ends when all enemies fall (victory) or all allies are K.O. (defeat). After {r} rounds the crew is overwhelmed, which counts as defeat.",
@@ -1164,6 +1213,7 @@ const i18n = {
     'data.pick':'Load local file', 'data.reload':'Reload from page', 'data.close':'Close', 'data.errors':'Problems found',
     'data.counts.characters':'{n} nakamas · {b} bosses', 'data.counts.fruits':'{n} fruits', 'data.counts.stages':'{n} stages', 'data.counts.items':'{n} items',
     'data.invalidJson':'{name} is not valid JSON.',
+    'nav.crew':'Crew', 'nav.map':'Map', 'nav.loot':'Loot',
     'crew.eyebrow':'Main deck', 'crew.title':'Your Crew', 'crew.captain':'Captain', 'crew.slot':'Slot {n}',
     'crew.empty':'Empty slot', 'crew.emptyHint':'Recruit at an island node',
     'crew.lead':'Band leadership',
@@ -1461,7 +1511,8 @@ const i18n = {
     "man.g.tipsT":"Consejos",
     "man.g.tips1":"Mezcla roles: un equipo equilibrado gana bonus de Armonía; repetir el mismo rol se penaliza.",
     "man.g.tips2":"Mira el enfrentamiento antes de luchar: la probabilidad de victoria y la debilidad de cada enemigo (el Haki de Observación las revela).",
-    "man.g.tips3":"No malgastes liderazgo en reclutas flojos; un Capitán fuerte con 3–4 buenos nakamas supera a una cubierta llena.",
+    "bt.roar":"¡RUGIDO! El jefe golpea a todos","bt.enrage":"¡ENFURECIDO!",
+    "man.g.tips3":"Los jefes golpean varias veces por ronda, rugen contra toda la banda cada tres rondas y se enfurecen por debajo de la mitad de vida. Defiéndete antes del rugido y céntrate en el punto débil. Los enemigos crecen con el tamaño de tu banda: recluta por equilibrio, no por cantidad.",
     "man.g.tips4":"Descansa en los camps cuando estés herido y cura con raciones antes de un jefe.",
     "man.c.flowT":"Cómo funciona un combate",
     "man.c.flow":"Un combate es una batalla real por rondas. Antes de empezar ves a los enemigos y la probabilidad estimada de victoria. En cada ronda actúa una vez cada luchador vivo, por orden de Velocidad (con algo de suerte). Los aliados atacan a un enemigo; los enemigos atacan a aliados al azar, con preferencia por los tanques y luchadores. Termina cuando caen todos los enemigos (victoria) o todos los aliados quedan K.O. (derrota). Tras {r} rondas la tripulación se ve desbordada, y cuenta como derrota.",
@@ -1525,6 +1576,7 @@ const i18n = {
     'data.pick':'Cargar archivo local', 'data.reload':'Recargar desde la página', 'data.close':'Cerrar', 'data.errors':'Problemas encontrados',
     'data.counts.characters':'{n} nakamas · {b} jefes', 'data.counts.fruits':'{n} frutas', 'data.counts.stages':'{n} etapas', 'data.counts.items':'{n} objetos',
     'data.invalidJson':'{name} no es un JSON válido.',
+    'nav.crew':'Banda', 'nav.map':'Mapa', 'nav.loot':'Botín',
     'crew.eyebrow':'Cubierta principal', 'crew.title':'Tu Tripulación', 'crew.captain':'Capitán', 'crew.slot':'Hueco {n}',
     'crew.empty':'Hueco libre', 'crew.emptyHint':'Recluta en un nodo de isla',
     'crew.lead':'Liderazgo de la banda',
@@ -1959,7 +2011,7 @@ function LeadMeter({ g }){
       <div className="lead-pips" role="img" aria-label=${t('crew.leadAria', { used, cap })}>
         ${Array.from({ length: cap }).map((_, i) => html`<i key=${i} style=${slots[i] ? { background: slots[i] } : null}></i>`)}
       </div>
-      <p className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${t('crew.leadHelp', { n: SETTINGS.leadershipPerStage })}</p>
+      <p className="text-xs mt-1 m-0" style=${{ color:'var(--mist)', opacity:.75 }}>${t('crew.leadHelp', { n: SETTINGS.leadershipPerStage })}</p>
     </div>`;
 }
 function CrewPanel({ g, onDismiss }){
@@ -1970,8 +2022,8 @@ function CrewPanel({ g, onDismiss }){
       <ul className="flex flex-col gap-2 p-0 m-0">
         ${g.crew.map(c => html`<${CrewCard} key=${c.id} c=${c} onDismiss=${onDismiss}/>`)}
         ${Array.from({ length: empties }).map((_, i) => html`
-          <li key=${'e' + i} className="slot-empty">
-            <div><div style=${{ color:'var(--foam)' }}>${t('crew.empty')} · ${t('crew.slot', { n: g.crew.length + i + 1 })}</div><div style=${{ fontSize:'12px', opacity:.8 }}>${t('crew.emptyHint')}</div></div>
+          <li key=${'e' + i} className="slot-empty slim">
+            <span><b style=${{ color:'var(--foam)', fontWeight:600 }}>${t('crew.slot', { n: g.crew.length + i + 1 })}</b> · ${t('crew.emptyHint')}</span>
           </li>`)}
       </ul>
       <div className="sect"><${LeadMeter} g=${g}/></div>
@@ -2040,10 +2092,10 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
           </div>
         </div>`
       : html`
-        <div className="mt-2 min-h-[38px] text-sm" style=${{ color:'var(--mist)' }}>
+        <div className="mt-2 min-h-[20px] text-sm" style=${{ color:'var(--mist)' }}>
           ${tip ? html`<span><b style=${{ color:'var(--foam)' }}>${L(tip.name)}.</b> ${L(tip.desc)}</span>`
                 : tags.length ? html`<span className="flex flex-wrap gap-1">${tags.map(x => html`<span key=${x} className="chip">${x}</span>`)}</span>`
-                : html`<span>${t('loot.noItems')}</span>`}
+                : null}
         </div>`}
 
       <div className="sect">
@@ -2058,14 +2110,14 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
                 <div className="text-xs" style=${{ color:'var(--gold)' }}>${t('loot.powerOf', { name: L(c.name) })}</div>
               </div>
             </div>`)}
-          ${fruited.length < 2 ? html`<div className="slot-empty">${t('loot.noFruit')}</div>` : null}
+          ${fruited.length < 2 ? html`<div className="slot-empty slim">${t('loot.noFruit')}</div>` : null}
         </div>
       </div>
 
       <div className="sect">
         <div className="sect-title">${t('loot.bounties')} <span style=${{ color:'var(--mist)' }}>${g.bounties.length}/${STAGES.length}</span></div>
         <div className="cork">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             ${STAGES.map((_, i) => html`<${Poster} key=${i} idx=${i} defeated=${g.bounties.includes(i)}/>`)}
           </div>
         </div>
@@ -2412,6 +2464,8 @@ function showEvent(e, v, fx){
     case 'revive': { const u = unit(e.id); if (u) { u.hp = e.n; u.stun = 0; A(e.id, 'heal'); flt(e.id, t('bt.revive'), 'heal'); fx.banner = { text:t('bt.revive'), color:'#3dd6a0' }; fx.log.push(t('log.revive', { a:evName(v, e.id) })); } d = 1.2; break; }
     case 'drain': { const u = unit(e.id); if (u) { u.hp = Math.min(u.maxHp, u.hp + e.n); flt(e.id, t('bt.drain'), 'heal'); } d = .4; break; }
     case 'pulse': A(e.id, 'special'); fx.overlay = { kind:'foecon', text:t('bt.pulse') }; fx.log.push(t('bt.pulse')); d = 1.6; break;
+    case 'roar': A(e.id, 'special'); fx.banner = { text:t('bt.roar'), color:'#ff5d47' }; fx.log.push(t('bt.roar')); d = 1.1; break;
+    case 'enrage': A(e.id, 'special'); fx.banner = { text:t('bt.enrage'), color:'#ff5d47' }; fx.log.push(t('bt.enrage')); d = 1.2; break;
     case 'bind': A(e.id, 'stun'); { const u = unit(e.id); if (u) u.stun = 1; } fx.banner = { text:t('bt.bind'), color:'#ff7a59' }; d = .9; break;
     case 'evade': flt(e.id, t('bt.evade'), 'obs'); d = .6; break;
     case 'haki': {
@@ -3004,7 +3058,7 @@ function StartScreen({ saved, onContinue, onDiscardSave, captainId, setCaptainId
         <p className="m-0 text-lg" style=${{ fontFamily:'var(--font-ui)', letterSpacing:'.06em', textTransform:'uppercase' }}>${t('start.tagline', { s:STAGES.length, y:yonko })}</p>
       </div>
       <div className="man-menu-card">
-        <div className="min-w-0"><div className="nm" style=${{ font:'700 22px var(--font-ui)', color:'var(--gold)' }}>${t('man.menuT')}</div><div className="text-sm" style=${{ color:'var(--foam)' }}>${t('man.menuD')}</div></div>
+        <div className="min-w-0"><div className="nm" style=${{ font:'700 22px var(--font-ui)', color:'var(--gold)' }}>${t('man.menuT')}</div></div>
         <button type="button" className="btn man-open" onClick=${onManual}>${t('man.btn')}</button>
       </div>
       <div>
@@ -3025,7 +3079,7 @@ function StartScreen({ saved, onContinue, onDiscardSave, captainId, setCaptainId
         <div className="grid gap-3 grid-cols-2" role="radiogroup" aria-label=${t('start.hair')}>
           ${AVATARS.map(a => html`
             <button key=${a.id} type="button" role="radio" aria-checked=${avatarId === a.id} className="pick-card avatar-pick" onClick=${() => setAvatarId(a.id)}>
-              <${Face} look=${cap ? cap.look : 0} color=${cap ? cap.color : '#ff7a59'} size=${150} avatar=${a.avatar}/>
+              <${Face} look=${cap ? cap.look : 0} color=${cap ? cap.color : '#ff7a59'} size=${96} avatar=${a.avatar}/>
               <div className="name" style=${{ font:'700 22px var(--font-ui)' }}>${L(a.name)}</div>
             </button>`)}
         </div>
@@ -3058,7 +3112,7 @@ function StartScreen({ saved, onContinue, onDiscardSave, captainId, setCaptainId
 
 /* ---------- el puente de mando ---------- */
 /* progreso guardado en el navegador (localStorage): cada jugador, en su propio navegador, conserva su partida */
-const SAVE_KEY = 'lp-save-v1';
+const SAVE_KEY = 'lp-save-v2';
 function readSave(){
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
@@ -3193,7 +3247,7 @@ function App(){
           <section className=${'panel min-h-0 min-w-0 overflow-y-auto ' + paneCls('loot')} aria-label=${t('loot.title')}><${LootPanel} g=${g} onDiscard=${discard} locked=${!canAct} onEquip=${(i, c) => setG(cur => equipItem(cur, i, c))} onUnequip=${i => setG(cur => unequipItem(cur, i))}/></section>
         </main>
         <nav className="lg:hidden grid grid-cols-3 gap-2">
-          ${[['crew', t('crew.title')], ['map', L(STAGES[g.stage].name)], ['loot', t('loot.title')]].map(([k, l]) => html`<button key=${k} type="button" className=${'navbtn truncate' + (tab === k ? ' on' : '')} onClick=${() => setTab(k)} aria-pressed=${tab === k}>${l}</button>`)}
+          ${[['crew', t('nav.crew')], ['map', t('nav.map')], ['loot', t('nav.loot')]].map(([k, l]) => html`<button key=${k} type="button" className=${'navbtn truncate' + (tab === k ? ' on' : '')} onClick=${() => setTab(k)} aria-pressed=${tab === k}>${l}</button>`)}
         </nav>` : null}
 
       ${node && !g.over ? (
