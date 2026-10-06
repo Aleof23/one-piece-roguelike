@@ -114,6 +114,39 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 .btn.man-open{background:linear-gradient(#7be0ff,#3aa9d6);color:#06222d}
 @media (max-width:640px){.man-wrap{padding:0}.man{max-height:100%;border-radius:0}.man-head h2{font-size:26px}}
 
+
+/* ===== identidad pirata ===== */
+.flag-picker{display:grid;grid-template-columns:minmax(240px,270px) minmax(0,1fr);gap:18px;align-items:start;padding:14px;border:3px solid #000;border-radius:4px;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 2px var(--line)}
+@media(max-width:700px){.flag-picker{grid-template-columns:minmax(0,1fr)}}
+.flag-preview{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 8px;border-radius:4px;background:radial-gradient(ellipse at 50% 30%,#2a6a8c 0,#0b2634 75%);box-shadow:inset 0 0 0 2px var(--line);position:sticky;top:0}
+.flag-name{font:400 22px/1.1 var(--font-display);color:var(--gold);text-align:center;text-shadow:0 2px 0 #000;min-height:24px}
+.flag-rows{display:flex;flex-direction:column;gap:12px;min-width:0}
+.flag-row{display:flex;flex-direction:column;gap:5px}
+.flag-opt{padding:3px;border:2px solid #000;border-radius:4px;background:rgba(0,0,0,.3);cursor:pointer;line-height:0;transition:transform .12s}
+.flag-opt:hover{transform:translateY(-2px)}
+.flag-opt[aria-checked="true"]{box-shadow:0 0 0 3px var(--gold);background:rgba(246,183,60,.12)}
+.flag-chip{font:600 14px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:2px solid #000;border-radius:3px;background:var(--hull-2);cursor:pointer;color:var(--foam)}
+.flag-chip[aria-checked="true"]{background:var(--gold);color:#2a1700}
+.flag-input{font:600 17px var(--font-ui);letter-spacing:.04em;padding:6px 10px;border:2px solid #000;border-radius:3px;background:rgba(0,0,0,.4);color:var(--foam);box-shadow:inset 0 0 0 1px var(--line);max-width:340px}
+.flag-input:focus-visible{outline:3px solid var(--gold)}
+.flag-dot{display:block;width:34px;height:34px;border-radius:50%;border:2px solid #000;box-shadow:inset 0 0 0 2px rgba(255,255,255,.15)}
+.flag-svg{display:block;overflow:visible;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+.flag-torn{filter:grayscale(.75) drop-shadow(0 3px 0 rgba(0,0,0,.5));transform:rotate(-5deg)}
+.snd-btn{position:relative;font-size:18px;line-height:1}
+.snd-btn.off{opacity:.6}
+.snd-btn.off .snd-x{position:absolute;left:20%;right:20%;top:50%;height:3px;background:var(--ember);transform:rotate(-35deg);border-radius:2px}
+.wanted-big{align-self:center;width:min(100%,330px);padding:16px 14px 14px;text-align:center;background:var(--paper);color:var(--ink);box-shadow:0 6px 0 rgba(0,0,0,.5),inset 0 0 0 4px rgba(42,26,14,.25);transform:rotate(-1.2deg);display:flex;flex-direction:column;align-items:center;gap:4px;animation:poster-in .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes poster-in{from{transform:rotate(-8deg) scale(.6);opacity:0}to{transform:rotate(-1.2deg) scale(1);opacity:1}}
+.wb-title{font:400 48px/1 var(--font-display);letter-spacing:.08em;text-transform:uppercase}
+.wb-pic .pic{border:4px solid var(--ink);display:block}
+.wb-name{font:700 28px/1.05 var(--font-ui);letter-spacing:.05em;text-transform:uppercase}
+.wb-sub{font:600 14px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.wb-bounty{font:700 34px var(--font-ui);letter-spacing:.04em;font-variant-numeric:tabular-nums;color:#7a1c1c}
+.wb-doa{font:700 14px var(--font-ui);letter-spacing:.3em;text-transform:uppercase}
+.end-bounty{display:flex;flex-direction:column;align-items:center}.end-bounty b{font:700 30px var(--font-ui);color:var(--gold);letter-spacing:.05em}
+/* carta nautica: marco de laton y vineta */
+.sea-wrap{position:relative;box-shadow:inset 0 0 0 3px #b8893a,inset 0 0 0 5px #000,inset 0 0 0 6px var(--line),0 6px 18px rgba(0,0,0,.45)}
+.sea-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(2,10,14,.55) 100%),radial-gradient(circle at 10px 10px,#e8c36a 0 4px,transparent 5px),radial-gradient(circle at calc(100% - 10px) 10px,#e8c36a 0 4px,transparent 5px),radial-gradient(circle at 10px calc(100% - 10px),#e8c36a 0 4px,transparent 5px),radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),#e8c36a 0 4px,transparent 5px)}
 /* ===== pulido visual v6 ===== */
 .hc-toggle{display:flex;gap:10px;align-items:center;justify-content:center;padding:8px 12px;margin-bottom:10px;border:2px dashed #b3261a;border-radius:4px;color:var(--foam);cursor:pointer;font-size:14px}
 .hc-toggle input{width:18px;height:18px;accent-color:#ff5d47;flex:none}
@@ -597,7 +630,7 @@ function newGame(captainId, opts = {}){
   const over = {};
   if (arch) Object.assign(over, { baseHp:arch.baseHp, baseAtk:arch.baseAtk, frole:arch.frole, style:arch.style, stats:arch.stats, hakiBase:arch.hakiBase, perk:arch.perk, role:arch.name, desc:arch.desc, archetype:arch.id });
   if (av && av.avatar) over.avatar = av.avatar;
-  const g = { seed, stage:0, pos:null, visited:[], crew:[makeMember(cap, 1, 'c0', over)], items:[], berries:SETTINGS.startBerries, bounties:[], lead:SETTINGS.leadership, over:null, uid:100, dismissed:[], lostFruits:[], hardcore:!!opts.hardcore };
+  const g = { seed, stage:0, pos:null, visited:[], crew:[makeMember(cap, 1, 'c0', over)], items:[], berries:SETTINGS.startBerries, bounties:[], lead:SETTINGS.leadership, over:null, uid:100, dismissed:[], lostFruits:[], hardcore:!!opts.hardcore, flag:opts.flag || DEFAULT_FLAG };
   g.map = genMap(seed, 0, ctxOf(g));
   return g;
 }
@@ -1214,12 +1247,12 @@ const i18n = {
     "man.bosses.stage":"Sea {n}",
     "man.bosses.none":"No special traits.",
 
-    'hdr.newRun':'New run', 'hdr.data':'Data', 'hdr.lang':'Language', 'hdr.berries':'Berries',
+    'hdr.newRun':'New voyage', 'hdr.data':'Data', 'hdr.lang':'Language', 'hdr.berries':'Berries',
     'start.tagline':'{s} seas. {y} Emperors. One treasure.',
     'start.route':'Your route to the treasure',
     'start.pickCaptain':'Choose your Captain',
     'start.solo':'You set sail alone. Every other crew slot fills up by recruiting at island nodes along the map.',
-    'start.go':'Start Voyage',
+    'start.go':'Set sail!',
     'save.continue':'Continue voyage (sea {s} · {n} crew · {b} ฿)',
     'save.discard':'Delete save',
     'start.counts':'{n} nakamas · {b} bosses · {f} fruits · {s} stages',
@@ -1236,6 +1269,17 @@ const i18n = {
     'nav.crew':'Crew', 'nav.map':'Map', 'nav.loot':'Loot',
     'loot.relics':'Passive relics', 'loot.gear':'Equipment', 'loot.noGear':'No equipment yet. Swords, guns and gear drop from fights and the market.', 'loot.equipTo':'Tap a crew member’s face to equip the item to them.',
     'hc.name':'Hardcore', 'hc.desc':'A nakama who falls in battle is gone for good. If the Captain falls, the voyage ends.', 'hc.fell':'{name} fell and is lost forever', 'hc.chip':'Hardcore',
+    'flag.section':'Your Jolly Roger', 'flag.title':'Pirate flag', 'flag.yours':'Your flag', 'flag.name':'Crew name', 'flag.namePh':'Name your crew', 'flag.random':'Random', 'flag.reset':'Reset',
+    'flag.cloth':'Cloth', 'flag.shape':'Shape', 'flag.pattern':'Pattern', 'flag.trim':'Stitching', 'flag.skull':'Skull', 'flag.gear':'Headgear and marks', 'flag.skullTone':'Skull tone', 'flag.emblem':'Emblem', 'flag.emblemTone':'Emblem tone',
+    'flag.c.black':'Black','flag.c.navy':'Navy','flag.c.crimson':'Crimson','flag.c.forest':'Forest','flag.c.violet':'Violet','flag.c.ivory':'Ivory','flag.c.gold':'Gold','flag.c.teal':'Teal','flag.c.rust':'Rust','flag.c.rose':'Rose',
+    'flag.s.flag':'Waving','flag.s.swallow':'Swallowtail','flag.s.torn':'Tattered',
+    'flag.p.plain':'Plain','flag.p.stripe':'Stripe','flag.p.split':'Split','flag.p.checker':'Checkered','flag.p.rays':'Rays','flag.p.cross':'Cross',
+    'flag.tr.none':'None','flag.tr.gold':'Gold','flag.tr.silver':'Silver',
+    'flag.k.classic':'Classic','flag.k.grin':'Grinning','flag.k.demon':'Demon','flag.k.round':'Round',
+    'flag.g.none':'None','flag.g.eyepatch':'Eyepatch','flag.g.bandana':'Bandana','flag.g.tricorn':'Tricorn hat','flag.g.crown':'Crown','flag.g.scar':'Scar',
+    'flag.tt.bone':'Bone','flag.tt.gold':'Gold','flag.tt.ghost':'Ghost','flag.tt.steel':'Steel',
+    'flag.e.bones':'Crossbones','flag.e.swords':'Cutlasses','flag.e.pistols':'Pistols','flag.e.anchor':'Anchor','flag.e.wings':'Wings','flag.e.laurel':'Laurel','flag.e.rays':'Sunburst',
+    'boss.eyebrow':'{stage} · Route Boss', 'boss.doa':'Dead or alive', 'boss.guard':'Guardian of the sea', 'boss.face':'Face them', 'snd.title':'Music and effects', 'end.total':'Total bounty',
     'crew.eyebrow':'Main deck', 'crew.title':'Your Crew', 'crew.captain':'Captain', 'crew.slot':'Slot {n}',
     'crew.empty':'Empty slot', 'crew.emptyHint':'Recruit at an island node',
     'crew.lead':'Band leadership',
@@ -1418,11 +1462,11 @@ const i18n = {
     'combat.victory':'Victory!', 'combat.bossDown':'Boss defeated!', 'combat.sunk':'Sunk!',
     'combat.berries':'+{n} berries', 'combat.loot':'Loot: {name}', 'combat.levelUp':'Whole crew levels up · +{n} leadership',
     'combat.lost':'Your band could not take the hit. The run ends here.',
-    'combat.next':'Keep sailing', 'combat.nextStage':'Sail to the next stage', 'combat.claim':'Claim the treasure', 'combat.outcome':'See the outcome',
+    'combat.next':'Keep sailing', 'combat.nextStage':'Set sail for the next sea', 'combat.claim':'Claim the treasure', 'combat.outcome':'See the outcome',
     'market.eyebrow':'Island stop', 'market.title':'Black Market', 'market.berries':'Your berries', 'market.owned':'Owned',
     'market.ration':'Cook’s ration', 'market.rationDesc':'Heals 35% of max HP for anyone still standing.', 'market.bought':'Bought: {n}',
     'market.soldOut':'The stalls are empty. You already own everything on sale.',
-    'recruit.eyebrow':'Island stop', 'recruit.title':'Recruitment', 'recruit.free':'Free leadership',
+    'recruit.eyebrow':'Island stop', 'recruit.title':'Recruit a Nakama', 'recruit.free':'Free leadership',
     'recruit.none':'Nobody else wants to join. Add more nakamas to characters.json.',
     'recruit.full':'Your crew is full: every slot is taken.',
     'recruit.cost':'Leadership cost: {n}', 'recruit.noRoom':'no room',
@@ -1579,12 +1623,12 @@ const i18n = {
     "man.bosses.stage":"Mar {n}",
     "man.bosses.none":"Sin rasgos especiales.",
 
-    'hdr.newRun':'Nueva run', 'hdr.data':'Datos', 'hdr.lang':'Idioma', 'hdr.berries':'Berries',
+    'hdr.newRun':'Nuevo viaje', 'hdr.data':'Datos', 'hdr.lang':'Idioma', 'hdr.berries':'Berries',
     'start.tagline':'{s} mares. {y} Emperadores. Un tesoro.',
     'start.route':'Tu ruta hasta el tesoro',
     'start.pickCaptain':'Elige a tu Capitán',
     'start.solo':'Zarpas en solitario. El resto de huecos de la tripulación se llenan reclutando en los nodos de isla del mapa.',
-    'start.go':'Zarpar',
+    'start.go':'¡Zarpar!',
     'save.continue':'Continuar viaje (mar {s} · {n} tripulantes · {b} ฿)',
     'save.discard':'Borrar partida',
     'start.counts':'{n} nakamas · {b} jefes · {f} frutas · {s} etapas',
@@ -1601,6 +1645,17 @@ const i18n = {
     'nav.crew':'Banda', 'nav.map':'Mapa', 'nav.loot':'Botín',
     'loot.relics':'Reliquias pasivas', 'loot.gear':'Equipo', 'loot.noGear':'Aún sin equipo. Espadas, armas y demás caen en combates y en el mercado.', 'loot.equipTo':'Toca la cara de un tripulante para equiparle el objeto.',
     'hc.name':'Hardcore', 'hc.desc':'Un nakama que cae en combate se pierde para siempre. Si cae el Capitán, termina el viaje.', 'hc.fell':'{name} ha caído y se pierde para siempre', 'hc.chip':'Hardcore',
+    'flag.section':'Tu bandera pirata', 'flag.title':'Bandera pirata', 'flag.yours':'Tu bandera', 'flag.name':'Nombre de la tripulación', 'flag.namePh':'Pon nombre a tu banda', 'flag.random':'Aleatoria', 'flag.reset':'Reiniciar',
+    'flag.cloth':'Tela', 'flag.shape':'Forma', 'flag.pattern':'Diseño', 'flag.trim':'Costura', 'flag.skull':'Calavera', 'flag.gear':'Tocado y marcas', 'flag.skullTone':'Tono de la calavera', 'flag.emblem':'Emblema', 'flag.emblemTone':'Tono del emblema',
+    'flag.c.black':'Negra','flag.c.navy':'Azul marino','flag.c.crimson':'Carmesí','flag.c.forest':'Verde bosque','flag.c.violet':'Violeta','flag.c.ivory':'Marfil','flag.c.gold':'Dorada','flag.c.teal':'Turquesa','flag.c.rust':'Óxido','flag.c.rose':'Rosa',
+    'flag.s.flag':'Ondeante','flag.s.swallow':'Cola de golondrina','flag.s.torn':'Hecha jirones',
+    'flag.p.plain':'Lisa','flag.p.stripe':'Franja','flag.p.split':'Partida','flag.p.checker':'Ajedrezada','flag.p.rays':'Rayos','flag.p.cross':'Cruz',
+    'flag.tr.none':'Ninguna','flag.tr.gold':'Dorada','flag.tr.silver':'Plateada',
+    'flag.k.classic':'Clásica','flag.k.grin':'Sonriente','flag.k.demon':'Demonio','flag.k.round':'Redonda',
+    'flag.g.none':'Nada','flag.g.eyepatch':'Parche','flag.g.bandana':'Bandana','flag.g.tricorn':'Tricornio','flag.g.crown':'Corona','flag.g.scar':'Cicatriz',
+    'flag.tt.bone':'Hueso','flag.tt.gold':'Oro','flag.tt.ghost':'Fantasma','flag.tt.steel':'Acero',
+    'flag.e.bones':'Huesos cruzados','flag.e.swords':'Sables','flag.e.pistols':'Pistolas','flag.e.anchor':'Ancla','flag.e.wings':'Alas','flag.e.laurel':'Laurel','flag.e.rays':'Sol radiante',
+    'boss.eyebrow':'{stage} · Jefe de ruta', 'boss.doa':'Vivo o muerto', 'boss.guard':'Guardián del mar', 'boss.face':'Plantarles cara', 'snd.title':'Música y efectos', 'end.total':'Recompensa total',
     'crew.eyebrow':'Cubierta principal', 'crew.title':'Tu Tripulación', 'crew.captain':'Capitán', 'crew.slot':'Hueco {n}',
     'crew.empty':'Hueco libre', 'crew.emptyHint':'Recluta en un nodo de isla',
     'crew.lead':'Liderazgo de la banda',
@@ -1783,11 +1838,11 @@ const i18n = {
     'combat.victory':'¡Victoria!', 'combat.bossDown':'¡Jefe derrotado!', 'combat.sunk':'¡Hundidos!',
     'combat.berries':'+{n} berries', 'combat.loot':'Botín: {name}', 'combat.levelUp':'Toda la banda sube de nivel · +{n} liderazgo',
     'combat.lost':'Tu banda no resistió el choque. La run termina aquí.',
-    'combat.next':'Seguir navegando', 'combat.nextStage':'Zarpar a la siguiente etapa', 'combat.claim':'Reclamar el tesoro', 'combat.outcome':'Ver el desenlace',
+    'combat.next':'Seguir navegando', 'combat.nextStage':'Zarpar al siguiente mar', 'combat.claim':'Reclamar el tesoro', 'combat.outcome':'Ver el desenlace',
     'market.eyebrow':'Parada en isla', 'market.title':'Mercado negro', 'market.berries':'Tus berries', 'market.owned':'Tuyo',
     'market.ration':'Ración del cocinero', 'market.rationDesc':'Cura 35% de la vida máxima a quien siga en pie.', 'market.bought':'Compradas: {n}',
     'market.soldOut':'Los puestos están vacíos. Ya tienes todo lo que se vende.',
-    'recruit.eyebrow':'Parada en isla', 'recruit.title':'Reclutamiento', 'recruit.free':'Liderazgo libre',
+    'recruit.eyebrow':'Parada en isla', 'recruit.title':'Reclutar un nakama', 'recruit.free':'Liderazgo libre',
     'recruit.none':'Nadie más quiere unirse. Añade más nakamas a characters.json.',
     'recruit.full':'Tu tripulación está completa: no queda ningún hueco.',
     'recruit.cost':'Coste de liderazgo: {n}', 'recruit.noRoom':'no cabe',
@@ -2625,7 +2680,7 @@ function FoeBrief({ f, st, crew }){
 }
 
 function CombatEvent({ g, setG, node, done }){
-  const [phase, setPhase] = useState('brief');   // brief | battle | result
+  const [phase, setPhase] = useState(node.type === 'boss' ? 'intro' : 'brief');   // intro | brief | battle | result
   const [rep, setRep] = useState(null);
   const [choice, setChoice] = useState(null);
   const boss = node.type === 'boss', s = STAGES[g.stage], T = TYPES[node.type];
@@ -2637,6 +2692,7 @@ function CombatEvent({ g, setG, node, done }){
   const swap = old => { setG(cur => swapItem(cur, old.id, rep.item)); setChoice('took'); };
   const title = nodeLabel(node, s);
   const finish = fin => { const r = battleResult(g, node, fin); setG(r.g); setRep(r); setPhase('result'); };
+  if (phase === 'intro') return html`<${BossIntro} stage=${g.stage} onGo=${() => setPhase('brief')}/>`;
   if (phase === 'brief') return html`
     <${Modal} wide=${true} tone=${T.color} eyebrow=${boss ? t('combat.eyebrowBoss', { stage:L(s.name) }) : t('type.' + node.type)} title=${title} icon=${icon}>
       <p className="m-0" style=${{ color:'var(--mist)' }}>${t('combat.introSim')}</p>
@@ -2807,11 +2863,15 @@ function EndScreen({ g, onRestart }){
     <div className="modal-wrap" role="dialog" aria-modal="true" aria-label=${win ? t('end.win') : t('end.lose')}>
       <div className="modal" style=${{ '--tone': win ? '#f6b73c' : '#ff5d47' }}>
         <div className="modal-body" style=${{ paddingTop: 22, alignItems:'center', textAlign:'center' }}>
-          <div className=${win ? 'shine' : ''} style=${{ color: win ? 'var(--gold)' : 'var(--ember)' }}><${Ico} n=${win ? 'crown' : 'skull'} size=${84} sw=${1.4}/></div>
+          <${Flag} flag=${g.flag || DEFAULT_FLAG} size=${win ? 210 : 170} wave=${win} className=${win ? '' : 'flag-torn'}/>
+          ${(g.flag && g.flag.name) ? html`<div className="flag-name">${g.flag.name}</div>` : null}
+          <div className=${win ? 'shine' : ''} style=${{ color: win ? 'var(--gold)' : 'var(--ember)' }}><${Ico} n=${win ? 'crown' : 'skull'} size=${52} sw=${1.4}/></div>
           <div className="victory-title">${win ? t('end.win') : t('end.lose')}</div>
           <p className="m-0" style=${{ color:'var(--mist)' }}>${win
             ? t('end.winText', { y: yonko, n: fmtBounty(total) })
             : t('end.loseText', { n: g.stage + 1, m: STAGES.length, name: L(STAGES[g.stage].name) })}</p>
+          <div className="flex gap-1 flex-wrap justify-center">${g.crew.map(c => html`<${Face} key=${c.id} look=${c.look} color=${c.color} size=${44} avatar=${c.avatar}/>`)}</div>
+          ${total > 0 ? html`<div className="end-bounty"><span className="eyebrow">${t('end.total')}</span><b>${fmtBounty(total)}</b></div>` : null}
           <button type="button" className="btn" onClick=${onRestart}>${win ? t('end.again') : t('end.retry')}</button>
         </div>
       </div>
@@ -3090,7 +3150,7 @@ function ManualScreen({ onClose }){
     </div>`;
 }
 
-function StartScreen({ hardcore, setHardcore, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
+function StartScreen({ flag, setFlag, hardcore, setHardcore, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
   const caps = NAKAMAS.filter(n => n.captain);
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
   const arch = ARCHETYPES.find(a => a.id === archId) || ARCHETYPES[0];
@@ -3110,6 +3170,10 @@ function StartScreen({ hardcore, setHardcore, saved, onContinue, onDiscardSave, 
       <div>
         <div className="sect-title">${t('start.route')}</div>
         <${Journey} idx=${-1} over=${null}/>
+      </div>
+      <div>
+        <div className="sect-title">${t('flag.section')}</div>
+        <${FlagPicker} flag=${flag} setFlag=${setFlag}/>
       </div>
       ${caps.length > 1 ? html`<div>
         <div className="sect-title">${t('start.pickCaptain')}</div>
@@ -3170,6 +3234,188 @@ function readSave(){
 function writeSave(g){ try { if (g.over) localStorage.removeItem(SAVE_KEY); else localStorage.setItem(SAVE_KEY, JSON.stringify({ g, auto:BATTLE_PREFS.auto, fast:BATTLE_PREFS.fast })); } catch (e) {} }
 function clearSave(){ try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
 
+
+/* ================= IDENTIDAD PIRATA: bandera propia y musica ================= */
+const FLAG_PALETTE = {
+  black:{ a:'#161b24', b:'#2c3544' }, navy:{ a:'#12304a', b:'#2a6a9c' }, crimson:{ a:'#7a1c1c', b:'#c0403a' }, forest:{ a:'#17402e', b:'#34865c' }, violet:{ a:'#3a2160', b:'#7048b0' },
+  ivory:{ a:'#d9d0b8', b:'#a8996f' }, gold:{ a:'#c8962a', b:'#f3d46f' }, teal:{ a:'#0f5a63', b:'#2fa6ae' }, rust:{ a:'#8a3b14', b:'#cf7436' }, rose:{ a:'#9a2a52', b:'#df6c93' },
+};
+const FLAG_OPTS = {
+  color:Object.keys(FLAG_PALETTE), shape:['flag', 'swallow', 'torn'], pattern:['plain', 'stripe', 'split', 'checker', 'rays', 'cross'], trim:['none', 'gold', 'silver'],
+  skull:['classic', 'grin', 'demon', 'round'], gear:['none', 'eyepatch', 'bandana', 'tricorn', 'crown', 'scar'], skullTone:['bone', 'gold', 'ghost'],
+  emblem:['bones', 'swords', 'pistols', 'anchor', 'wings', 'laurel', 'rays'], emblemTone:['bone', 'gold', 'steel'],
+};
+const SKULL_TONES = { bone:['#f4efe0', '#d6caab'], gold:['#f3c74f', '#c18e22'], ghost:['#d6f2f7', '#9ccbd6'] };
+const EMBLEM_TONES = { bone:'#efe6cf', gold:'#e9b73e', steel:'#b9c5d1' };
+const TRIMS = { gold:'#e9b73e', silver:'#d3dae2' };
+const DEFAULT_FLAG = { color:'black', shape:'flag', pattern:'plain', trim:'gold', skull:'classic', gear:'none', skullTone:'bone', emblem:'bones', emblemTone:'bone', name:'' };
+function normFlag(f){
+  const o = { ...DEFAULT_FLAG }; if (!f || typeof f !== 'object') return o;
+  for (const k in FLAG_OPTS) if (FLAG_OPTS[k].includes(f[k])) o[k] = f[k];
+  if (typeof f.name === 'string') o.name = f.name.slice(0, 22);
+  return o;
+}
+function readFlag(){ try { return normFlag(JSON.parse(localStorage.getItem('lp-flag') || 'null')); } catch (e) { return DEFAULT_FLAG; } }
+function randomFlag(){
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  return normFlag({ color:pick(FLAG_OPTS.color), shape:pick(FLAG_OPTS.shape), pattern:pick(FLAG_OPTS.pattern), trim:pick(FLAG_OPTS.trim), skull:pick(FLAG_OPTS.skull), gear:pick(FLAG_OPTS.gear), skullTone:pick(FLAG_OPTS.skullTone), emblem:pick(FLAG_OPTS.emblem), emblemTone:pick(FLAG_OPTS.emblemTone) });
+}
+const CLOTH_PATHS = {
+  flag:'M10 12 C38 3 58 20 88 12 S132 6 152 14 L152 84 C130 93 110 78 84 86 S38 92 10 84 Z',
+  swallow:'M10 12 C38 3 58 20 88 12 S132 6 152 14 L128 49 L152 84 C130 93 110 78 84 86 S38 92 10 84 Z',
+  torn:'M10 12 C38 3 58 20 88 12 S132 6 152 14 L146 24 L152 33 L143 43 L151 55 L144 64 L152 74 L149 84 C128 92 108 78 84 86 S38 92 10 84 Z',
+};
+function FlagEmblem({ kind, tone }){
+  const c = EMBLEM_TONES[tone] || EMBLEM_TONES.bone, K = '#0a0a0a';
+  if (kind === 'swords') {
+    const blade = html`<g><path d="M-4 26 C-10 2 -7 -30 5 -58 C10 -30 10 2 4 26Z" fill=${c} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><path d="M0 22 C-4 0 -2 -26 4 -50" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="1.4"/>
+      <rect x="-14" y="25" width="28" height="6" rx="3" fill="#e9b73e" stroke=${K} strokeWidth="2"/><rect x="-3" y="31" width="6" height="15" rx="2" fill="#6b3f1e" stroke=${K} strokeWidth="2"/><circle cx="0" cy="49" r="4.5" fill="#e9b73e" stroke=${K} strokeWidth="2"/></g>`;
+    return html`<g><g transform="rotate(60)">${blade}</g><g transform="rotate(-60)">${blade}</g></g>`;
+  }
+  if (kind === 'pistols') {
+    const gun = html`<g><path d="M-44 -9 L14 -9 L14 1 L-44 1Z" fill=${c} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><rect x="-46" y="-11" width="6" height="14" rx="2" fill=${c} stroke=${K} strokeWidth="2"/>
+      <path d="M6 -12 L30 -12 L36 0 L46 26 L30 29 L24 10 L6 8Z" fill="#7a4a22" stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><path d="M8 -12 L14 -20 L20 -12Z" fill="#9aa5b1" stroke=${K} strokeWidth="2"/>
+      <path d="M12 10 Q20 22 28 12" fill="none" stroke=${K} strokeWidth="2"/></g>`;
+    return html`<g><g transform="scale(1.1) rotate(145)">${gun}</g><g transform="scale(-1.1 1.1) rotate(145)">${gun}</g></g>`;
+  }
+  if (kind === 'anchor') {
+    return html`<g strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <g stroke=${K} strokeWidth="11"><circle cx="0" cy="-42" r="6"/><line x1="0" y1="-36" x2="0" y2="36"/><line x1="-16" y1="-26" x2="16" y2="-26"/><path d="M-32 14 Q-30 40 0 40 Q30 40 32 14"/><path d="M-38 20 L-32 10 L-24 20Z M38 20 L32 10 L24 20Z"/></g>
+      <g stroke=${c} strokeWidth="6"><circle cx="0" cy="-42" r="6"/><line x1="0" y1="-36" x2="0" y2="36"/><line x1="-16" y1="-26" x2="16" y2="-26"/><path d="M-32 14 Q-30 40 0 40 Q30 40 32 14"/><path d="M-38 20 L-32 10 L-24 20Z M38 20 L32 10 L24 20Z" fill=${c}/></g></g>`;
+  }
+  if (kind === 'wings') {
+    const w = html`<g><path d="M-14 6 C-34 -30 -64 -42 -92 -28 C-76 -26 -70 -18 -74 -10 C-62 -14 -54 -6 -56 4 C-46 -2 -38 6 -38 16 C-30 8 -22 8 -12 14Z" fill=${c} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/>
+      <g fill="none" stroke="rgba(0,0,0,.4)" strokeWidth="1.4" strokeLinecap="round"><path d="M-24 4 C-42 -18 -62 -28 -80 -26"/><path d="M-26 12 C-40 0 -52 -6 -64 -6"/></g></g>`;
+    return html`<g>${w}<g transform="scale(-1 1)">${w}</g></g>`;
+  }
+  if (kind === 'laurel') {
+    const leaves = []; for (let i = 0; i < 9; i++) { const th = 172 - i * 20.5, a = th * Math.PI / 180; leaves.push({ x:Math.cos(a) * 52, y:Math.sin(a) * 42 + 2, r:th }); }
+    return html`<g><path d=${'M' + leaves[0].x + ' ' + leaves[0].y + ' ' + leaves.slice(1).map(l => 'L' + l.x + ' ' + l.y).join(' ')} fill="none" stroke=${K} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+      ${leaves.map((l, i) => html`<ellipse key=${i} cx=${l.x} cy=${l.y} rx="4.4" ry="9.5" transform=${'rotate(' + l.r + ' ' + l.x + ' ' + l.y + ')'} fill=${c} stroke=${K} strokeWidth="1.9"/>`)}</g>`;
+  }
+  if (kind === 'rays') {
+    const r = []; for (let i = 0; i < 20; i++) { const a = i * 18 * Math.PI / 180, L = i % 2 ? 50 : 66, w = 5.5 * Math.PI / 180; r.push(`M0 0 L${(Math.cos(a - w) * L).toFixed(1)} ${(Math.sin(a - w) * L).toFixed(1)} L${(Math.cos(a + w) * L).toFixed(1)} ${(Math.sin(a + w) * L).toFixed(1)}Z`); }
+    return html`<g><path d=${r.join(' ')} fill=${c} stroke=${K} strokeWidth="1.8" strokeLinejoin="round" opacity=".92"/></g>`;
+  }
+  const bone = html`<g><g stroke=${K} strokeLinecap="round"><line x1="-46" y1="0" x2="46" y2="0" strokeWidth="12"/><circle cx="-50" cy="-5" r="7.5" fill=${K}/><circle cx="-50" cy="5" r="7.5" fill=${K}/><circle cx="50" cy="-5" r="7.5" fill=${K}/><circle cx="50" cy="5" r="7.5" fill=${K}/></g>
+    <g stroke=${c} strokeLinecap="round"><line x1="-46" y1="0" x2="46" y2="0" strokeWidth="8"/></g><g fill=${c}><circle cx="-50" cy="-5" r="5.6"/><circle cx="-50" cy="5" r="5.6"/><circle cx="50" cy="-5" r="5.6"/><circle cx="50" cy="5" r="5.6"/></g></g>`;
+  return html`<g><g transform="rotate(32)">${bone}</g><g transform="rotate(-32)">${bone}</g></g>`;
+}
+function FlagSkull({ kind, gear, tone }){
+  const [s1, s2] = SKULL_TONES[tone] || SKULL_TONES.bone, K = '#0a0a0a', demon = kind === 'demon';
+  const eyeFill = demon ? '#ff4a35' : K;
+  const head = kind === 'round'
+    ? html`<g><circle cx="0" cy="-4" r="27" fill=${s1} stroke=${K} strokeWidth="2.6"/><path d="M-14 18 L-14 29 Q0 33 14 29 L14 18Z" fill=${s1} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/>
+        <ellipse cx="-11" cy="-3" rx="8" ry="9.5" fill=${K}/><ellipse cx="11" cy="-3" rx="8" ry="9.5" fill=${K}/><circle cx="-8" cy="-6" r="2.6" fill="#fff" opacity=".85"/><circle cx="14" cy="-6" r="2.6" fill="#fff" opacity=".85"/>
+        <path d="M0 9 L-3.5 15 Q0 13.5 3.5 15Z" fill=${K}/><g stroke=${K} strokeWidth="1.5"><line x1="-7" y1="19" x2="-7" y2="29"/><line x1="0" y1="19" x2="0" y2="30"/><line x1="7" y1="19" x2="7" y2="29"/></g></g>`
+    : html`<g><path d="M0 -30 C-19 -30 -29 -17 -27 -1 C-26 9 -20 13 -17 18 L-17 28 L17 28 L17 18 C20 13 26 9 27 -1 C29 -17 19 -30 0 -30Z" fill=${s1} stroke=${K} strokeWidth="2.6" strokeLinejoin="round"/>
+        <path d="M-27 -1 C-26 9 -20 13 -17 18 L-17 23 C-24 15 -28 8 -27 -1Z M27 -1 C26 9 20 13 17 18 L17 23 C24 15 28 8 27 -1Z" fill=${s2} opacity=".7"/>
+        <ellipse cx="-9" cy="-20" rx="9" ry="4" fill="#fff" opacity=".3" transform="rotate(-18 -9 -20)"/><path d="M9 -29 L6 -20 L10 -14 L7 -8" fill="none" stroke=${K} strokeWidth="1.3" opacity=".5" strokeLinecap="round"/>
+        ${kind === 'grin'
+          ? html`<path d="M-21 -8 Q-9 -11 -3 -1 Q-8 8 -18 5Z" fill=${K}/><path d="M21 -8 Q9 -11 3 -1 Q8 8 18 5Z" fill=${K}/>`
+          : html`<ellipse cx="-11" cy="-1" rx="7.6" ry="8.8" fill=${eyeFill} stroke=${K} strokeWidth="1.6" transform="rotate(-8 -11 -1)"/><ellipse cx="11" cy="-1" rx="7.6" ry="8.8" fill=${eyeFill} stroke=${K} strokeWidth="1.6" transform="rotate(8 11 -1)"/>
+            ${demon ? html`<ellipse cx="-11" cy="-1" rx="2" ry="6" fill=${K}/><ellipse cx="11" cy="-1" rx="2" ry="6" fill=${K}/>` : null}`}
+        <path d="M0 8 L-4.5 17 Q0 15 4.5 17Z" fill=${K}/>
+        ${kind === 'grin'
+          ? html`<path d="M-15 19 Q0 32 15 19" fill="none" stroke=${K} strokeWidth="2.6" strokeLinecap="round"/><g stroke=${K} strokeWidth="1.6"><line x1="-10" y1="22" x2="-10" y2="28"/><line x1="-5" y1="25" x2="-5" y2="30"/><line x1="0" y1="26" x2="0" y2="31"/><line x1="5" y1="25" x2="5" y2="30"/><line x1="10" y1="22" x2="10" y2="28"/></g>`
+          : html`<g stroke=${K} strokeWidth="1.5"><line x1="-11" y1="19.5" x2="-11" y2="28"/><line x1="-5.5" y1="19.5" x2="-5.5" y2="28"/><line x1="0" y1="19.5" x2="0" y2="28"/><line x1="5.5" y1="19.5" x2="5.5" y2="28"/><line x1="11" y1="19.5" x2="11" y2="28"/><line x1="-17" y1="23.5" x2="17" y2="23.5"/></g>`}</g>`;
+  const horns = demon ? html`<g fill=${s1} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"><path d="M-20 -22 C-36 -28 -42 -44 -32 -56 C-32 -42 -24 -34 -12 -29Z"/><path d="M20 -22 C36 -28 42 -44 32 -56 C32 -42 24 -34 12 -29Z"/></g>` : null;
+  const G = {
+    eyepatch: html`<g><path d="M-28 -10 L28 -18" stroke=${K} strokeWidth="4" strokeLinecap="round"/><ellipse cx="11" cy="-1" rx="10.5" ry="11.5" fill="#15151b" stroke=${K} strokeWidth="2" transform="rotate(8 11 -1)"/><path d="M5 -6 Q11 -10 17 -6" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="1.6" strokeLinecap="round"/></g>`,
+    bandana: html`<g><path d="M-29 -15 C-14 -30 14 -30 29 -15 L29 -5 C14 -18 -14 -18 -29 -5Z" fill="#c8332b" stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><g fill="#fff" opacity=".85"><circle cx="-14" cy="-19" r="1.7"/><circle cx="-4" cy="-21" r="1.7"/><circle cx="7" cy="-21" r="1.7"/><circle cx="17" cy="-18" r="1.7"/></g>
+      <circle cx="29" cy="-8" r="5.5" fill="#c8332b" stroke=${K} strokeWidth="2"/><path d="M31 -5 L44 3 L37 5 L45 16 L33 9Z" fill="#c8332b" stroke=${K} strokeWidth="2" strokeLinejoin="round"/></g>`,
+    tricorn: html`<g><path d="M-33 -22 C-31 -42 -14 -50 0 -50 C14 -50 31 -42 33 -22 C20 -29 -20 -29 -33 -22Z" fill="#1d1b25" stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/>
+      <path d="M-46 -18 Q-35 -36 -20 -27 L20 -27 Q35 -36 46 -18 Q24 -10 0 -16 Q-24 -10 -46 -18Z" fill="#2a2733" stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><path d="M-45 -18 Q-24 -10 0 -16 Q24 -10 45 -18" fill="none" stroke="#e9b73e" strokeWidth="2.4" strokeLinecap="round"/>
+      <circle cx="0" cy="-37" r="5.5" fill="#f4efe0" stroke=${K} strokeWidth="1.6"/><circle cx="-2" cy="-37.5" r="1.1" fill=${K}/><circle cx="2" cy="-37.5" r="1.1" fill=${K}/></g>`,
+    crown: html`<g><path d="M-25 -26 L-29 -50 L-14 -38 L0 -56 L14 -38 L29 -50 L25 -26Z" fill="#f0c04a" stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><rect x="-25" y="-31" width="50" height="6" fill="#d9a32c" stroke=${K} strokeWidth="2"/>
+      <circle cx="0" cy="-45" r="3.2" fill="#e0453a" stroke=${K} strokeWidth="1.2"/><circle cx="-16" cy="-34" r="2.4" fill="#3b8be0" stroke=${K} strokeWidth="1"/><circle cx="16" cy="-34" r="2.4" fill="#3b8be0" stroke=${K} strokeWidth="1"/></g>`,
+    scar: html`<g><path d="M-19 -20 L-4 15" stroke="#b3261a" strokeWidth="3" strokeLinecap="round" fill="none"/><g stroke="#b3261a" strokeWidth="1.6" strokeLinecap="round"><line x1="-18" y1="-12" x2="-12" y2="-15"/><line x1="-14" y1="-4" x2="-8" y2="-7"/><line x1="-11" y1="4" x2="-5" y2="1"/><line x1="-8" y1="11" x2="-2" y2="8"/></g></g>`,
+  };
+  return html`<g>${horns}${head}${G[gear] || null}</g>`;
+}
+function Flag({ flag, size = 96, wave = false, className = '' }){
+  const f = normFlag(flag), id = React.useId().replace(/[^a-zA-Z0-9]/g, ''), pal = FLAG_PALETTE[f.color], cloth = CLOTH_PATHS[f.shape];
+  const A = pal.a, B = pal.b;
+  const pattern = f.pattern === 'stripe' ? html`<rect x="0" y="40" width="170" height="20" fill=${B}/>`
+    : f.pattern === 'split' ? html`<path d="M170 0 L170 110 L0 110Z" fill=${B}/>`
+    : f.pattern === 'cross' ? html`<g fill=${B}><rect x="36" y="0" width="16" height="110"/><rect x="0" y="43" width="170" height="14"/></g>`
+    : f.pattern === 'checker' ? html`<g fill=${B}>${Array.from({ length:14 }).map((_, i) => html`<g key=${i}><rect x=${10 + i * 10.2} y=${i % 2 ? 12 : 22} width="10.2" height="10"/><rect x=${10 + i * 10.2} y=${i % 2 ? 76 : 66} width="10.2" height="10"/></g>`)}</g>`
+    : f.pattern === 'rays' ? html`<g fill=${B} opacity=".55">${Array.from({ length:12 }).map((_, i) => { const a = i * 30 * Math.PI / 180, w = 7.5 * Math.PI / 180; return html`<path key=${i} d=${'M81 49 L' + (81 + Math.cos(a - w) * 120) + ' ' + (49 + Math.sin(a - w) * 120) + ' L' + (81 + Math.cos(a + w) * 120) + ' ' + (49 + Math.sin(a + w) * 120) + 'Z'}/>`; })}</g>` : null;
+  const body = html`<g>
+      <path d=${cloth} fill=${A}/>
+      <g clipPath=${'url(#c' + id + ')'}>${pattern}<rect x="0" y="0" width="170" height="110" fill=${'url(#f' + id + ')'}/><rect x="0" y="0" width="170" height="30" fill="#fff" opacity=".07"/></g>
+      ${f.trim !== 'none' ? html`<path d=${cloth} transform="translate(81 49) scale(.93 .84) translate(-81 -49)" fill="none" stroke=${TRIMS[f.trim]} strokeWidth="1.6" strokeDasharray="4 3" strokeLinecap="round" opacity=".9"/>` : null}
+      <path d=${cloth} fill="none" stroke="#0a0a0a" strokeWidth="3.2" strokeLinejoin="round"/>
+      <g transform="translate(81 49)"><g opacity=".98" transform="scale(.86)"><${FlagEmblem} kind=${f.emblem} tone=${f.emblemTone}/></g><g transform=${(f.gear === 'tricorn' || f.gear === 'crown') ? 'translate(0 7) scale(.76)' : 'translate(0 1) scale(.86)'}><${FlagSkull} kind=${f.skull} gear=${f.gear} tone=${f.skullTone}/></g></g>
+    </g>`;
+  return html`<svg className=${'flag-svg ' + className} viewBox="0 0 160 104" width=${size} height=${Math.round(size * 104 / 160)} role="img" aria-label=${t('flag.title')}>
+    <defs><clipPath id=${'c' + id}><path d=${cloth}/></clipPath>
+      <linearGradient id=${'f' + id} x1="0" y1="0" x2=".22" y2="0" spreadMethod="reflect"><stop offset="0" stopColor="#000" stopOpacity=".26"/><stop offset=".5" stopColor="#fff" stopOpacity=".09"/><stop offset="1" stopColor="#000" stopOpacity=".26"/></linearGradient>
+      ${wave ? html`<filter id=${'w' + id} x="-6%" y="-12%" width="112%" height="124%"><feTurbulence type="fractalNoise" baseFrequency="0.011 0.03" numOctaves="1" seed="3" result="n"><animate attributeName="baseFrequency" dur="7s" values="0.011 0.03;0.017 0.04;0.011 0.03" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>` : null}</defs>
+    <rect x="3" y="2" width="6" height="100" rx="3" fill="#6b4a22" stroke="#0a0a0a" strokeWidth="1.6"/><circle cx="6" cy="4" r="5" fill="#e9b73e" stroke="#0a0a0a" strokeWidth="1.6"/>
+    ${wave ? html`<g filter=${'url(#w' + id + ')'}>${body}</g>` : body}</svg>`;
+}
+function FlagPicker({ flag, setFlag }){
+  const set = (k, v) => setFlag({ ...flag, [k]:v });
+  const sw = (k, v) => html`<button key=${v} type="button" role="radio" aria-checked=${flag[k] === v} className="flag-opt" title=${t('flag.c.' + v)} onClick=${() => set(k, v)}><span className="flag-dot" style=${{ background:'linear-gradient(135deg,' + FLAG_PALETTE[v].b + ',' + FLAG_PALETTE[v].a + ' 60%)' }}></span></button>`;
+  const mini = (k, v, p) => html`<button key=${v} type="button" role="radio" aria-checked=${flag[k] === v} className="flag-opt" title=${t('flag.' + p + '.' + v)} onClick=${() => set(k, v)}><${Flag} flag=${{ ...flag, [k]:v }} size=${74}/></button>`;
+  const chip = (k, v, p) => html`<button key=${v} type="button" role="radio" aria-checked=${flag[k] === v} className="flag-chip" onClick=${() => set(k, v)}>${t('flag.' + p + '.' + v)}</button>`;
+  const row = (label, kind, children) => html`<div className="flag-row"><div className="eyebrow">${label}</div><div className="flex gap-2 flex-wrap items-center" role="radiogroup" aria-label=${label}>${children}</div></div>`;
+  return html`<div className="flag-picker">
+    <div className="flag-preview">
+      <${Flag} flag=${flag} size=${230} wave=${true}/>
+      <div className="flag-name">${flag.name || t('flag.yours')}</div>
+      <div className="flex gap-2"><button type="button" className="btn small" onClick=${() => setFlag({ ...randomFlag(), name:flag.name })}>${t('flag.random')}</button><button type="button" className="btn ghost small" onClick=${() => setFlag({ ...DEFAULT_FLAG, name:flag.name })}>${t('flag.reset')}</button></div>
+    </div>
+    <div className="flag-rows">
+      <label className="flag-row" htmlFor="flag-name"><span className="eyebrow">${t('flag.name')}</span><input id="flag-name" className="flag-input" type="text" maxLength="22" value=${flag.name} placeholder=${t('flag.namePh')} onChange=${e => set('name', e.target.value)}/></label>
+      ${row(t('flag.cloth'), 'color', FLAG_OPTS.color.map(v => sw('color', v)))}
+      ${row(t('flag.shape'), 'shape', FLAG_OPTS.shape.map(v => chip('shape', v, 's')))}
+      ${row(t('flag.pattern'), 'pattern', FLAG_OPTS.pattern.map(v => chip('pattern', v, 'p')))}
+      ${row(t('flag.trim'), 'trim', FLAG_OPTS.trim.map(v => chip('trim', v, 'tr')))}
+      ${row(t('flag.skull'), 'skull', FLAG_OPTS.skull.map(v => mini('skull', v, 'k')))}
+      ${row(t('flag.gear'), 'gear', FLAG_OPTS.gear.map(v => mini('gear', v, 'g')))}
+      ${row(t('flag.skullTone'), 'skullTone', FLAG_OPTS.skullTone.map(v => chip('skullTone', v, 'tt')))}
+      ${row(t('flag.emblem'), 'emblem', FLAG_OPTS.emblem.map(v => mini('emblem', v, 'e')))}
+      ${row(t('flag.emblemTone'), 'emblemTone', FLAG_OPTS.emblemTone.map(v => chip('emblemTone', v, 'tt')))}
+    </div></div>`;
+}
+/* musica: UN solo archivo que pones tu junto al index.html (MUSIC_FILE). Sin sonidos generados. */
+const MUSIC_FILE = 'musica.mp3', MUSIC_VOLUME = .5;
+const SND = (() => {
+  let a = null, muted = false, failed = false;
+  try { muted = localStorage.getItem('lp-mute') === '1'; } catch (e) {}
+  const make = () => { if (a || failed) return; try { a = new Audio(MUSIC_FILE); a.loop = true; a.volume = MUSIC_VOLUME; a.preload = 'auto'; a.addEventListener('error', () => { failed = true; a = null; }); } catch (e) { failed = true; a = null; } };
+  return {
+    unlock(){ make(); if (a && !muted && a.paused) a.play().catch(() => {}); },
+    toggle(){ muted = !muted; try { localStorage.setItem('lp-mute', muted ? '1' : '0'); } catch (e) {} make(); if (a) { if (muted) a.pause(); else a.play().catch(() => {}); } return muted; },
+    get muted(){ return muted; },
+  };
+})();
+/* intro de jefe: cartel de SE BUSCA a pantalla completa con la recompensa contando */
+function BossIntro({ stage, onGo }){
+  const s = STAGES[stage], b = s.boss;
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!(b.bounty > 0)) return;
+    let raf; const t0 = performance.now();
+    const tick = now => { const k = Math.min(1, (now - t0) / 2000); setN(Math.round(b.bounty * (1 - Math.pow(1 - k, 3)))); if (k < 1) raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick); return () => cancelAnimationFrame(raf);
+  }, []);
+  return html`
+    <${Modal} tone=${RANKS[b.rank].color} eyebrow=${t('boss.eyebrow', { stage:L(s.name) })} title=${t('rank.' + b.rank)} icon=${RANKS[b.rank].icon}>
+      <div className="wanted-big">
+        <div className="wb-title">${b.bounty > 0 ? t('poster.wanted') : t('rank.' + b.rank)}</div>
+        <div className="wb-pic"><${Face} look=${b.look} color=${b.color} size=${150} crown=${b.rank === 'yonko'} className="pic" avatar=${b.avatar}/></div>
+        <div className="wb-name">${bossName(b)}</div>
+        ${b.title ? html`<div className="wb-sub">${L(b.title)}</div>` : null}
+        <div className="wb-bounty">${b.bounty > 0 ? fmtBounty(n) : L(s.name)}</div>
+        <div className="wb-doa">${b.bounty > 0 ? t('boss.doa') : t('boss.guard')}</div>
+      </div>
+      <button type="button" className="btn" onClick=${onGo}>${t('boss.face')}</button>
+    <//>`;
+}
+
 function App(){
   const [lang, setLangState] = useState(() => { try { return localStorage.getItem('lp-lang') === 'es' ? 'es' : 'en'; } catch (e) { return 'en'; } });
   LANG = lang;
@@ -3195,6 +3441,10 @@ function App(){
   const [hover, setHover] = useState(null);
   const [saved, setSaved] = useState(null);
   const [hardcore, setHardcore] = useState(false);
+  const [flag, setFlagState] = useState(readFlag);
+  const setFlag = f => { setFlagState(f); try { localStorage.setItem('lp-flag', JSON.stringify(f)); } catch (e) {} };
+  const [muted, setMuted] = useState(SND.muted);
+  useEffect(() => { const f = () => SND.unlock(); window.addEventListener('pointerdown', f); window.addEventListener('keydown', f); return () => { window.removeEventListener('pointerdown', f); window.removeEventListener('keydown', f); }; }, []);
 
   const goStart = () => {
     const sv = readSave(); setSaved(sv ? sv.g : null);
@@ -3228,7 +3478,7 @@ function App(){
     setErrors([]); installData(res.data); goStart();
   };
 
-  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(captainId, { avatarId, archetypeId:archId, hardcore })); setTab('map'); setPhase('play'); };
+  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(captainId, { avatarId, archetypeId:archId, hardcore, flag:normFlag(flag) })); setTab('map'); setPhase('play'); };
 
   const continueSave = () => { const sv = readSave(); if (!sv) { setSaved(null); return; } BATTLE_PREFS.auto = !!sv.auto; BATTLE_PREFS.fast = !!sv.fast; setG(sv.g); setModal(null); setTab('map'); setPhase('play'); };
   const discardSave = () => { clearSave(); setSaved(null); };
@@ -3261,10 +3511,11 @@ function App(){
     <div className="h-full flex flex-col gap-3 px-4 pt-3" style=${{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 0px))' }}>
       <header className="flex items-center gap-3 justify-between flex-wrap">
         <div className="flex items-baseline gap-3 min-w-0">
-          <h1 className="m-0" style=${{ fontFamily:'var(--font-display)', fontSize:'34px', lineHeight:1, color:'var(--gold)', textShadow:'0 3px 0 #000' }}>OnePieceLike</h1>
+          ${playing ? html`<span title=${(g.flag && g.flag.name) || ''}><${Flag} flag=${g.flag || flag} size=${46}/></span>` : null}<h1 className="m-0" style=${{ fontFamily:'var(--font-display)', fontSize:'34px', lineHeight:1, color:'var(--gold)', textShadow:'0 3px 0 #000' }}>OnePieceLike</h1>
           <span className="eyebrow hidden md:inline">${t('app.tagline')}</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <button type="button" className=${'btn ghost small snd-btn' + (muted ? ' off' : '')} aria-pressed=${!muted} title=${t('snd.title')} onClick=${() => { SND.unlock(); setMuted(SND.toggle()); }}>♪<span className="snd-x"></span></button>
           ${playing ? html`
             <span className="timer" style=${{ color:'var(--gold)' }} title=${t('hdr.berries')}><span style=${{ fontSize:'18px' }}>฿</span> ${g.berries}</span>` : null}
           <${LangToggle} lang=${lang} setLang=${setLang}/>
@@ -3286,7 +3537,7 @@ function App(){
           </div>
         </main>` : null}
 
-      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} hardcore=${hardcore} setHardcore=${setHardcore} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
+      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} flag=${flag} setFlag=${setFlag} hardcore=${hardcore} setHardcore=${setHardcore} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
 
       ${playing ? html`
         <main className="flex-1 min-h-0 grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)_320px]">
