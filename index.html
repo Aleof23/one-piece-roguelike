@@ -116,6 +116,13 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 
 
 /* ===== identidad pirata ===== */
+.flag-toggle{width:100%;background:none;border:0;padding:4px 0;cursor:pointer;text-align:left;color:var(--foam)}
+.flag-toggle:hover .flag-hint{color:var(--gold)}
+.flag-caret{display:inline-block;transition:transform .15s;color:var(--gold)}.flag-caret.open{transform:rotate(90deg)}
+.flag-mini{display:inline-flex;align-items:center;gap:8px;text-transform:none;letter-spacing:.02em}
+.flag-mini-name{font:400 17px var(--font-display);color:var(--gold)}
+.flag-hint{margin-left:auto;font:600 12px var(--font-ui);letter-spacing:.12em;color:var(--mist);order:3}
+.flag-toggle::after{order:2}
 .flag-picker{display:grid;grid-template-columns:minmax(240px,270px) minmax(0,1fr);gap:18px;align-items:start;padding:14px;border:3px solid #000;border-radius:4px;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 2px var(--line)}
 @media(max-width:700px){.flag-picker{grid-template-columns:minmax(0,1fr)}}
 .flag-preview{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 8px;border-radius:4px;background:radial-gradient(ellipse at 50% 30%,#2a6a8c 0,#0b2634 75%);box-shadow:inset 0 0 0 2px var(--line);position:sticky;top:0}
@@ -170,15 +177,30 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 <title>One Piece Like - One Piece Roguelike</title>
-<meta name="description" content="One Piece Like is a free One Piece roguelike game playable directly in your browser.">
-<meta name="robots" content="index, follow">
-
+<meta name="description" content="One Piece Like is a free One Piece roguelike autobattler you play in your browser: build a pirate crew of up to 9 nakama, sail the Grand Line, beat the bosses and design your own Jolly Roger.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0b1620">
+<meta name="application-name" content="OnePieceLike">
 <link rel="canonical" href="https://onepiecelike.com/">
-<link rel="icon" type="image/png" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
-<meta property="og:image" content="logo.png">
+<link rel="alternate" hreflang="x-default" href="https://onepiecelike.com/">
+<link rel="icon" type="image/png" sizes="512x512" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OnePieceLike">
 <meta property="og:title" content="One Piece Like - One Piece Roguelike">
-
+<meta property="og:description" content="One Piece Like is a free One Piece roguelike autobattler you play in your browser: build a pirate crew of up to 9 nakama, sail the Grand Line, beat the bosses and design your own Jolly Roger.">
+<meta property="og:url" content="https://onepiecelike.com/">
+<meta property="og:image" content="https://onepiecelike.com/logo.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="OnePieceLike logo">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="One Piece Like - One Piece Roguelike">
+<meta name="twitter:description" content="One Piece Like is a free One Piece roguelike autobattler you play in your browser: build a pirate crew of up to 9 nakama, sail the Grand Line, beat the bosses and design your own Jolly Roger.">
+<meta name="twitter:image" content="https://onepiecelike.com/logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://onepiecelike.com/#website","url":"https://onepiecelike.com/","name":"OnePieceLike","alternateName":["One Piece Like","One Piece Roguelike"],"inLanguage":["en","es"]},{"@type":"VideoGame","@id":"https://onepiecelike.com/#game","url":"https://onepiecelike.com/","name":"OnePieceLike","alternateName":"One Piece Like","description":"One Piece Like is a free One Piece roguelike autobattler you play in your browser: build a pirate crew of up to 9 nakama, sail the Grand Line, beat the bosses and design your own Jolly Roger.","image":"https://onepiecelike.com/logo.png","genre":["Roguelike","Autobattler","Strategy"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","playMode":"SinglePlayer","inLanguage":["en","es"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isPartOf":{"@id":"https://onepiecelike.com/#website"}}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
@@ -392,7 +414,9 @@ button.offer:disabled{cursor:not-allowed}
 }
 </style>
 
-<div id="root"></div>
+</head>
+<body>
+<div id="root"><main style="max-width:720px;margin:12vh auto;padding:0 16px;font-family:Barlow,system-ui,sans-serif;color:#e8d9a8;text-align:center"><h1 style="font-family:'Pirata One',serif;font-size:2.4rem;margin:0 0 .4rem">OnePieceLike</h1><p style="margin:0;opacity:.85">One Piece roguelike autobattler: build your crew, sail the Grand Line, defeat the bosses and fly your own Jolly Roger.</p><noscript><p>This game needs JavaScript enabled.</p></noscript></main></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
@@ -988,17 +1012,14 @@ function foeAct(st, f, ev, rnd){
   }
   let n = f.traits.includes('swift') ? 2 : 1;
   if (f.boss) {
-    const enraged = f.hp < f.maxHp * SETTINGS.bossEnrage;
-    if (enraged && !f.enraged) { f.enraged = true; ev.push({ t:'enrage', id:f.id }); }
     if (f.tier >= SETTINGS.bossExtraFrom - 1) n++;
     if (aliveA(st).length >= 7) n++;
-    if (enraged) n++;
     if (st.round % SETTINGS.bossRoarEvery === 0) {
       ev.push({ t:'roar', id:f.id });
-      aliveA(st).forEach(a => { if (a.hp > 0) foeAttack(st, f, a, ev, rnd, SETTINGS.bossRoar * (f.enraged ? SETTINGS.bossEnrageAtk : 1)); });
+      aliveA(st).forEach(a => { if (a.hp > 0) foeAttack(st, f, a, ev, rnd, SETTINGS.bossRoar); });
     }
   }
-  const mult = n >= 2 ? (f.boss ? .72 : .62) * (f.enraged ? SETTINGS.bossEnrageAtk : 1) : 1;
+  const mult = n >= 2 ? (f.boss ? .72 : .62) : 1;
   for (let i = 0; i < n && aliveA(st).length; i++) {
     const a = weightedAlly(st, rnd); foeAttack(st, f, a, ev, rnd, mult);
     if (f.traits.includes('giant') && rnd() < .35 && aliveA(st).length) foeAttack(st, f, weightedAlly(st, rnd), ev, rnd, .5);
@@ -1202,7 +1223,7 @@ const i18n = {
     "man.g.tips1":"Mix roles: a balanced crew gains a Harmony bonus; stacking the same role is penalized.",
     "man.g.tips2":"Check the matchup before a fight: the estimated win chance and each enemy’s weakness (Observation Haki reveals them).",
     "bt.roar":"ROAR! The boss hits everyone","bt.enrage":"ENRAGED!",
-    "man.g.tips3":"Bosses hit several times per round, roar at the whole crew every third round and become enraged below half health. Brace (Defend) before the roar and focus the weak spot. Enemies grow with the size of your crew, so recruit for balance, not for numbers.",
+    "man.g.tips3":"Bosses hit several times per round, roar at the whole crew every third round. Brace (Defend) before the roar and focus the weak spot. Enemies grow with the size of your crew, so recruit for balance, not for numbers.",
     "man.g.tips4":"Rest at camps when your crew is hurt, and heal with rations before a boss.",
     "man.c.flowT":"How a fight works",
     "man.c.flow":"A fight is a real battle played in rounds. Before it starts you see the enemies and an estimated win chance. In each round every living fighter acts once, in order of Speed (with a little luck). Allies attack a foe; foes attack random allies, favouring tanks and brawlers. The fight ends when all enemies fall (victory) or all allies are K.O. (defeat). After {r} rounds the crew is overwhelmed, which counts as defeat.",
@@ -1269,6 +1290,7 @@ const i18n = {
     'nav.crew':'Crew', 'nav.map':'Map', 'nav.loot':'Loot',
     'loot.relics':'Passive relics', 'loot.gear':'Equipment', 'loot.noGear':'No equipment yet. Swords, guns and gear drop from fights and the market.', 'loot.equipTo':'Tap a crew member’s face to equip the item to them.',
     'hc.name':'Hardcore', 'hc.desc':'A nakama who falls in battle is gone for good. If the Captain falls, the voyage ends.', 'hc.fell':'{name} fell and is lost forever', 'hc.chip':'Hardcore',
+    'flag.e.trident':'Trident','flag.e.flames':'Flames','flag.e.lightning':'Lightning','flag.e.crescent':'Crescent moon','flag.e.stars':'Stars','flag.e.compass':'Compass rose','flag.e.tentacles':'Tentacles','flag.e.keys':'Keys', 'flag.close':'Close', 'flag.open':'Customize',
     'flag.section':'Your Jolly Roger', 'flag.title':'Pirate flag', 'flag.yours':'Your flag', 'flag.name':'Crew name', 'flag.namePh':'Name your crew', 'flag.random':'Random', 'flag.reset':'Reset',
     'flag.cloth':'Cloth', 'flag.shape':'Shape', 'flag.pattern':'Pattern', 'flag.trim':'Stitching', 'flag.skull':'Skull', 'flag.gear':'Headgear and marks', 'flag.skullTone':'Skull tone', 'flag.emblem':'Emblem', 'flag.emblemTone':'Emblem tone',
     'flag.c.black':'Black','flag.c.navy':'Navy','flag.c.crimson':'Crimson','flag.c.forest':'Forest','flag.c.violet':'Violet','flag.c.ivory':'Ivory','flag.c.gold':'Gold','flag.c.teal':'Teal','flag.c.rust':'Rust','flag.c.rose':'Rose',
@@ -1578,7 +1600,7 @@ const i18n = {
     "man.g.tips1":"Mezcla roles: un equipo equilibrado gana bonus de Armonía; repetir el mismo rol se penaliza.",
     "man.g.tips2":"Mira el enfrentamiento antes de luchar: la probabilidad de victoria y la debilidad de cada enemigo (el Haki de Observación las revela).",
     "bt.roar":"¡RUGIDO! El jefe golpea a todos","bt.enrage":"¡ENFURECIDO!",
-    "man.g.tips3":"Los jefes golpean varias veces por ronda, rugen contra toda la banda cada tres rondas y se enfurecen por debajo de la mitad de vida. Defiéndete antes del rugido y céntrate en el punto débil. Los enemigos crecen con el tamaño de tu banda: recluta por equilibrio, no por cantidad.",
+    "man.g.tips3":"Los jefes golpean varias veces por ronda y rugen contra toda la banda cada tres rondas. Defiéndete antes del rugido y céntrate en el punto débil. Los enemigos crecen con el tamaño de tu banda: recluta por equilibrio, no por cantidad.",
     "man.g.tips4":"Descansa en los camps cuando estés herido y cura con raciones antes de un jefe.",
     "man.c.flowT":"Cómo funciona un combate",
     "man.c.flow":"Un combate es una batalla real por rondas. Antes de empezar ves a los enemigos y la probabilidad estimada de victoria. En cada ronda actúa una vez cada luchador vivo, por orden de Velocidad (con algo de suerte). Los aliados atacan a un enemigo; los enemigos atacan a aliados al azar, con preferencia por los tanques y luchadores. Termina cuando caen todos los enemigos (victoria) o todos los aliados quedan K.O. (derrota). Tras {r} rondas la tripulación se ve desbordada, y cuenta como derrota.",
@@ -1645,6 +1667,7 @@ const i18n = {
     'nav.crew':'Banda', 'nav.map':'Mapa', 'nav.loot':'Botín',
     'loot.relics':'Reliquias pasivas', 'loot.gear':'Equipo', 'loot.noGear':'Aún sin equipo. Espadas, armas y demás caen en combates y en el mercado.', 'loot.equipTo':'Toca la cara de un tripulante para equiparle el objeto.',
     'hc.name':'Hardcore', 'hc.desc':'Un nakama que cae en combate se pierde para siempre. Si cae el Capitán, termina el viaje.', 'hc.fell':'{name} ha caído y se pierde para siempre', 'hc.chip':'Hardcore',
+    'flag.e.trident':'Tridente','flag.e.flames':'Llamas','flag.e.lightning':'Rayos','flag.e.crescent':'Luna creciente','flag.e.stars':'Estrellas','flag.e.compass':'Rosa de los vientos','flag.e.tentacles':'Tentáculos','flag.e.keys':'Llaves', 'flag.close':'Cerrar', 'flag.open':'Personalizar',
     'flag.section':'Tu bandera pirata', 'flag.title':'Bandera pirata', 'flag.yours':'Tu bandera', 'flag.name':'Nombre de la tripulación', 'flag.namePh':'Pon nombre a tu banda', 'flag.random':'Aleatoria', 'flag.reset':'Reiniciar',
     'flag.cloth':'Tela', 'flag.shape':'Forma', 'flag.pattern':'Diseño', 'flag.trim':'Costura', 'flag.skull':'Calavera', 'flag.gear':'Tocado y marcas', 'flag.skullTone':'Tono de la calavera', 'flag.emblem':'Emblema', 'flag.emblemTone':'Tono del emblema',
     'flag.c.black':'Negra','flag.c.navy':'Azul marino','flag.c.crimson':'Carmesí','flag.c.forest':'Verde bosque','flag.c.violet':'Violeta','flag.c.ivory':'Marfil','flag.c.gold':'Dorada','flag.c.teal':'Turquesa','flag.c.rust':'Óxido','flag.c.rose':'Rosa',
@@ -3171,10 +3194,7 @@ function StartScreen({ flag, setFlag, hardcore, setHardcore, saved, onContinue, 
         <div className="sect-title">${t('start.route')}</div>
         <${Journey} idx=${-1} over=${null}/>
       </div>
-      <div>
-        <div className="sect-title">${t('flag.section')}</div>
-        <${FlagPicker} flag=${flag} setFlag=${setFlag}/>
-      </div>
+      <${FlagSection} flag=${flag} setFlag=${setFlag}/>
       ${caps.length > 1 ? html`<div>
         <div className="sect-title">${t('start.pickCaptain')}</div>
         <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label=${t('start.pickCaptain')}>
@@ -3243,7 +3263,7 @@ const FLAG_PALETTE = {
 const FLAG_OPTS = {
   color:Object.keys(FLAG_PALETTE), shape:['flag', 'swallow', 'torn'], pattern:['plain', 'stripe', 'split', 'checker', 'rays', 'cross'], trim:['none', 'gold', 'silver'],
   skull:['classic', 'grin', 'demon', 'round'], gear:['none', 'eyepatch', 'bandana', 'tricorn', 'crown', 'scar'], skullTone:['bone', 'gold', 'ghost'],
-  emblem:['bones', 'swords', 'pistols', 'anchor', 'wings', 'laurel', 'rays'], emblemTone:['bone', 'gold', 'steel'],
+  emblem:['bones', 'swords', 'pistols', 'anchor', 'wings', 'laurel', 'rays', 'trident', 'flames', 'lightning', 'crescent', 'stars', 'compass', 'tentacles', 'keys'], emblemTone:['bone', 'gold', 'steel'],
 };
 const SKULL_TONES = { bone:['#f4efe0', '#d6caab'], gold:['#f3c74f', '#c18e22'], ghost:['#d6f2f7', '#9ccbd6'] };
 const EMBLEM_TONES = { bone:'#efe6cf', gold:'#e9b73e', steel:'#b9c5d1' };
@@ -3296,6 +3316,43 @@ function FlagEmblem({ kind, tone }){
   if (kind === 'rays') {
     const r = []; for (let i = 0; i < 20; i++) { const a = i * 18 * Math.PI / 180, L = i % 2 ? 50 : 66, w = 5.5 * Math.PI / 180; r.push(`M0 0 L${(Math.cos(a - w) * L).toFixed(1)} ${(Math.sin(a - w) * L).toFixed(1)} L${(Math.cos(a + w) * L).toFixed(1)} ${(Math.sin(a + w) * L).toFixed(1)}Z`); }
     return html`<g><path d=${r.join(' ')} fill=${c} stroke=${K} strokeWidth="1.8" strokeLinejoin="round" opacity=".92"/></g>`;
+  }
+  if (kind === 'trident') {
+    const t1 = html`<g strokeLinecap="round" strokeLinejoin="round" fill="none"><g stroke=${K} strokeWidth="10"><line x1="0" y1="-18" x2="0" y2="50"/><path d="M-14 -38 L-14 -24 Q-14 -17 0 -17 Q14 -17 14 -24 L14 -38"/><line x1="0" y1="-17" x2="0" y2="-40"/></g>
+      <g stroke=${c} strokeWidth="5"><line x1="0" y1="-18" x2="0" y2="50"/><path d="M-14 -38 L-14 -24 Q-14 -17 0 -17 Q14 -17 14 -24 L14 -38"/><line x1="0" y1="-17" x2="0" y2="-40"/></g>
+      <g fill=${c} stroke=${K} strokeWidth="2"><path d="M-19 -36 L-14 -50 L-9 -36Z"/><path d="M9 -36 L14 -50 L19 -36Z"/><path d="M-5 -38 L0 -56 L5 -38Z"/></g></g>`;
+    return html`<g transform="scale(1.08)"><g transform="rotate(62)">${t1}</g><g transform="rotate(-62)">${t1}</g></g>`;
+  }
+  if (kind === 'flames') {
+    const fl = (x, y, r, s) => html`<g transform=${'translate(' + x + ' ' + y + ') rotate(' + r + ') scale(' + s + ')'}><path d="M0 24 C-16 12 -12 -2 -2 -12 C-2 -2 7 -3 4 -16 C18 -4 20 14 0 24Z" fill=${c} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><path d="M0 22 C-7 14 -5 6 1 0 C3 8 8 12 0 22Z" fill="rgba(255,255,255,.45)"/></g>`;
+    return html`<g transform="translate(0 6) scale(1.15)">${fl(-54, 4, -40, 1.1)}${fl(54, 4, 40, 1.1)}${fl(-40, 20, -24, 1.2)}${fl(40, 20, 24, 1.2)}${fl(-22, 30, -10, 1.25)}${fl(22, 30, 10, 1.25)}</g>`;
+  }
+  if (kind === 'lightning') {
+    const b = html`<path d="M7 -44 L-15 4 L-3 4 L-11 44 L17 -9 L4 -9 L13 -44Z" fill=${c} stroke=${K} strokeWidth="2.6" strokeLinejoin="round"/>`;
+    return html`<g transform="scale(1.15)"><g transform="rotate(64)">${b}</g><g transform="rotate(-64)">${b}</g></g>`;
+  }
+  if (kind === 'crescent') {
+    return html`<g><path d="M-50 -10 A50 50 0 0 0 50 -10 A50 26 0 0 1 -50 -10Z" fill=${c} stroke=${K} strokeWidth="2.8" strokeLinejoin="round"/><path d="M-42 -4 A42 42 0 0 0 42 -4" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2" strokeLinecap="round"/></g>`;
+  }
+  if (kind === 'stars') {
+    const star = (x, y, s) => { const p = []; for (let i = 0; i < 10; i++) { const a = (-90 + i * 36) * Math.PI / 180, r = i % 2 ? 4.2 : 10; p.push((x + Math.cos(a) * r * s).toFixed(1) + ',' + (y + Math.sin(a) * r * s).toFixed(1)); } return html`<polygon key=${x + ',' + y} points=${p.join(' ')} fill=${c} stroke=${K} strokeWidth="1.8" strokeLinejoin="round"/>`; };
+    return html`<g>${[[-58, -10, 1.2], [58, -10, 1.2], [-44, 14, 1.35], [44, 14, 1.35], [-24, 30, 1.35], [24, 30, 1.35], [0, 36, 1.5]].map(([x, y, s]) => star(x, y, s))}</g>`;
+  }
+  if (kind === 'compass') {
+    const pts = [[0, -50], [7, -7], [50, 0], [7, 7], [0, 50], [-7, 7], [-50, 0], [-7, -7]].map(p => p.join(',')).join(' '), diag = [[0, -30], [8, -8], [30, 0], [8, 8], [0, 30], [-8, 8], [-30, 0], [-8, -8]].map(p => p.join(',')).join(' ');
+    return html`<g><circle cx="0" cy="0" r="40" fill="none" stroke=${K} strokeWidth="6"/><circle cx="0" cy="0" r="40" fill="none" stroke=${c} strokeWidth="2.4" strokeDasharray="3 3"/>
+      <polygon points=${diag} transform="rotate(45)" fill=${c} stroke=${K} strokeWidth="2" strokeLinejoin="round" opacity=".85"/><polygon points=${pts} fill=${c} stroke=${K} strokeWidth="2.4" strokeLinejoin="round"/><circle cx="0" cy="0" r="5" fill=${K}/></g>`;
+  }
+  if (kind === 'tentacles') {
+    const tt = html`<g fill="none" strokeLinecap="round"><g stroke=${K} strokeWidth="13"><path d="M-30 40 C-56 30 -34 14 -50 4 C-62 -4 -50 -20 -38 -22"/><path d="M-10 44 C-34 46 -18 28 -30 20"/></g>
+      <g stroke=${c} strokeWidth="8.5"><path d="M-30 40 C-56 30 -34 14 -50 4 C-62 -4 -50 -20 -38 -22"/><path d="M-10 44 C-34 46 -18 28 -30 20"/></g>
+      <g fill=${K} stroke="none" opacity=".55"><circle cx="-46" cy="22" r="1.8"/><circle cx="-48" cy="9" r="1.8"/><circle cx="-54" cy="-6" r="1.8"/><circle cx="-44" cy="-18" r="1.6"/></g></g>`;
+    return html`<g>${tt}<g transform="scale(-1 1)">${tt}</g></g>`;
+  }
+  if (kind === 'keys') {
+    const key = html`<g strokeLinecap="round" strokeLinejoin="round"><g stroke=${K} strokeWidth="9" fill="none"><line x1="0" y1="-30" x2="0" y2="44"/><circle cx="0" cy="-40" r="9"/><path d="M0 34 L11 34 M0 42 L9 42"/></g>
+      <g stroke=${c} strokeWidth="4.4" fill="none"><line x1="0" y1="-30" x2="0" y2="44"/><circle cx="0" cy="-40" r="9"/><path d="M0 34 L11 34 M0 42 L9 42"/></g></g>`;
+    return html`<g><g transform="rotate(48)">${key}</g><g transform="rotate(-48)">${key}</g></g>`;
   }
   const bone = html`<g><g stroke=${K} strokeLinecap="round"><line x1="-46" y1="0" x2="46" y2="0" strokeWidth="12"/><circle cx="-50" cy="-5" r="7.5" fill=${K}/><circle cx="-50" cy="5" r="7.5" fill=${K}/><circle cx="50" cy="-5" r="7.5" fill=${K}/><circle cx="50" cy="5" r="7.5" fill=${K}/></g>
     <g stroke=${c} strokeLinecap="round"><line x1="-46" y1="0" x2="46" y2="0" strokeWidth="8"/></g><g fill=${c}><circle cx="-50" cy="-5" r="5.6"/><circle cx="-50" cy="5" r="5.6"/><circle cx="50" cy="-5" r="5.6"/><circle cx="50" cy="5" r="5.6"/></g></g>`;
@@ -3354,6 +3411,18 @@ function Flag({ flag, size = 96, wave = false, className = '' }){
       ${wave ? html`<filter id=${'w' + id} x="-6%" y="-12%" width="112%" height="124%"><feTurbulence type="fractalNoise" baseFrequency="0.011 0.03" numOctaves="1" seed="3" result="n"><animate attributeName="baseFrequency" dur="7s" values="0.011 0.03;0.017 0.04;0.011 0.03" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>` : null}</defs>
     <rect x="3" y="2" width="6" height="100" rx="3" fill="#6b4a22" stroke="#0a0a0a" strokeWidth="1.6"/><circle cx="6" cy="4" r="5" fill="#e9b73e" stroke="#0a0a0a" strokeWidth="1.6"/>
     ${wave ? html`<g filter=${'url(#w' + id + ')'}>${body}</g>` : body}</svg>`;
+}
+function FlagSection({ flag, setFlag }){
+  const [open, setOpen] = useState(() => { try { return localStorage.getItem('lp-flag-open') !== '0'; } catch (e) { return true; } });
+  const toggle = () => { const v = !open; setOpen(v); try { localStorage.setItem('lp-flag-open', v ? '1' : '0'); } catch (e) {} };
+  return html`<div>
+    <button type="button" className="sect-title flag-toggle" aria-expanded=${open} aria-controls="flag-panel" onClick=${toggle}>
+      <span className=${'flag-caret' + (open ? ' open' : '')} aria-hidden="true">▸</span><span>${t('flag.section')}</span>
+      ${open ? null : html`<span className="flag-mini"><${Flag} flag=${flag} size=${38}/><span className="flag-mini-name">${flag.name || t('flag.yours')}</span></span>`}
+      <span className="flag-hint">${open ? t('flag.close') : t('flag.open')}</span>
+    </button>
+    ${open ? html`<div id="flag-panel"><${FlagPicker} flag=${flag} setFlag=${setFlag}/></div>` : null}
+  </div>`;
 }
 function FlagPicker({ flag, setFlag }){
   const set = (k, v) => setFlag({ ...flag, [k]:v });
