@@ -55,6 +55,18 @@
 @keyframes pulse{50%{filter:brightness(1.6)}}
 .sp-btn{font:700 11px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:2px solid #000;border-radius:3px;background:#ffd36b;color:#2a1700;cursor:pointer}.sp-btn.on{background:#ff7a59;color:#fff}
 .foe-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.coach{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:2px solid var(--gold);border-radius:4px;background:rgba(246,183,60,.12);color:var(--foam);font:500 14px/1.35 var(--font-body)}
+.coach .eyebrow{color:var(--gold)}
+.tut-box{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 10px;border:2px solid var(--gold);border-radius:4px;background:rgba(246,183,60,.1);font-size:13px;line-height:1.35}.tut-box .tut-txt{flex:1 1 260px;min-width:0}.tut-box .tut-btns{display:flex;gap:6px}
+.tut-stance .stances{animation:tutglow 1.1s ease-in-out infinite}.tut-prot .prot-btn:not(:disabled){animation:tutglow 1.1s ease-in-out infinite}.tut-special .gauge{animation:tutglow 1.1s ease-in-out infinite}
+@keyframes tutglow{50%{box-shadow:0 0 0 3px var(--gold),0 0 16px rgba(246,183,60,.8)}}
+.tgt-tag{position:absolute;top:-8px;right:-4px;font-size:18px;animation:pulse-t 1s ease-in-out infinite}
+@keyframes pulse-t{50%{transform:scale(1.25)}}
+.bunit.targeted{box-shadow:0 0 0 3px #ff5d47,0 0 14px rgba(255,93,71,.55)}
+.roar-warn{padding:6px 10px;border:2px solid #000;border-radius:4px;background:rgba(255,93,71,.18);color:#ffb3a6;font:700 14px var(--font-ui);letter-spacing:.04em;text-align:center}
+.report{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:2px solid #000;border-radius:4px;background:rgba(0,0,0,.3)}
+.rep-row{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr));gap:6px;align-items:center;font:500 13px var(--font-body);color:var(--foam);padding:2px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.rep-row>span:not(:first-child){text-align:right}.rep-head{font:700 11px var(--font-ui);letter-spacing:.05em;text-transform:uppercase;color:var(--mist)}.rep-row.ko{opacity:.55}.mvp{color:var(--gold)}
 .prot-tag{position:absolute;top:-6px;left:6px;font-size:18px}
 .prot-btn{margin-top:2px;padding:2px 6px;font:600 11px var(--font-ui);letter-spacing:.05em;text-transform:uppercase;border:2px solid #000;border-radius:4px;background:rgba(61,214,160,.14);color:var(--foam);cursor:pointer}.prot-btn.on{background:#3dd6a0;color:#04201a}.prot-btn:disabled{opacity:.4;cursor:not-allowed}
 .stun-tag{position:absolute;top:-6px;right:6px;font-size:18px;animation:spin 1.2s linear infinite}
@@ -452,6 +464,7 @@ const TYPES = {
   recruit: { color:'#7be0ff', icon:'recruit', freq:2 },
   camp:    { color:'#3dd6a0', icon:'tent',    freq:2 },
   chest:   { color:'#b66dff', icon:'fruit',   freq:1 },
+  event:   { color:'#ffa94d', icon:'bottle',  freq:1 },
   boss:    { color:'#ff5d47', icon:'crown',   freq:0 },
 };
 
@@ -627,6 +640,10 @@ function genMap(seed, si, ctx){
   // con hasta 9 huecos, cada mar ofrece al menos dos reclutamientos
   if (ctx.recruit) while (cnt('recruit') < 2 && flat.some(n => n.f >= 1 && n.f <= F - 3 && ['marine', 'pirate', 'market'].includes(n.type))) conv(flat.filter(n => n.f >= 1 && n.f <= F - 3 && ['marine', 'pirate', 'market'].includes(n.type)), 'recruit');
   flat.filter(n => n.type === 'chest').slice(2).forEach(n => n.type = 'marine');
+  // eventos con decision y riesgo: sustituyen algun combate de en medio (siempre hay al menos uno por mar, como mucho tres)
+  { const cand = () => flat.filter(n => n.f >= 1 && n.f <= F - 3 && (n.type === 'marine' || n.type === 'pirate'));
+    cand().forEach(n => { if (cnt('event') < 3 && rnd() < .12) n.type = 'event'; });
+    if (cnt('event') === 0) conv(cand(), 'event'); }
   const E = STAGES[si].enemies || {};
   const pickName = list => list.length ? list[Math.floor(rnd() * list.length)] : null;
   flat.forEach(n => {
@@ -886,7 +903,8 @@ function battleInit(g, node){
     atkMult:1 + Hs / 100, takenMult:1 - Hs / 200, power:1 + m.power, guard:clamp(m.guard, 0, .6), shield:Math.round(m.ward || 0), stance:'bal', over:null, rounds:0,
     regen:m.regen || 0, calm:clamp(m.calm || 0, 0, .7), revive:Math.round(m.revive || 0), reviveUsed:0 };
   if (m.ambush > 0) st.foes.forEach(f => { f.hp = Math.max(1, Math.round(f.maxHp * (1 - m.ambush * (f.boss ? .5 : 1)))); });
-  st.tactician = crew.some(c => c.perk === 'tactician');
+  st.tactician = crew.some(c => c.perk === 'tactician'); st.tally = {};
+  st.foes.filter(f => f.boss).forEach(f => { const w = weightedAlly(st, Math.random); if (w) f.tgt = w.id; }); /* el jefe fija su primer objetivo y se ve en pantalla */
   st.revealed = st.tactician || m.reveal > 0 || st.allies.some(a => a.haki.obs > 0);
   return st;
 }
@@ -1025,7 +1043,7 @@ function foeAct(st, f, ev, rnd){
   }
   const mult = n >= 2 ? (f.boss ? .72 : .62) : 1;
   for (let i = 0; i < n && aliveA(st).length; i++) {
-    const a = weightedAlly(st, rnd); foeAttack(st, f, a, ev, rnd, mult);
+    const a = (i === 0 && f.boss && f.tgt && aliveA(st).find(x => x.id === f.tgt)) || weightedAlly(st, rnd); foeAttack(st, f, a, ev, rnd, mult);
     if (f.traits.includes('giant') && rnd() < .35 && aliveA(st).length) foeAttack(st, f, weightedAlly(st, rnd), ev, rnd, .5);
   }
 }
@@ -1039,6 +1057,16 @@ function reviveCheck(st, ev){
 function endCheck(st){
   if (!aliveF(st).length) st.over = 'win'; else if (!aliveA(st).length) st.over = 'lose';
   return st.over;
+}
+/* resumen por nakama: daño hecho, daño recibido, golpes bloqueados y curación */
+function tallyRound(st, ev){
+  const T = st.tally || (st.tally = {}), row = id => T[id] || (T[id] = { dmg:0, taken:0, blocks:0, heal:0 });
+  ev.forEach(e => {
+    if (e.t === 'atk') { if (e.side === 'a') row(e.src).dmg += e.dmg || 0; else row(e.dst).taken += e.dmg || 0; }
+    else if (e.t === 'block') row(e.dst).blocks++;
+    else if (e.t === 'heal' && e.n && st.allies.some(a => a.id === e.src)) row(e.src).heal += e.n;
+    else if (e.t === 'burn') row(e.id).taken += e.dmg || 0;
+  });
 }
 /* Avanza UNA ronda (muta st y devuelve los eventos para animarlos). orders = { stance, focus, fire:[ids], auto } */
 function stepRound(st, orders = {}, rnd = Math.random){
@@ -1076,6 +1104,8 @@ function stepRound(st, orders = {}, rnd = Math.random){
     st.shield = Math.max(0, st.shield - 1); st.foes.forEach(f => { if (f.vuln > 0) f.vuln--; });
     if (st.round >= MAX_ROUNDS) st.over = 'lose';
   }
+  if (!st.over) st.foes.forEach(f => { if (f.boss && f.hp > 0 && aliveA(st).length) f.tgt = weightedAlly(st, rnd).id; });
+  tallyRound(st, ev);
   if (st.over) ev.push({ t:'end', win:st.over === 'win' });
   return ev;
 }
@@ -1101,7 +1131,8 @@ function smartOrders(st){
   }).map(a => a.id);
   let protect = null;
   if (boss || fs.length >= 2) {
-    const wk = as.filter(a => a.protLast !== st.round && a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    const tg = boss && boss.tgt && as.find(a => a.id === boss.tgt);
+    const wk = tg && tg.protLast !== st.round && tg.hp / tg.maxHp < .5 ? tg : as.filter(a => a.protLast !== st.round && a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (wk && as.length > 1) protect = wk.id;
   }
   return { stance, focus, fire: fire.filter(id => id !== protect), protect };
@@ -1148,6 +1179,46 @@ function projectRisk(g, node, N = 24){
   return [p >= .93 ? 'low' : p >= .75 ? 'medium' : p >= .45 ? 'high' : 'deadly', p >= .93 ? '#3dd6a0' : p >= .75 ? '#f6b73c' : p >= .45 ? '#ff9a3d' : '#ff5d47', Math.round(p * 100), Math.round(lossAvg * 100)];
 }
 
+/* ---------- eventos de mapa: cada opcion devuelve { g, rows, key, ...vars }; nunca matan (la vida baja como mucho a 1) ---------- */
+const EVENT_IDS = ['castaway', 'trapchest', 'pact', 'whirlpool', 'gamble'];
+const eventOf = (g, node) => EVENT_IDS[hashStr(g.seed + ':' + node.id) % EVENT_IDS.length];
+const eventBerries = (g, node) => { const s = STAGES[g.stage]; return Math.round((60 + node.f * 8) * Math.pow(s.rewardMult != null ? s.rewardMult : s.powerMult, SETTINGS.rewardExp)); };
+function hurtCrew(g, pct){
+  const rows = g.crew.map(c => ({ c, from:c.hp, to: c.hp > 0 ? Math.max(1, c.hp - Math.round(c.maxHp * pct)) : 0 }));
+  return { rows, g:{ ...g, crew: g.crew.map((c, i) => ({ ...c, hp:rows[i].to })) } };
+}
+function eventRun(g, node, id, choice, rnd = Math.random){
+  const berries = eventBerries(g, node);
+  if (id === 'castaway' && choice === 'help') {
+    if (rnd() < .3) { const lost = Math.min(g.berries, Math.max(20, Math.round(g.berries * .12))); return { g:{ ...g, berries:g.berries - lost }, key:'thief', n:lost, bad:true }; }
+    const def = weightedPick(recruitCandidates(g).filter(d => canRecruit(d, g)), 1)[0];
+    if (def) return { g:{ ...g, crew:[...g.crew, makeMember(def, g.stage + 1, 'c' + g.uid)], uid:g.uid + 1 }, key:'joined', def };
+    return { g:{ ...g, berries:g.berries + berries }, key:'thanks', n:berries };
+  }
+  if (id === 'trapchest' && (choice === 'open' || choice === 'haki')) {
+    const safe = choice === 'haki' || rnd() < .55;
+    if (!safe) { const r = hurtCrew(g, .25); return { ...r, key:'trap', bad:true }; }
+    const pool = itemPool(g).filter(i => !slotFull(g, i));
+    if (pool.length) { const item = pool[Math.floor(rnd() * pool.length)]; return { g:gainItem(g, item), key:'item', item }; }
+    return { g:{ ...g, berries:g.berries + berries * 2 }, key:'gold', n:berries * 2 };
+  }
+  if (id === 'pact' && choice.startsWith('c:')) {
+    const c = g.crew.find(x => x.id === choice.slice(2)); if (!c) return { g, key:'none' };
+    const up = levelUp({ ...c, hp:Math.max(1, Math.round(c.hp * .6)) }), to = Math.max(1, Math.round(c.hp * .6) + Math.round((up.maxHp - c.maxHp) * .0));
+    const row = { c:{ ...c, maxHp:up.maxHp }, from:c.hp, to };
+    return { g:{ ...g, crew:g.crew.map(x => x.id === c.id ? { ...up, hp:to } : x) }, rows:[row], key:'pact', name:c.name };
+  }
+  if (id === 'whirlpool' && choice === 'cross') {
+    if (rnd() < .5) return { g:{ ...g, berries:g.berries + berries * 3 }, key:'wreck', n:berries * 3 };
+    const r = hurtCrew(g, .18); return { ...r, key:'smash', bad:true };
+  }
+  if (id === 'gamble' && (choice === 'small' || choice === 'big')) {
+    const bet = Math.min(g.berries, Math.round(g.berries * (choice === 'small' ? .15 : .4)));
+    const win = rnd() < (choice === 'small' ? .5 : .4), net = win ? Math.round(bet * (choice === 'small' ? 1.2 : 2)) : -bet;
+    return { g:{ ...g, berries:g.berries + net }, key: win ? 'won' : 'lost', n:Math.abs(net), bad:!win };
+  }
+  return { g, key:'leave' };
+}
 function sleep(g){
   const pct = .6 + mods(g).camp;
   const rows = g.crew.map(c => {
@@ -1222,6 +1293,7 @@ const i18n = {
     "man.n.market":"Buy items with berries (3 offers) or rations that heal 35% of everyone’s HP. Prices rise {p}% for every sea you have sailed.",
     "man.n.recruit":"Two candidates are on offer. Recruit those you can afford in leadership. They join at your current level.",
     "man.n.camp":"Rest: heals {pct}% of max HP (plus camp bonuses) and revives K.O. crew members with 30% HP.",
+    "man.n.event":"A sea event: a choice with a risk and a reward. A castaway, a trapped chest, a strange pact, a whirlpool or a gambler. Nothing here can kill a nakama, but it can hurt.",
     "man.n.chest":"A rare chest with a Devil Fruit to give to one crew member who does not have one yet.",
     "man.n.boss":"The Route Boss. Beat them to end the sea: the whole crew levels up and heals fully, and you gain +{n} leadership.",
     "man.g.crewT":"Your crew and leadership",
@@ -1336,7 +1408,7 @@ const i18n = {
     'map.available':'available', 'map.power':'power {n}',
     'legend.aria':'Event frequency', 'legend.combat':'Combat', 'legend.island':'Island', 'legend.camp':'Camp', 'legend.chest':'Rare chest',
     'type.marine':'Marine squad', 'type.pirate':'Rival pirate ship', 'type.market':'Black market', 'type.recruit':'Recruitment',
-    'type.camp':'Camp', 'type.chest':'Rare chest', 'type.boss':'Route Boss',
+    'type.camp':'Camp', 'type.chest':'Rare chest', 'type.event':'Sea event', 'legend.event':'Event', 'type.boss':'Route Boss',
     'enemy.ship':'Ship “{name}”',
     'combat.eyebrowBoss':'Route Boss · {stage}',
     'combat.introBoss':'The Route Boss blocks the way. When they fall, this stage ends and your band levels up.',
@@ -1457,6 +1529,21 @@ const i18n = {
     "bt.skip":"Resolve now",
     "bt.focus":"Focus",
     "bt.focusHelp":"Tap an enemy to focus it. Tap a charged special to fire it. Use Protect to shield a nakama this round.",
+    "bt.sumTitle":"Battle report", "bt.sumDmg":"Damage", "bt.sumTaken":"Taken", "bt.sumBlock":"Blocks", "bt.sumHeal":"Healing", "bt.mvp":"MVP", "bt.targeted":"The boss is aiming at this nakama", "bt.roarNext":"Next round: ROAR! It will hit the whole crew",
+    "ev.eyebrow":"Sea event",
+    "ev.castaway.title":"A castaway", "ev.castaway.desc":"A man clings to a barrel in the middle of the sea, waving his arms. He says he is a great fighter. Or maybe he is only a great liar.", "ev.castaway.help":"Pull him aboard", "ev.castaway.leave":"Sail past",
+    "ev.trapchest.title":"A chest on the rocks", "ev.trapchest.desc":"A chest sits alone on a reef. Too easy. Something here smells of powder.", "ev.trapchest.open":"Open it (risky)", "ev.trapchest.haki":"Read it with Observation Haki (safe)", "ev.trapchest.leave":"Leave it",
+    "ev.pact.title":"The shadow merchant", "ev.pact.desc":"A hooded figure offers power at a price: pick a nakama. They lose 40% of their current health, but come back a level stronger.", "ev.pact.btn":"Sign", "ev.pact.leave":"Refuse the pact", "ev.pact.change":"HP {h} → {h2} · Level {lv} → {lv2}",
+    "ev.whirlpool.title":"The whirlpool", "ev.whirlpool.desc":"A huge whirlpool blocks the way. Wrecks from other ships spin in it, full of treasure. Cross it and you might get rich or get smashed.", "ev.whirlpool.cross":"Cross it (50/50)", "ev.whirlpool.leave":"Go around",
+    "ev.gamble.title":"The gambler", "ev.gamble.desc":"A smiling pirate shuffles a pair of dice. “A little bet, friend?”", "ev.gamble.small":"Small bet: 15% of your berries (50%, wins ×1.2)", "ev.gamble.big":"Big bet: 40% of your berries (40%, wins ×2)", "ev.gamble.leave":"Decline",
+    "ev.res.thief":"He was a thief! He ran off with {n} berries.", "ev.res.joined":"{name} joins your crew!", "ev.res.thanks":"Your hold is full, so he gives you {n} berries as thanks.",
+    "ev.res.trap":"BOOM! The chest was rigged. Everyone is hurt.", "ev.res.item":"Inside: {item}!", "ev.res.gold":"Inside: {n} berries!",
+    "ev.res.pact":"The pact is sealed. They are stronger now, and weaker.", "ev.res.wreck":"You loot the wrecks: {n} berries!", "ev.res.smash":"The whirlpool throws you against the rocks. Everyone is hurt.",
+    "ev.res.won":"Lucky dice! You win {n} berries.", "ev.res.lost":"Loaded dice. You lose {n} berries.", "ev.res.leave":"You sail on.", "ev.res.none":"Nothing happens.",
+    "tut.skip":"Skip tutorial", "tut.ok":"Got it", "tut.step":"Tip {n}/{m}",
+    "tut.stance":"Pick how your crew fights each round: Quick hits first and dodges more, Power hits harder but last, Balanced is in between.",
+    "tut.special":"Each nakama fills a bar as they fight. When it is full, a Special button appears: tap it before pressing Next to unleash it.",
+    "tut.protect":"Press 🛡 Protect on a nakama: they skip their attack but take NO damage that round. Use it on the one the 🎯 boss is aiming at. Not two rounds in a row.",
     "bt.protect":"Protect", "bt.protectOn":"Protecting", "bt.protectCd":"Can't protect twice in a row", "bt.protectTip":"This nakama doesn't act this round and takes no damage if targeted. Can't be used two rounds in a row.", "bt.blocked":"Blocked!", "bt.protecting":"Shielded", "log.protect":"{a} braces and protects", "log.block":"{b} blocks {a}'s attack",
     "bt.noFocus":"No focus — crew picks its own targets",
     "bt.ready":"READY",
@@ -1600,6 +1687,7 @@ const i18n = {
     "man.n.market":"Compra objetos con berries (3 ofertas) o raciones que curan el 35% de la vida de todos. Los precios suben un {p}% por cada mar recorrido.",
     "man.n.recruit":"Hay dos candidatos. Recluta a los que te permita el liderazgo. Se unen a tu nivel actual.",
     "man.n.camp":"Descanso: cura el {pct}% de la vida máxima (más bonus de camp) y revive a los K.O. con el 30% de vida.",
+    "man.n.event":"Un suceso en el mar: una decisión con riesgo y recompensa. Un náufrago, un cofre trampa, un pacto extraño, un remolino o un tahúr. Aquí no muere ningún nakama, pero puede doler.",
     "man.n.chest":"Un cofre raro con una Fruta del Diablo para dársela a un tripulante que aún no tenga ninguna.",
     "man.n.boss":"El Jefe de Ruta. Derrótalo para terminar el mar: toda la tripulación sube de nivel y se cura del todo, y ganas +{n} de liderazgo.",
     "man.g.crewT":"Tu tripulación y el liderazgo",
@@ -1714,7 +1802,7 @@ const i18n = {
     'map.available':'disponible', 'map.power':'poder {n}',
     'legend.aria':'Frecuencia de eventos', 'legend.combat':'Combates', 'legend.island':'Isla', 'legend.camp':'Camp', 'legend.chest':'Cofre raro',
     'type.marine':'Escuadrón de Marines', 'type.pirate':'Barco pirata rival', 'type.market':'Mercado negro', 'type.recruit':'Reclutamiento',
-    'type.camp':'Campamento', 'type.chest':'Cofre raro', 'type.boss':'Jefe de Ruta',
+    'type.camp':'Campamento', 'type.chest':'Cofre raro', 'type.event':'Suceso en el mar', 'legend.event':'Suceso', 'type.boss':'Jefe de Ruta',
     'enemy.ship':'Barco «{name}»',
     'combat.eyebrowBoss':'Jefe de Ruta · {stage}',
     'combat.introBoss':'El Jefe de Ruta bloquea el paso. Si cae, esta etapa termina y la banda sube de nivel.',
@@ -1835,6 +1923,21 @@ const i18n = {
     "bt.skip":"Resolver ya",
     "bt.focus":"Objetivo",
     "bt.focusHelp":"Toca un enemigo para fijarlo. Toca un especial cargado para lanzarlo. Usa Proteger para resguardar a un nakama esta ronda.",
+    "bt.sumTitle":"Informe del combate", "bt.sumDmg":"Daño", "bt.sumTaken":"Recibido", "bt.sumBlock":"Bloqueos", "bt.sumHeal":"Curación", "bt.mvp":"MVP", "bt.targeted":"El jefe apunta a este nakama", "bt.roarNext":"Próxima ronda: ¡RUGIDO! Golpeará a toda la banda",
+    "ev.eyebrow":"Suceso en el mar",
+    "ev.castaway.title":"Un náufrago", "ev.castaway.desc":"Un hombre se agarra a un barril en mitad del mar y agita los brazos. Dice que es un gran luchador. O quizá solo un gran mentiroso.", "ev.castaway.help":"Subirlo a bordo", "ev.castaway.leave":"Pasar de largo",
+    "ev.trapchest.title":"Un cofre en los arrecifes", "ev.trapchest.desc":"Un cofre solitario sobre un arrecife. Demasiado fácil. Aquí huele a pólvora.", "ev.trapchest.open":"Abrirlo (arriesgado)", "ev.trapchest.haki":"Leerlo con Haki de Observación (seguro)", "ev.trapchest.leave":"Dejarlo",
+    "ev.pact.title":"El mercader de las sombras", "ev.pact.desc":"Una figura encapuchada ofrece poder a cambio de algo: elige un nakama. Pierde el 40% de su vida actual, pero vuelve un nivel más fuerte.", "ev.pact.btn":"Firmar", "ev.pact.leave":"Rechazar el pacto", "ev.pact.change":"Vida {h} → {h2} · Nivel {lv} → {lv2}",
+    "ev.whirlpool.title":"El remolino", "ev.whirlpool.desc":"Un enorme remolino corta el paso. Giran en él restos de otros barcos llenos de tesoro. Cruzarlo puede hacerte rico o estrellarte.", "ev.whirlpool.cross":"Cruzarlo (50/50)", "ev.whirlpool.leave":"Rodearlo",
+    "ev.gamble.title":"El tahúr", "ev.gamble.desc":"Un pirata sonriente agita un par de dados. «¿Una apuesta pequeña, amigo?»", "ev.gamble.small":"Apuesta pequeña: 15% de tus berries (50%, gana ×1,2)", "ev.gamble.big":"Apuesta grande: 40% de tus berries (40%, gana ×2)", "ev.gamble.leave":"Rechazar",
+    "ev.res.thief":"¡Era un ladrón! Se escapa con {n} berries.", "ev.res.joined":"¡{name} se une a tu tripulación!", "ev.res.thanks":"Tu bodega está llena, así que te da {n} berries como agradecimiento.",
+    "ev.res.trap":"¡BUM! El cofre estaba trampeado. Todos salen heridos.", "ev.res.item":"Dentro: ¡{item}!", "ev.res.gold":"Dentro: ¡{n} berries!",
+    "ev.res.pact":"El pacto está sellado. Ahora es más fuerte, y más débil.", "ev.res.wreck":"Saqueas los restos: ¡{n} berries!", "ev.res.smash":"El remolino te lanza contra las rocas. Todos salen heridos.",
+    "ev.res.won":"¡Dados con suerte! Ganas {n} berries.", "ev.res.lost":"Dados trucados. Pierdes {n} berries.", "ev.res.leave":"Sigues navegando.", "ev.res.none":"No pasa nada.",
+    "tut.skip":"Saltar tutorial", "tut.ok":"Entendido", "tut.step":"Consejo {n}/{m}",
+    "tut.stance":"Elige cómo lucha tu banda cada ronda: Rápido golpea antes y esquiva más, Poderoso pega más fuerte pero el último, Equilibrado es el punto medio.",
+    "tut.special":"Cada nakama llena una barra mientras lucha. Cuando está llena aparece un botón de Especial: púlsalo antes de dar a Siguiente para lanzarlo.",
+    "tut.protect":"Pulsa 🛡 Proteger en un nakama: no ataca pero NO recibe daño esa ronda. Úsalo en el que apunta el jefe 🎯. No sirve dos rondas seguidas.",
     "bt.protect":"Proteger", "bt.protectOn":"Protegiendo", "bt.protectCd":"No puede proteger dos rondas seguidas", "bt.protectTip":"Este nakama no actúa esta ronda y no recibe daño si es el objetivo. No se puede usar dos rondas seguidas.", "bt.blocked":"¡Bloqueado!", "bt.protecting":"Protegido", "log.protect":"{a} se cubre y se protege", "log.block":"{b} bloquea el ataque de {a}",
     "bt.noFocus":"Sin objetivo: la tripulación elige sola",
     "bt.ready":"LISTO",
@@ -2288,7 +2391,7 @@ function Journey({ idx, over }){
 }
 function Dots({ n }){ return html`<span className="dots" aria-hidden="true">${[1, 2, 3].map(k => html`<i key=${k} className=${k <= n ? 'on' : ''}></i>`)}</span>`; }
 function Legend(){
-  const rows = [['marine', 'legend.combat', 3], ['market', 'legend.island', 2], ['camp', 'legend.camp', 2], ['chest', 'legend.chest', 1]];
+  const rows = [['marine', 'legend.combat', 3], ['market', 'legend.island', 2], ['camp', 'legend.camp', 2], ['chest', 'legend.chest', 1], ['event', 'legend.event', 1]];
   return html`
     <div className="legend" aria-label=${t('legend.aria')}>
       ${rows.map(([ty, key, n]) => html`
@@ -2544,9 +2647,9 @@ function FoeFace({ f, size }){
   const col = marine ? '#5aa9ff' : '#ff5d47';
   return html`<span className="foe-face" style=${{ width:size, height:size, '--fc':col }}><${Ico} n=${marine ? 'shield' : 'skull'} size=${size * .62} sw=${1.8}/></span>`;
 }
-function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire, canProtect, protectOn, protectCd, onProtect }){
+function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire, canProtect, protectOn, protectCd, onProtect, targeted }){
   const dead = u.hp <= 0, pct = Math.max(0, u.hp / u.maxHp * 100), tone = pct > 55 ? '' : pct > 25 ? 'mid' : 'low';
-  const cls = ['bunit', side, dead ? 'dead' : '', anim && anim[u.id] ? 'a-' + anim[u.id] : '', u.stun > 0 ? 'stunned' : '', focus === u.id ? 'focus' : '', u.haki && u.haki.arm ? 'has-arm' : '', u.haki && u.haki.obs ? 'has-obs' : '', u.haki && u.haki.con ? 'has-con' : ''].join(' ');
+  const cls = ['bunit', side, dead ? 'dead' : '', anim && anim[u.id] ? 'a-' + anim[u.id] : '', u.stun > 0 ? 'stunned' : '', focus === u.id ? 'focus' : '', u.haki && u.haki.arm ? 'has-arm' : '', u.haki && u.haki.obs ? 'has-obs' : '', u.haki && u.haki.con ? 'has-con' : '', targeted ? 'targeted' : ''].join(' ');
   const weakK = side === 'f' && (st.revealed || known[u.id]);
   return html`
     <div className=${cls} onClick=${side === 'f' && !dead ? () => onPick(u.id) : null} role=${side === 'f' ? 'button' : null}>
@@ -2554,6 +2657,7 @@ function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firi
         ${side === 'a' ? html`<${Face} look=${u.look} color=${u.color} size=${54} avatar=${u.avatar}/>` : html`<${FoeFace} f=${u} size=${u.boss ? 66 : 54}/>`}
         ${u.stun > 0 && !dead ? html`<span className="stun-tag">💫</span>` : null}
         ${u.prot && !dead ? html`<span className="prot-tag">🛡</span>` : null}
+        ${targeted && !dead ? html`<span className="tgt-tag" title=${t('bt.targeted')}>🎯</span>` : null}
         ${(floats || []).filter(x => x.id === u.id).map(x => html`<span key=${x.k} className=${'float ' + x.cls}>${x.text}</span>`)}
       </div>
       <div className="bname truncate">${side === 'f' ? (u.boss ? bossName(STAGES[0] && STAGES.map(s => s.boss).find(b => b.id === u.bossId)) : L(u.name)) : L(u.name)}</div>
@@ -2633,10 +2737,18 @@ function BattleArena({ init, onEnd, boss }){
   const [focus, setFocus] = useState(null);
   const [fire, setFire] = useState([]);
   const [protect, setProtect] = useState(null);
+  const [tutSteps, setTutSteps] = useState(() => {
+    if (boss) return [];
+    let done = []; try { done = JSON.parse(localStorage.getItem('lp-tut') || '[]'); } catch (e) {}
+    const want = ['stance']; if (init.allies.filter(a => a.hp > 0).length > 1) want.push('protect'); want.push('special');
+    return want.filter(k => !done.includes(k));
+  });
+  const tutDone = ks => { setTutSteps(l => l.filter(k => !ks.includes(k))); try { const d = JSON.parse(localStorage.getItem('lp-tut') || '[]'); localStorage.setItem('lp-tut', JSON.stringify([...new Set([...d, ...ks])])); } catch (e) {} };
   const [auto, setAutoS] = useState(() => !boss && BATTLE_PREFS.auto);
   const [fast, setFastS] = useState(() => !boss && BATTLE_PREFS.fast);
   const setAuto = fn => setAutoS(a => { const v = typeof fn === 'function' ? fn(a) : fn; if (!boss) BATTLE_PREFS.auto = v; return v; });
   const setFast = fn => setFastS(a => { const v = typeof fn === 'function' ? fn(a) : fn; if (!boss) BATTLE_PREFS.fast = v; return v; });
+  const tut = (!auto && !st.over && tutSteps.find(k => k !== 'special' || st.allies.some(a => a.hp > 0 && a.gauge >= 100))) || null;
   const [anim, setAnim] = useState({});
   const [floats, setFloats] = useState([]);
   const [overlay, setOverlay] = useState(null);
@@ -2669,14 +2781,14 @@ function BattleArena({ init, onEnd, boss }){
   };
   useEffect(() => { if (auto && !busy && !st.over) { const id = setTimeout(() => play(false), fast ? 150 : 450); return () => clearTimeout(id); } }, [auto, busy, st, fast]);
   const resolveNow = () => { if (busy) return; const fin = cloneSt(st); let n = 0; while (!fin.over && n++ < MAX_ROUNDS + 2) stepRound(fin, { ...autoOrders(fin), focus }); setSt(fin); setView(fin); onEnd(fin); };
-  const toggleProtect = id => setProtect(p => p === id ? null : id);
-  const toggleFire = id => setFire(f => f.includes(id) ? f.filter(x => x !== id) : [...f, id]);
+  const toggleProtect = id => { if (tut === 'protect') tutDone(['protect']); setProtect(p => p === id ? null : id); };
+  const toggleFire = id => { if (tut === 'special') tutDone(['special']); setFire(f => f.includes(id) ? f.filter(x => x !== id) : [...f, id]); };
   const pickFocus = id => setFocus(f => f === id ? null : id);
   const over = st.over && !busy;
 
   return html`
     <div className="battle">
-      <div className=${'arena' + (overlay ? ' ov ov-' + overlay.kind : '')}>
+      <div className=${'arena' + (overlay ? ' ov ov-' + overlay.kind : '') + (tut ? ' tut-' + tut : '')}>
         ${overlay ? html`<div className=${'ov-text ov-' + overlay.kind}><span>${overlay.text}</span></div>` : null}
         ${banner ? html`<div className="banner" style=${{ '--bc':banner.color }}>${banner.text}</div>` : null}
         <div className="side foes-side"><div className="side-title">${t('bt.foes')} · ${t('bt.round', { n:Math.max(1, view.round || 0) })}</div>
@@ -2684,12 +2796,14 @@ function BattleArena({ init, onEnd, boss }){
         <div className="side crew-side"><div className="side-title">${t('bt.crew')} · ${t('harm.title')} ${st.H > 0 ? '+' : ''}${st.H}%</div>
           <div className="units">${view.allies.map(a => {
             const real = st.allies.find(x => x.id === a.id) || a;
-            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${real.protLast === st.round} onProtect=${toggleProtect}/>`; })}</div></div>
+            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${real.protLast === st.round} onProtect=${toggleProtect} targeted=${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0 && f.tgt === a.id)}/>`; })}</div></div>
       </div>
+      ${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0) && (st.round + 1) % SETTINGS.bossRoarEvery === 0 ? html`<div className="roar-warn">⚠ ${t('bt.roarNext')}</div>` : null}
       <div className="battle-log" aria-live="polite">${log.slice(-5).map((l, i, arr) => html`<div key=${log.length - arr.length + i} className=${i === arr.length - 1 ? 'last' : ''}>${l}</div>`)}${log.length === 0 ? html`<div>${t('bt.focusHelp')}</div>` : null}</div>
+      ${tut ? html`<div className="tut-box" role="note"><div className="tut-txt"><span className="eyebrow">${t('tut.step', { n:['stance', 'protect', 'special'].indexOf(tut) + 1, m:3 })}</span><p className="m-0">${t('tut.' + tut)}</p></div><div className="tut-btns"><button type="button" className="btn small" onClick=${() => tutDone([tut])}>${t('tut.ok')}</button><button type="button" className="btn ghost small" onClick=${() => tutDone(['stance', 'protect', 'special'])}>${t('tut.skip')}</button></div></div>` : null}
       ${!st.over ? html`
         <div className="ctl">
-          <div className="stances" role="radiogroup">${['bal', 'fast', 'pow'].map(k => html`<button key=${k} type="button" role="radio" aria-checked=${stance === k} disabled=${busy} className=${'stance' + (stance === k ? ' on' : '')} title=${t('stance.' + k + 'D')} onClick=${() => setStance(k)}><b>${t('stance.' + k)}</b><small>${t('stance.' + k + 'D')}</small></button>`)}</div>
+          <div className="stances" role="radiogroup">${['bal', 'fast', 'pow'].map(k => html`<button key=${k} type="button" role="radio" aria-checked=${stance === k} disabled=${busy} className=${'stance' + (stance === k ? ' on' : '')} title=${t('stance.' + k + 'D')} onClick=${() => { setStance(k); if (tut === 'stance') tutDone(['stance']); }}><b>${t('stance.' + k)}</b><small>${t('stance.' + k + 'D')}</small></button>`)}</div>
           <div className="flex flex-wrap gap-2 items-center">
             <button type="button" className="btn" disabled=${busy || auto} onClick=${() => play(false)}>${t('bt.next')}</button>
             <button type="button" className=${'btn ghost small'} aria-pressed=${auto} onClick=${() => setAuto(a => !a)}>${auto ? t('bt.autoOn') : t('bt.auto')}</button>
@@ -2698,10 +2812,25 @@ function BattleArena({ init, onEnd, boss }){
             <span className="text-xs" style=${{ color:'var(--mist)' }}>${focus ? t('bt.focus') + ': ' + evName(view, focus) : t('bt.noFocus')}</span>
           </div>
         </div>` : null}
+      ${over ? html`<${BattleReport} st=${st}/>` : null}
       ${over ? html`<div className="flex items-center justify-between gap-3 flex-wrap"><strong className="big-res" style=${{ color: st.over === 'win' ? 'var(--gold)' : 'var(--ember)' }}>${st.over === 'win' ? t('bt.winTitle') : t('combat.sunk')} · ${t('bt.rounds', { n:st.rounds })}</strong><button type="button" className="btn" onClick=${() => onEnd(st)}>${t('combat.outcome')}</button></div>` : null}
     </div>`;
 }
 
+function BattleReport({ st }){
+  const rows = st.allies.map(a => ({ a, r:(st.tally || {})[a.id] || { dmg:0, taken:0, blocks:0, heal:0 } }));
+  const top = rows.reduce((m, x) => x.r.dmg > m ? x.r.dmg : m, 0);
+  return html`
+    <div className="report" aria-label=${t('bt.sumTitle')}>
+      <div className="eyebrow">${t('bt.sumTitle')}</div>
+      <div className="rep-row rep-head"><span></span><span>⚔ ${t('bt.sumDmg')}</span><span>🩸 ${t('bt.sumTaken')}</span><span>🛡 ${t('bt.sumBlock')}</span><span>✚ ${t('bt.sumHeal')}</span></div>
+      ${rows.map(({ a, r }) => html`
+        <div key=${a.id} className=${'rep-row' + (a.hp <= 0 ? ' ko' : '')}>
+          <span className="truncate">${top > 0 && r.dmg === top ? html`<b className="mvp" title=${t('bt.mvp')}>★</b> ` : null}${L(a.name)}</span>
+          <span className="tabular-nums">${r.dmg}</span><span className="tabular-nums">${r.taken}</span><span className="tabular-nums">${r.blocks}</span><span className="tabular-nums">${r.heal}</span>
+        </div>`)}
+    </div>`;
+}
 function FoeBrief({ f, st, crew }){
   const boss = f.boss ? STAGES.map(s => s.boss).find(b => b.id === f.bossId) : null;
   const known = st.revealed;
@@ -2900,6 +3029,37 @@ function ChestEvent({ g, setG, done }){
     <//>`;
 }
 
+function MapEvent({ g, setG, node, done }){
+  const id = useMemo(() => eventOf(g, node), []);
+  const [res, setRes] = useState(null);
+  const berries = eventBerries(g, node);
+  const alive = g.crew.filter(c => c.hp > 0);
+  const hasHaki = g.crew.some(c => c.hp > 0 && c.hakiBase && c.hakiBase.obs > 0);
+  const go = choice => { const r = eventRun(g, node, id, choice); setG(r.g); setRes(r); };
+  const opts = id === 'castaway' ? [['help', 'ev.castaway.help'], ['leave', 'ev.castaway.leave']]
+    : id === 'trapchest' ? [['open', 'ev.trapchest.open'], ...(hasHaki ? [['haki', 'ev.trapchest.haki']] : []), ['leave', 'ev.trapchest.leave']]
+    : id === 'whirlpool' ? [['cross', 'ev.whirlpool.cross'], ['leave', 'ev.whirlpool.leave']]
+    : id === 'gamble' ? [['small', 'ev.gamble.small'], ['big', 'ev.gamble.big'], ['leave', 'ev.gamble.leave']].filter(o => o[0] === 'leave' || g.berries >= 40)
+    : [];
+  return html`
+    <${Modal} tone="#ffa94d" eyebrow=${t('ev.eyebrow')} title=${t('ev.' + id + '.title')} icon="bottle">
+      ${!res ? html`
+        <p className="m-0" style=${{ color:'var(--mist)' }}>${t('ev.' + id + '.desc')}</p>
+        ${id === 'pact' ? html`<div className="flex flex-col gap-2">${alive.filter(c => c.hp > 1).map(c => html`
+          <button key=${c.id} type="button" className="offer" style=${{ cursor:'pointer', textAlign:'left' }} onClick=${() => go('c:' + c.id)}>
+            <${Face} look=${c.look} color=${c.color} size=${44} avatar=${c.avatar}/>
+            <div className="flex-1 min-w-0"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'18px' }}>${L(c.name)}</div><div className="desc">${t('ev.pact.change', { h:c.hp, h2:Math.max(1, Math.round(c.hp * .6)), lv:c.lvl, lv2:c.lvl + 1 })}</div></div>
+            <span className="price">${t('ev.pact.btn')}</span>
+          </button>`)}</div>
+          <button type="button" className="btn ghost" onClick=${() => go('leave')}>${t('ev.pact.leave')}</button>`
+        : html`<div className="flex flex-col gap-2">${opts.map(([k, tk]) => html`<button key=${k} type="button" className=${k === 'leave' ? 'btn ghost' : 'btn'} onClick=${() => go(k)}>${t(tk)}</button>`)}</div>`}`
+      : html`
+        <p className="m-0" style=${{ color: res.bad ? 'var(--ember)' : 'var(--foam)', fontWeight:600 }}>${t('ev.res.' + res.key, { n:res.n, name:res.def ? L(res.def.name) : res.name ? L(res.name) : '', item:res.item ? L(res.item.name) : '' })}</p>
+        ${res.rows ? html`<div className="flex flex-col gap-2">${res.rows.filter(r => r.from !== r.to || r.c.hp !== undefined).map(r => html`<${MiniHp} key=${r.c.id} c=${r.c} from=${r.from} to=${r.to}/>`)}</div>` : null}
+        <button type="button" className="btn" onClick=${done}>${t('common.sail')}</button>`}
+    <//>`;
+}
+
 function EndScreen({ g, onRestart }){
   const win = g.over === 'win';
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
@@ -3089,7 +3249,7 @@ function ManualScreen({ onClose }){
     <h3>${t('man.g.goalT')}</h3><p>${t('man.g.goal', { s:STAGES.length })}</p>
     <h3>${t('man.g.mapT')}</h3><p>${t('man.g.map', { f:SETTINGS.floors })}</p>
     <h3>${t('man.g.nodesT')}</h3>
-    <div className="man-sub">${['marine', 'pirate', 'market', 'recruit', 'camp', 'chest', 'boss'].map(k => html`
+    <div className="man-sub">${['marine', 'pirate', 'market', 'recruit', 'camp', 'chest', 'event', 'boss'].map(k => html`
       <div key=${k} className="man-card"><span style=${{ color:TYPES[k].color, flex:'none' }}><${Ico} n=${TYPES[k].icon} size=${34}/></span>
         <div><div className="nm">${t('type.' + k)}</div><div className="tiny">${t('man.n.' + k, { pct:Math.round(60), n:SETTINGS.leadershipPerStage, p:Math.round(SETTINGS.marketInflation * 100) })}</div></div></div>`)}</div>
     <h3>${t('man.g.crewT')}</h3><p>${t('man.g.crew', { slots:SETTINGS.crewSlots, lead:SETTINGS.leadership, n:SETTINGS.leadershipPerStage })}</p>
@@ -3645,6 +3805,7 @@ function App(){
         : node.type === 'market'  ? html`<${MarketEvent}  key=${node.id} g=${g} setG=${setG} done=${close}/>`
         : node.type === 'recruit' ? html`<${RecruitEvent} key=${node.id} g=${g} setG=${setG} done=${close}/>`
         : node.type === 'camp'    ? html`<${CampEvent}    key=${node.id} g=${g} setG=${setG} done=${close}/>`
+        : node.type === 'event'   ? html`<${MapEvent}     key=${node.id} g=${g} setG=${setG} node=${node} done=${close}/>`
         : html`<${ChestEvent} key=${node.id} g=${g} setG=${setG} done=${close}/>`
       ) : null}
       ${playing && g.over ? html`<${EndScreen} g=${g} onRestart=${goStart}/>` : null}
