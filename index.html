@@ -858,7 +858,7 @@ const BOSS_WEAK = { logia:'mind', slippery:'brawl', swordmaster:'brawl', giant:'
 
 function enemyPower(g, node){
   const s = STAGES[g.stage], boss = node.type === 'boss';
-  const k = boss ? 1.5 * (s.boss.powerMult || 1) * (s.bossMult != null ? s.bossMult / s.powerMult : 1) : (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage);
+  const k = boss ? 1.5 * (s.boss.powerMult || 1) * (s.bossMult != null ? s.bossMult / s.powerMult : 1) : (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
   const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n;
   return Math.round((12 + node.f * 3.2) * s.powerMult * k * crewK);
 }
@@ -1075,7 +1075,7 @@ function stepRound(st, orders = {}, rnd = Math.random){
   ev.push({ t:'round', n:st.round, stance:st.stance });
   st.allies.forEach(a => { a.prot = false; });
   const pu = orders.protect && st.allies.find(a => a.id === orders.protect);
-  if (pu && pu.hp > 0 && !(pu.stun > 0) && pu.protLast !== st.round - 1) { pu.prot = true; pu.protLast = st.round; ev.push({ t:'protect', id:pu.id }); }
+  if (pu && pu.hp > 0 && !(pu.stun > 0) && st.protLast !== st.round - 1) { pu.prot = true; st.protLast = st.round; ev.push({ t:'protect', id:pu.id }); }
   if (st.round === 1) openingHaki(st, ev, rnd);
   if (st.round === 1) endCheck(st);
   const actors = [...st.allies.map(u => ({ u, side:'a', k:u.stats.spd + rnd() * 3 + stanceMods(st).init })), ...st.foes.map(u => ({ u, side:'f', k:u.spd + rnd() * 3 }))].sort((x, y) => y.k - x.k);
@@ -1132,7 +1132,7 @@ function smartOrders(st){
   let protect = null;
   if (boss || fs.length >= 2) {
     const tg = boss && boss.tgt && as.find(a => a.id === boss.tgt);
-    const wk = tg && tg.protLast !== st.round && tg.hp / tg.maxHp < .5 ? tg : as.filter(a => a.protLast !== st.round && a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    const wk = st.protLast === st.round ? null : tg && tg.hp / tg.maxHp < .5 ? tg : as.filter(a => a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (wk && as.length > 1) protect = wk.id;
   }
   return { stance, focus, fire: fire.filter(id => id !== protect), protect };
@@ -1313,7 +1313,7 @@ const i18n = {
     "man.g.tips4":"Rest at camps when your crew is hurt, and heal with rations before a boss.",
     "man.c.flowT":"How a fight works",
     "man.c.flow":"A fight is a real battle played in rounds. Before it starts you see the enemies and an estimated win chance. In each round every living fighter acts once, in order of Speed (with a little luck). Allies attack a foe; foes attack random allies, favouring tanks and brawlers. The fight ends when all enemies fall (victory) or all allies are K.O. (defeat). After {r} rounds the crew is overwhelmed, which counts as defeat.",
-    "man.c.orders":"Your orders: pick a stance each round, tap an enemy to focus everyone on it, and tap a charged special to fire it. Press Protect on a nakama to make them skip their attack and avoid all damage that round (never two rounds in a row). Or press Auto to let the crew decide, Fast to speed up the animation, and Resolve now to skip to the end.",
+    "man.c.orders":"Your orders: pick a stance each round, tap an enemy to focus everyone on it, and tap a charged special to fire it. Press Protect on a nakama to make them skip their attack and avoid all damage that round (and then nobody can be protected the next round). Or press Auto to let the crew decide, Fast to speed up the animation, and Resolve now to skip to the end.",
     "man.c.dmgT":"Damage, hits and crits",
     "man.c.dmg1":"An attack’s power comes from the fighter’s ATK, boosted by the skill stat of their fighting style (Swordsmanship for blades, Marksmanship for guns, Strength for blows, Intelligence for arcane).",
     "man.c.dmg2":"Swords and guns can miss (more likely against fast enemies); blows are more reliable; arcane attacks almost never miss. Crits deal ×1.6.",
@@ -1354,7 +1354,7 @@ const i18n = {
     "man.bosses.stage":"Sea {n}",
     "man.bosses.none":"No special traits.",
 
-    'hdr.newRun':'New voyage', 'hdr.data':'Data', 'hdr.lang':'Language', 'hdr.berries':'Berries',
+    'hdr.tutorial':'Tutorial', 'hdr.tutorialOn':'On: next fight', 'hdr.tutorialTip':'Show the combat tips again in your next normal fight', 'hdr.newRun':'New voyage', 'hdr.data':'Data', 'hdr.lang':'Language', 'hdr.berries':'Berries',
     'start.tagline':'{s} seas. {y} Emperors. One treasure.',
     'start.route':'Your route to the treasure',
     'start.pickCaptain':'Choose your Captain',
@@ -1543,8 +1543,8 @@ const i18n = {
     "tut.skip":"Skip tutorial", "tut.ok":"Got it", "tut.step":"Tip {n}/{m}",
     "tut.stance":"Pick how your crew fights each round: Quick hits first and dodges more, Power hits harder but last, Balanced is in between.",
     "tut.special":"Each nakama fills a bar as they fight. When it is full, a Special button appears: tap it before pressing Next to unleash it.",
-    "tut.protect":"Press 🛡 Protect on a nakama: they skip their attack but take NO damage that round. Use it on the one the 🎯 boss is aiming at. Not two rounds in a row.",
-    "bt.protect":"Protect", "bt.protectOn":"Protecting", "bt.protectCd":"Can't protect twice in a row", "bt.protectTip":"This nakama doesn't act this round and takes no damage if targeted. Can't be used two rounds in a row.", "bt.blocked":"Blocked!", "bt.protecting":"Shielded", "log.protect":"{a} braces and protects", "log.block":"{b} blocks {a}'s attack",
+    "tut.protect":"Press 🛡 Protect on a nakama: they skip their attack but take NO damage that round. Use it on the one the 🎯 boss is aiming at. If you protect someone, nobody can be protected the next round.",
+    "bt.protect":"Protect", "bt.protectOn":"Protecting", "bt.protectCd":"Nobody can be protected the round after a protection", "bt.protectTip":"This nakama doesn't act this round and takes no damage if targeted. If you protect someone, nobody can be protected next round.", "bt.blocked":"Blocked!", "bt.protecting":"Shielded", "log.protect":"{a} braces and protects", "log.block":"{b} blocks {a}'s attack",
     "bt.noFocus":"No focus — crew picks its own targets",
     "bt.ready":"READY",
     "bt.stun":"Stunned",
@@ -1707,7 +1707,7 @@ const i18n = {
     "man.g.tips4":"Descansa en los camps cuando estés herido y cura con raciones antes de un jefe.",
     "man.c.flowT":"Cómo funciona un combate",
     "man.c.flow":"Un combate es una batalla real por rondas. Antes de empezar ves a los enemigos y la probabilidad estimada de victoria. En cada ronda actúa una vez cada luchador vivo, por orden de Velocidad (con algo de suerte). Los aliados atacan a un enemigo; los enemigos atacan a aliados al azar, con preferencia por los tanques y luchadores. Termina cuando caen todos los enemigos (victoria) o todos los aliados quedan K.O. (derrota). Tras {r} rondas la tripulación se ve desbordada, y cuenta como derrota.",
-    "man.c.orders":"Tus órdenes: elige una postura cada ronda, toca a un enemigo para que todos le ataquen y toca un especial cargado para lanzarlo. Pulsa Proteger en un nakama para que no ataque y esquive todo el daño esa ronda (nunca dos rondas seguidas). O pulsa Auto para que la tripulación decida, Rápido para acelerar y Resolver ya para saltar al final.",
+    "man.c.orders":"Tus órdenes: elige una postura cada ronda, toca a un enemigo para que todos le ataquen y toca un especial cargado para lanzarlo. Pulsa Proteger en un nakama para que no ataque y esquive todo el daño esa ronda (y en la ronda siguiente no se podrá proteger a nadie). O pulsa Auto para que la tripulación decida, Rápido para acelerar y Resolver ya para saltar al final.",
     "man.c.dmgT":"Daño, aciertos y críticos",
     "man.c.dmg1":"La fuerza de un ataque sale del ATQ del luchador, potenciado por la estadística de su estilo (Esgrima para espadas, Puntería para armas de fuego, Fuerza para golpes, Inteligencia para lo arcano).",
     "man.c.dmg2":"Las espadas y las armas pueden fallar (más contra enemigos rápidos); los golpes son más fiables; lo arcano casi nunca falla. Un crítico hace ×1,6.",
@@ -1748,7 +1748,7 @@ const i18n = {
     "man.bosses.stage":"Mar {n}",
     "man.bosses.none":"Sin rasgos especiales.",
 
-    'hdr.newRun':'Nuevo viaje', 'hdr.data':'Datos', 'hdr.lang':'Idioma', 'hdr.berries':'Berries',
+    'hdr.tutorial':'Tutorial', 'hdr.tutorialOn':'Activado: próximo combate', 'hdr.tutorialTip':'Vuelve a mostrar los consejos de combate en tu próximo combate normal', 'hdr.newRun':'Nuevo viaje', 'hdr.data':'Datos', 'hdr.lang':'Idioma', 'hdr.berries':'Berries',
     'start.tagline':'{s} mares. {y} Emperadores. Un tesoro.',
     'start.route':'Tu ruta hasta el tesoro',
     'start.pickCaptain':'Elige a tu Capitán',
@@ -1937,8 +1937,8 @@ const i18n = {
     "tut.skip":"Saltar tutorial", "tut.ok":"Entendido", "tut.step":"Consejo {n}/{m}",
     "tut.stance":"Elige cómo lucha tu banda cada ronda: Rápido golpea antes y esquiva más, Poderoso pega más fuerte pero el último, Equilibrado es el punto medio.",
     "tut.special":"Cada nakama llena una barra mientras lucha. Cuando está llena aparece un botón de Especial: púlsalo antes de dar a Siguiente para lanzarlo.",
-    "tut.protect":"Pulsa 🛡 Proteger en un nakama: no ataca pero NO recibe daño esa ronda. Úsalo en el que apunta el jefe 🎯. No sirve dos rondas seguidas.",
-    "bt.protect":"Proteger", "bt.protectOn":"Protegiendo", "bt.protectCd":"No puede proteger dos rondas seguidas", "bt.protectTip":"Este nakama no actúa esta ronda y no recibe daño si es el objetivo. No se puede usar dos rondas seguidas.", "bt.blocked":"¡Bloqueado!", "bt.protecting":"Protegido", "log.protect":"{a} se cubre y se protege", "log.block":"{b} bloquea el ataque de {a}",
+    "tut.protect":"Pulsa 🛡 Proteger en un nakama: no ataca pero NO recibe daño esa ronda. Úsalo en el que apunta el jefe 🎯. Si proteges a alguien, nadie podrá ser protegido la ronda siguiente.",
+    "bt.protect":"Proteger", "bt.protectOn":"Protegiendo", "bt.protectCd":"Nadie puede ser protegido la ronda siguiente a una protección", "bt.protectTip":"Este nakama no actúa esta ronda y no recibe daño si es el objetivo. Si proteges a alguien, nadie podrá ser protegido en la ronda siguiente.", "bt.blocked":"¡Bloqueado!", "bt.protecting":"Protegido", "log.protect":"{a} se cubre y se protege", "log.block":"{b} bloquea el ataque de {a}",
     "bt.noFocus":"Sin objetivo: la tripulación elige sola",
     "bt.ready":"LISTO",
     "bt.stun":"Aturdido",
@@ -2796,7 +2796,7 @@ function BattleArena({ init, onEnd, boss }){
         <div className="side crew-side"><div className="side-title">${t('bt.crew')} · ${t('harm.title')} ${st.H > 0 ? '+' : ''}${st.H}%</div>
           <div className="units">${view.allies.map(a => {
             const real = st.allies.find(x => x.id === a.id) || a;
-            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${real.protLast === st.round} onProtect=${toggleProtect} targeted=${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0 && f.tgt === a.id)}/>`; })}</div></div>
+            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${st.protLast === st.round} onProtect=${toggleProtect} targeted=${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0 && f.tgt === a.id)}/>`; })}</div></div>
       </div>
       ${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0) && (st.round + 1) % SETTINGS.bossRoarEvery === 0 ? html`<div className="roar-warn">⚠ ${t('bt.roarNext')}</div>` : null}
       <div className="battle-log" aria-live="polite">${log.slice(-5).map((l, i, arr) => html`<div key=${log.length - arr.length + i} className=${i === arr.length - 1 ? 'last' : ''}>${l}</div>`)}${log.length === 0 ? html`<div>${t('bt.focusHelp')}</div>` : null}</div>
@@ -3683,6 +3683,7 @@ function App(){
   const [archId, setArchId] = useState(null);
   const [sheet, setSheet] = useState(null);
   const [manualOpen, setManualOpen] = useState(false);
+  const [tutOn, setTutOn] = useState(false);
   const [g, setG] = useState(null);
   const [tab, setTab] = useState('map');
   const [modal, setModal] = useState(null);
@@ -3771,6 +3772,7 @@ function App(){
             <span className="timer" style=${{ color:'var(--gold)' }} title=${t('hdr.berries')}><span style=${{ fontSize:'18px' }}>฿</span> ${g.berries}</span>` : null}
           <${LangToggle} lang=${lang} setLang=${setLang}/>
           <button type="button" className="btn small man-open" onClick=${() => setManualOpen(true)}>${t('man.btn')}</button>
+          <button type="button" className="btn ghost small" title=${t('hdr.tutorialTip')} onClick=${() => { try { localStorage.setItem('lp-tut', '[]'); } catch (e) {} setTutOn(true); setTimeout(() => setTutOn(false), 2500); }}>${tutOn ? '✓ ' + t('hdr.tutorialOn') : t('hdr.tutorial')}</button>
           <button type="button" className="btn ghost small" onClick=${() => setDataOpen(true)}>${t('hdr.data')}</button>
           ${phase === 'play' || phase === 'start' ? html`<button type="button" className="btn ghost small" onClick=${goStart}>${t('hdr.newRun')}</button>` : null}
         </div>

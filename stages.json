@@ -1,440 +1,452 @@
 {
- "_help": "The run is this list of stages, played in order. Each stage is one map that ends in a Route Boss. bossRank must be pirate | shichibukai | admiral | yonko, and the ranks should climb. bossId points to an id in characters.json bosses. powerMult is the difficulty of the whole stage (enemies and rewards). sea is two hex colors for the map gradient. enemies (optional per stage) overrides commonEnemies. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored.",
- "settings": {
-  "floors": 6,
-  "crewSlots": 9,
-  "leadership": 10,
-  "dismissFeePerCost": 20,
-  "dismissLeaveChance": 0.15,
-  "leadershipPerStage": 3,
-  "rewardMarine": 1,
-  "rewardPirate": 1.35,
-  "rewardBoss": 2.5,
-  "rewardExp": 0.45,
-  "marketInflation": 0.2,
-  "rationPrice": 45,
-  "rationInflation": 0.2,
-  "startBerries": 120,
-  "levelUpAtkMult": 1.3,
-  "levelUpHpMult": 1.2,
-  "marineMult": 2.1,
-  "pirateMult": 2.8,
-  "normalRamp": 0.38,
-  "dropMarine": 0.22,
-  "dropPirate": 0.32,
-  "foeHpK": 3.0,
-  "foeAtkK": 0.32,
-  "allyHpK": 0.8,
-  "allyAtkK": 0.72
- },
- "commonEnemies": {
-  "marine": [
-   {
-    "en": "Port Patrol",
-    "es": "Patrulla del Puerto"
-   },
-   {
-    "en": "Rifle Platoon",
-    "es": "Pelotón de Fusileros"
-   },
-   {
-    "en": "Cannon Squad",
-    "es": "Escuadrón de Cañoneros"
-   },
-   {
-    "en": "Captains' Brigade",
-    "es": "Brigada de Capitanes"
-   },
-   {
-    "en": "Lighthouse Guard",
-    "es": "Guardia del Faro"
-   }
-  ],
-  "pirate": [
-   {
-    "en": "Furious Crab",
-    "es": "Cangrejo Furioso"
-   },
-   {
-    "en": "Black Widow",
-    "es": "Viuda Negra"
-   },
-   {
-    "en": "Little Kraken",
-    "es": "Kraken Pequeño"
-   },
-   {
-    "en": "Bald Shark",
-    "es": "Tiburón Calvo"
-   },
-   {
-    "en": "Rum & Powder",
-    "es": "Ron y Pólvora"
-   },
-   {
-    "en": "Crimson Seagull",
-    "es": "Gaviota Carmesí"
-   }
+  "_help": "The run is this list of stages, played in order. Each stage is one map that ends in a Route Boss. bossRank must be pirate | shichibukai | admiral | yonko, and the ranks should climb. bossId points to an id in characters.json bosses. powerMult is the difficulty of the whole stage (enemies and rewards). sea is two hex colors for the map gradient. enemies (optional per stage) overrides commonEnemies. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored.",
+  "settings": {
+    "floors": 6,
+    "crewSlots": 9,
+    "leadership": 10,
+    "dismissFeePerCost": 20,
+    "dismissLeaveChance": 0.15,
+    "leadershipPerStage": 3,
+    "rewardMarine": 1,
+    "rewardPirate": 1.35,
+    "rewardBoss": 2.5,
+    "rewardExp": 0.45,
+    "marketInflation": 0.2,
+    "rationPrice": 45,
+    "rationInflation": 0.2,
+    "startBerries": 120,
+    "levelUpAtkMult": 1.3,
+    "levelUpHpMult": 1.2,
+    "marineMult": 2.1,
+    "pirateMult": 2.8,
+    "normalRamp": 0.38,
+    "dropMarine": 0.22,
+    "dropPirate": 0.32,
+    "foeHpK": 3.0,
+    "foeAtkK": 0.32,
+    "allyHpK": 0.8,
+    "allyAtkK": 0.72,
+    "normalStageMult": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0.95,
+      0.8,
+      0.72,
+      0.66,
+      0.62
+    ]
+  },
+  "commonEnemies": {
+    "marine": [
+      {
+        "en": "Port Patrol",
+        "es": "Patrulla del Puerto"
+      },
+      {
+        "en": "Rifle Platoon",
+        "es": "Pelotón de Fusileros"
+      },
+      {
+        "en": "Cannon Squad",
+        "es": "Escuadrón de Cañoneros"
+      },
+      {
+        "en": "Captains' Brigade",
+        "es": "Brigada de Capitanes"
+      },
+      {
+        "en": "Lighthouse Guard",
+        "es": "Guardia del Faro"
+      }
+    ],
+    "pirate": [
+      {
+        "en": "Furious Crab",
+        "es": "Cangrejo Furioso"
+      },
+      {
+        "en": "Black Widow",
+        "es": "Viuda Negra"
+      },
+      {
+        "en": "Little Kraken",
+        "es": "Kraken Pequeño"
+      },
+      {
+        "en": "Bald Shark",
+        "es": "Tiburón Calvo"
+      },
+      {
+        "en": "Rum & Powder",
+        "es": "Ron y Pólvora"
+      },
+      {
+        "en": "Crimson Seagull",
+        "es": "Gaviota Carmesí"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "id": "east_blue",
+      "name": {
+        "en": "East Blue",
+        "es": "East Blue"
+      },
+      "bossRank": "pirate",
+      "bossId": "boss_buggy",
+      "powerMult": 0.663,
+      "sea": [
+        "#0d4a5c",
+        "#06222d"
+      ],
+      "bossMult": 0.932,
+      "rewardMult": 0.852
+    },
+    {
+      "id": "alabasta",
+      "name": {
+        "en": "Alabasta",
+        "es": "Arabasta"
+      },
+      "bossRank": "shichibukai",
+      "bossId": "boss_crocodile",
+      "powerMult": 1.699,
+      "sea": [
+        "#6b4a14",
+        "#241705"
+      ],
+      "enemies": [
+        {
+          "en": "Desert Bandit",
+          "es": "Bandido del Desierto"
+        },
+        {
+          "en": "Baroque Agent",
+          "es": "Agente de Baroque Works"
+        },
+        {
+          "en": "Sand Marauder",
+          "es": "Saqueador de Arena"
+        },
+        {
+          "en": "Cobra Guard",
+          "es": "Guardia de Cobra"
+        },
+        {
+          "en": "Rain Dinners Agent",
+          "es": "Agente de Rain Dinners"
+        }
+      ],
+      "bossMult": 1.551,
+      "rewardMult": 1.485
+    },
+    {
+      "id": "skypiea",
+      "name": {
+        "en": "Skypiea",
+        "es": "Skypiea"
+      },
+      "bossRank": "shichibukai",
+      "bossId": "boss_mihawk",
+      "powerMult": 3.499,
+      "sea": [
+        "#2a5a8c",
+        "#0b1f3a"
+      ],
+      "enemies": [
+        {
+          "en": "Sky Warrior",
+          "es": "Guerrero del Cielo"
+        },
+        {
+          "en": "White Beret Guard",
+          "es": "Guardia de Boina Blanca"
+        },
+        {
+          "en": "Shandian Warrior",
+          "es": "Guerrero Shandia"
+        },
+        {
+          "en": "Sky Knight",
+          "es": "Caballero del Cielo"
+        },
+        {
+          "en": "Upper Yard Guardian",
+          "es": "Guardián del Upper Yard"
+        }
+      ],
+      "bossMult": 1.76,
+      "rewardMult": 2.204
+    },
+    {
+      "id": "water_7",
+      "name": {
+        "en": "Water 7",
+        "es": "Water Seven"
+      },
+      "bossRank": "shichibukai",
+      "bossId": "boss_doflamingo",
+      "powerMult": 5.393,
+      "sea": [
+        "#0f5a70",
+        "#06222b"
+      ],
+      "enemies": [
+        {
+          "en": "Galley-La Fighter",
+          "es": "Luchador de Galley-La"
+        },
+        {
+          "en": "Dock Worker",
+          "es": "Trabajador de los Muelles"
+        },
+        {
+          "en": "Franky Family Thug",
+          "es": "Matón de la Franky Family"
+        },
+        {
+          "en": "Cipher Pol Agent",
+          "es": "Agente del Cipher Pol"
+        },
+        {
+          "en": "Sea Train Guard",
+          "es": "Guardia del Tren Marino"
+        }
+      ],
+      "bossMult": 2.365,
+      "rewardMult": 3.348
+    },
+    {
+      "id": "marineford",
+      "name": {
+        "en": "Marineford",
+        "es": "Marineford"
+      },
+      "bossRank": "admiral",
+      "bossId": "boss_kizaru",
+      "powerMult": 8.294,
+      "sea": [
+        "#4a1d2a",
+        "#150610"
+      ],
+      "enemies": [
+        {
+          "en": "Marine Officer",
+          "es": "Oficial de la Marina"
+        },
+        {
+          "en": "Marine Captain",
+          "es": "Capitán de la Marina"
+        },
+        {
+          "en": "Pacifista Unit",
+          "es": "Unidad Pacifista"
+        },
+        {
+          "en": "Giant Marine",
+          "es": "Gigante de la Marina"
+        },
+        {
+          "en": "Vice Admiral Guard",
+          "es": "Guardia de Vicealmirante"
+        }
+      ],
+      "bossMult": 2.805,
+      "rewardMult": 3.958
+    },
+    {
+      "id": "dressrosa",
+      "name": {
+        "en": "Dressrosa",
+        "es": "Dressrosa"
+      },
+      "bossRank": "admiral",
+      "bossId": "boss_akainu",
+      "powerMult": 11.924,
+      "sea": [
+        "#8a2a4a",
+        "#2a0a18"
+      ],
+      "enemies": [
+        {
+          "en": "Colosseum Fighter",
+          "es": "Luchador del Coliseo"
+        },
+        {
+          "en": "Donquixote Officer",
+          "es": "Oficial Donquixote"
+        },
+        {
+          "en": "Toy Soldier",
+          "es": "Soldado de Juguete"
+        },
+        {
+          "en": "Kingdom Guard",
+          "es": "Guardia del Reino"
+        },
+        {
+          "en": "Elite Pirate",
+          "es": "Pirata de Élite"
+        }
+      ],
+      "bossMult": 3.752,
+      "rewardMult": 5.448
+    },
+    {
+      "id": "whole_cake",
+      "name": {
+        "en": "Whole Cake Island",
+        "es": "Isla Tarta"
+      },
+      "bossRank": "yonko",
+      "bossId": "boss_big_mom",
+      "powerMult": 16.229,
+      "sea": [
+        "#8a3a6b",
+        "#2a0c20"
+      ],
+      "enemies": [
+        {
+          "en": "Homie Soldier",
+          "es": "Soldado Homie"
+        },
+        {
+          "en": "Chess Soldier",
+          "es": "Soldado de Ajedrez"
+        },
+        {
+          "en": "Sweet Commander Guard",
+          "es": "Guardia de Comandante Dulce"
+        },
+        {
+          "en": "Big Mom Pirate",
+          "es": "Pirata de Big Mom"
+        },
+        {
+          "en": "Living Food",
+          "es": "Comida Viviente"
+        }
+      ],
+      "bossMult": 5.034,
+      "rewardMult": 7.656
+    },
+    {
+      "id": "wano",
+      "name": {
+        "en": "Wano",
+        "es": "Wano"
+      },
+      "bossRank": "yonko",
+      "bossId": "boss_kaido",
+      "powerMult": 51.583,
+      "sea": [
+        "#5a2d6b",
+        "#1a0c24"
+      ],
+      "enemies": [
+        {
+          "en": "Beast Pirate",
+          "es": "Pirata de las Bestias"
+        },
+        {
+          "en": "Gifters",
+          "es": "Gifters"
+        },
+        {
+          "en": "Samurai",
+          "es": "Samurái"
+        },
+        {
+          "en": "Headliner",
+          "es": "Headliner"
+        },
+        {
+          "en": "Numbers Warrior",
+          "es": "Guerrero Numbers"
+        }
+      ],
+      "bossMult": 5.819,
+      "rewardMult": 8.322
+    },
+    {
+      "id": "egghead",
+      "name": {
+        "en": "Egghead",
+        "es": "Egghead"
+      },
+      "bossRank": "yonko",
+      "bossId": "boss_shanks",
+      "powerMult": 108.03,
+      "sea": [
+        "#1d5a5a",
+        "#071f26"
+      ],
+      "enemies": [
+        {
+          "en": "Seraphim Unit",
+          "es": "Unidad Seraphim"
+        },
+        {
+          "en": "Pacifista Mark III",
+          "es": "Pacifista Mark III"
+        },
+        {
+          "en": "Marine Science Soldier",
+          "es": "Soldado Científico de la Marina"
+        },
+        {
+          "en": "Cipher Pol Agent",
+          "es": "Agente del Cipher Pol"
+        },
+        {
+          "en": "Egghead Security Unit",
+          "es": "Unidad de Seguridad de Egghead"
+        }
+      ],
+      "bossMult": 8.595,
+      "rewardMult": 12.816
+    },
+    {
+      "id": "laugh_tale",
+      "name": {
+        "en": "Laugh Tale",
+        "es": "Laugh Tale"
+      },
+      "bossRank": "yonko",
+      "bossId": "boss_blackbeard",
+      "powerMult": 213.856,
+      "sea": [
+        "#6b5a14",
+        "#201a05"
+      ],
+      "enemies": [
+        {
+          "en": "Elite Pirate",
+          "es": "Pirata de Élite"
+        },
+        {
+          "en": "Yonko Commander",
+          "es": "Comandante de Yonko"
+        },
+        {
+          "en": "Ancient Guardian",
+          "es": "Guardián Antiguo"
+        },
+        {
+          "en": "Legendary Pirate",
+          "es": "Pirata Legendario"
+        },
+        {
+          "en": "Final Voyage Raider",
+          "es": "Asaltante del Viaje Final"
+        }
+      ],
+      "bossMult": 13.109,
+      "rewardMult": 17.836
+    }
   ]
- },
- "stages": [
-  {
-   "id": "east_blue",
-   "name": {
-    "en": "East Blue",
-    "es": "East Blue"
-   },
-   "bossRank": "pirate",
-   "bossId": "boss_buggy",
-   "powerMult": 0.663,
-   "sea": [
-    "#0d4a5c",
-    "#06222d"
-   ],
-   "bossMult": 0.932,
-   "rewardMult": 0.852
-  },
-  {
-   "id": "alabasta",
-   "name": {
-    "en": "Alabasta",
-    "es": "Arabasta"
-   },
-   "bossRank": "shichibukai",
-   "bossId": "boss_crocodile",
-   "powerMult": 1.699,
-   "sea": [
-    "#6b4a14",
-    "#241705"
-   ],
-   "enemies": [
-    {
-     "en": "Desert Bandit",
-     "es": "Bandido del Desierto"
-    },
-    {
-     "en": "Baroque Agent",
-     "es": "Agente de Baroque Works"
-    },
-    {
-     "en": "Sand Marauder",
-     "es": "Saqueador de Arena"
-    },
-    {
-     "en": "Cobra Guard",
-     "es": "Guardia de Cobra"
-    },
-    {
-     "en": "Rain Dinners Agent",
-     "es": "Agente de Rain Dinners"
-    }
-   ],
-   "bossMult": 1.551,
-   "rewardMult": 1.485
-  },
-  {
-   "id": "skypiea",
-   "name": {
-    "en": "Skypiea",
-    "es": "Skypiea"
-   },
-   "bossRank": "shichibukai",
-   "bossId": "boss_mihawk",
-   "powerMult": 3.499,
-   "sea": [
-    "#2a5a8c",
-    "#0b1f3a"
-   ],
-   "enemies": [
-    {
-     "en": "Sky Warrior",
-     "es": "Guerrero del Cielo"
-    },
-    {
-     "en": "White Beret Guard",
-     "es": "Guardia de Boina Blanca"
-    },
-    {
-     "en": "Shandian Warrior",
-     "es": "Guerrero Shandia"
-    },
-    {
-     "en": "Sky Knight",
-     "es": "Caballero del Cielo"
-    },
-    {
-     "en": "Upper Yard Guardian",
-     "es": "Guardián del Upper Yard"
-    }
-   ],
-   "bossMult": 1.76,
-   "rewardMult": 2.204
-  },
-  {
-   "id": "water_7",
-   "name": {
-    "en": "Water 7",
-    "es": "Water Seven"
-   },
-   "bossRank": "shichibukai",
-   "bossId": "boss_doflamingo",
-   "powerMult": 5.393,
-   "sea": [
-    "#0f5a70",
-    "#06222b"
-   ],
-   "enemies": [
-    {
-     "en": "Galley-La Fighter",
-     "es": "Luchador de Galley-La"
-    },
-    {
-     "en": "Dock Worker",
-     "es": "Trabajador de los Muelles"
-    },
-    {
-     "en": "Franky Family Thug",
-     "es": "Matón de la Franky Family"
-    },
-    {
-     "en": "Cipher Pol Agent",
-     "es": "Agente del Cipher Pol"
-    },
-    {
-     "en": "Sea Train Guard",
-     "es": "Guardia del Tren Marino"
-    }
-   ],
-   "bossMult": 2.365,
-   "rewardMult": 3.348
-  },
-  {
-   "id": "marineford",
-   "name": {
-    "en": "Marineford",
-    "es": "Marineford"
-   },
-   "bossRank": "admiral",
-   "bossId": "boss_kizaru",
-   "powerMult": 8.294,
-   "sea": [
-    "#4a1d2a",
-    "#150610"
-   ],
-   "enemies": [
-    {
-     "en": "Marine Officer",
-     "es": "Oficial de la Marina"
-    },
-    {
-     "en": "Marine Captain",
-     "es": "Capitán de la Marina"
-    },
-    {
-     "en": "Pacifista Unit",
-     "es": "Unidad Pacifista"
-    },
-    {
-     "en": "Giant Marine",
-     "es": "Gigante de la Marina"
-    },
-    {
-     "en": "Vice Admiral Guard",
-     "es": "Guardia de Vicealmirante"
-    }
-   ],
-   "bossMult": 2.805,
-   "rewardMult": 3.958
-  },
-  {
-   "id": "dressrosa",
-   "name": {
-    "en": "Dressrosa",
-    "es": "Dressrosa"
-   },
-   "bossRank": "admiral",
-   "bossId": "boss_akainu",
-   "powerMult": 11.924,
-   "sea": [
-    "#8a2a4a",
-    "#2a0a18"
-   ],
-   "enemies": [
-    {
-     "en": "Colosseum Fighter",
-     "es": "Luchador del Coliseo"
-    },
-    {
-     "en": "Donquixote Officer",
-     "es": "Oficial Donquixote"
-    },
-    {
-     "en": "Toy Soldier",
-     "es": "Soldado de Juguete"
-    },
-    {
-     "en": "Kingdom Guard",
-     "es": "Guardia del Reino"
-    },
-    {
-     "en": "Elite Pirate",
-     "es": "Pirata de Élite"
-    }
-   ],
-   "bossMult": 3.752,
-   "rewardMult": 5.448
-  },
-  {
-   "id": "whole_cake",
-   "name": {
-    "en": "Whole Cake Island",
-    "es": "Isla Tarta"
-   },
-   "bossRank": "yonko",
-   "bossId": "boss_big_mom",
-   "powerMult": 16.229,
-   "sea": [
-    "#8a3a6b",
-    "#2a0c20"
-   ],
-   "enemies": [
-    {
-     "en": "Homie Soldier",
-     "es": "Soldado Homie"
-    },
-    {
-     "en": "Chess Soldier",
-     "es": "Soldado de Ajedrez"
-    },
-    {
-     "en": "Sweet Commander Guard",
-     "es": "Guardia de Comandante Dulce"
-    },
-    {
-     "en": "Big Mom Pirate",
-     "es": "Pirata de Big Mom"
-    },
-    {
-     "en": "Living Food",
-     "es": "Comida Viviente"
-    }
-   ],
-   "bossMult": 5.034,
-   "rewardMult": 7.656
-  },
-  {
-   "id": "wano",
-   "name": {
-    "en": "Wano",
-    "es": "Wano"
-   },
-   "bossRank": "yonko",
-   "bossId": "boss_kaido",
-   "powerMult": 51.583,
-   "sea": [
-    "#5a2d6b",
-    "#1a0c24"
-   ],
-   "enemies": [
-    {
-     "en": "Beast Pirate",
-     "es": "Pirata de las Bestias"
-    },
-    {
-     "en": "Gifters",
-     "es": "Gifters"
-    },
-    {
-     "en": "Samurai",
-     "es": "Samurái"
-    },
-    {
-     "en": "Headliner",
-     "es": "Headliner"
-    },
-    {
-     "en": "Numbers Warrior",
-     "es": "Guerrero Numbers"
-    }
-   ],
-   "bossMult": 5.819,
-   "rewardMult": 8.322
-  },
-  {
-   "id": "egghead",
-   "name": {
-    "en": "Egghead",
-    "es": "Egghead"
-   },
-   "bossRank": "yonko",
-   "bossId": "boss_shanks",
-   "powerMult": 108.03,
-   "sea": [
-    "#1d5a5a",
-    "#071f26"
-   ],
-   "enemies": [
-    {
-     "en": "Seraphim Unit",
-     "es": "Unidad Seraphim"
-    },
-    {
-     "en": "Pacifista Mark III",
-     "es": "Pacifista Mark III"
-    },
-    {
-     "en": "Marine Science Soldier",
-     "es": "Soldado Científico de la Marina"
-    },
-    {
-     "en": "Cipher Pol Agent",
-     "es": "Agente del Cipher Pol"
-    },
-    {
-     "en": "Egghead Security Unit",
-     "es": "Unidad de Seguridad de Egghead"
-    }
-   ],
-   "bossMult": 8.595,
-   "rewardMult": 12.816
-  },
-  {
-   "id": "laugh_tale",
-   "name": {
-    "en": "Laugh Tale",
-    "es": "Laugh Tale"
-   },
-   "bossRank": "yonko",
-   "bossId": "boss_blackbeard",
-   "powerMult": 213.856,
-   "sea": [
-    "#6b5a14",
-    "#201a05"
-   ],
-   "enemies": [
-    {
-     "en": "Elite Pirate",
-     "es": "Pirata de Élite"
-    },
-    {
-     "en": "Yonko Commander",
-     "es": "Comandante de Yonko"
-    },
-    {
-     "en": "Ancient Guardian",
-     "es": "Guardián Antiguo"
-    },
-    {
-     "en": "Legendary Pirate",
-     "es": "Pirata Legendario"
-    },
-    {
-     "en": "Final Voyage Raider",
-     "es": "Asaltante del Viaje Final"
-    }
-   ],
-   "bossMult": 13.109,
-   "rewardMult": 17.836
-  }
- ]
 }
