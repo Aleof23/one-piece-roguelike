@@ -57,6 +57,12 @@
 .foe-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
 .coach{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:2px solid var(--gold);border-radius:4px;background:rgba(246,183,60,.12);color:var(--foam);font:500 14px/1.35 var(--font-body)}
 .coach .eyebrow{color:var(--gold)}
+.hub{display:flex;flex-direction:column;gap:24px;padding-top:2vh}.hub .grid{gap:14px}
+.hub-tile{display:flex;align-items:center;gap:14px;padding:12px 14px;border:3px solid #000;border-radius:6px;background:linear-gradient(180deg,rgba(18,52,70,.9),rgba(8,30,42,.9));color:var(--foam);text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(246,183,60,.25);transition:transform .15s,box-shadow .15s}
+.hub-tile:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 2px var(--gold),0 6px 18px rgba(0,0,0,.4)}
+.hub-ico{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:36px;flex:none}
+.hub-txt{display:flex;flex-direction:column;min-width:0}.hub-txt b{font:700 22px var(--font-ui);letter-spacing:.05em;text-transform:uppercase;color:var(--gold)}.hub-txt small{font:500 14px var(--font-body);color:var(--mist);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sail-btn{font-size:30px!important;padding:18px 48px!important;min-width:min(100%,420px)}
 .mission{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:2px solid #000;border-radius:4px;background:rgba(0,0,0,.28);opacity:.8}.mission.done{opacity:1;box-shadow:inset 0 0 0 1px var(--kelp);background:rgba(61,214,160,.08)}.mission-ico{font-size:18px;line-height:1.2;flex:none}
 .pick-card.locked{opacity:.5;cursor:not-allowed;filter:grayscale(.6)}.lock-tag{margin-left:auto;font:600 12px var(--font-ui);color:var(--gold);text-transform:none}
 .mission-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:80;max-width:min(92vw,520px);padding:10px 14px;border:3px solid #000;border-radius:6px;background:#0e2b3a;box-shadow:0 0 0 2px var(--gold),0 8px 30px rgba(0,0,0,.6);color:var(--foam);font:500 14px/1.35 var(--font-body);cursor:pointer;animation:toastin .35s ease-out}.mission-toast b{color:var(--gold)}
@@ -1366,7 +1372,7 @@ const i18n = {
     'start.route':'Your route to the treasure',
     'start.pickCaptain':'Choose your Captain',
     'start.solo':'You set sail alone. Every other crew slot fills up by recruiting at island nodes along the map.',
-    'start.go':'Set sail!',
+    'start.go':'Set sail!', 'start.back':'Back', 'start.done':'Done', 'hub.captain':'Captain', 'hub.flag':'Jolly Roger', 'hub.missions':'Missions', 'hub.missionsSub':'{a} / {b} completed', 'hub.manual':'Manual',
     'save.continue':'Continue voyage (sea {s} · {n} crew · {b} ฿)',
     'save.discard':'Delete save',
     'start.counts':'{n} nakamas · {b} bosses · {f} fruits · {s} stages',
@@ -1763,7 +1769,7 @@ const i18n = {
     'start.route':'Tu ruta hasta el tesoro',
     'start.pickCaptain':'Elige a tu Capitán',
     'start.solo':'Zarpas en solitario. El resto de huecos de la tripulación se llenan reclutando en los nodos de isla del mapa.',
-    'start.go':'¡Zarpar!',
+    'start.go':'¡Zarpar!', 'start.back':'Volver', 'start.done':'Listo', 'hub.captain':'Capitán', 'hub.flag':'Bandera pirata', 'hub.missions':'Misiones', 'hub.missionsSub':'{a} / {b} completadas', 'hub.manual':'Manual',
     'save.continue':'Continuar viaje (mar {s} · {n} tripulantes · {b} ฿)',
     'save.discard':'Borrar partida',
     'start.counts':'{n} nakamas · {b} jefes · {f} frutas · {s} etapas',
@@ -3422,39 +3428,44 @@ function MissionsPanel({ meta }){
 }
 
 function StartScreen({ meta, flag, setFlag, hardcore, setHardcore, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
+  const [view, setView] = useState(null);
   const caps = NAKAMAS.filter(n => n.captain).sort((a, b) => (a.hero ? 1 : 0) - (b.hero ? 1 : 0));
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
   const arch = effArch(meta, archId);
   const av = AVATARS.find(a => a.id === avatarId) || AVATARS[0];
   const cap = effCaptain(meta, captainId);
   const isHero = !!(cap && cap.hero);
-  return html`
-    <div className="mx-auto w-full max-w-[860px] flex flex-col gap-6 py-2">
-      <div className="text-center flex flex-col gap-2 items-center">
-        <div className="eyebrow">${t('app.tagline')}</div>
-        <h2 className="start-title">OnePieceLike</h2>
-        <p className="m-0 text-lg" style=${{ fontFamily:'var(--font-ui)', letterSpacing:'.06em', textTransform:'uppercase' }}>${t('start.tagline', { s:STAGES.length, y:yonko })}</p>
-      </div>
-      <div className="man-menu-card">
-        <div className="min-w-0"><div className="nm" style=${{ font:'700 22px var(--font-ui)', color:'var(--gold)' }}>${t('man.menuT')}</div></div>
-        <button type="button" className="btn man-open" onClick=${onManual}>${t('man.btn')}</button>
-      </div>
+  const youAvatar = a => (a && a.avatar) || 'you_boy.png';
+  const myFace = isHero ? { look:cap.look, color:cap.color, avatar:cap.avatar } : { look:cap.look, color:cap.color, avatar:youAvatar(av) };
+  const done = MISSIONS.filter(m => missionDone(m, meta)).length;
+  const Back = () => html`<button type="button" className="btn ghost small self-start" onClick=${() => setView(null)}>← ${t('start.back')}</button>`;
+
+  if (view === 'flag') return html`
+    <div className="mx-auto w-full max-w-[860px] flex flex-col gap-4 py-2"><${Back}/>
+      <div><div className="sect-title">${t('flag.section')}</div><${FlagPicker} flag=${flag} setFlag=${setFlag}/></div>
+      <button type="button" className="btn big self-center" onClick=${() => setView(null)}>${t('start.done')}</button>
+    </div>`;
+
+  if (view === 'missions') return html`
+    <div className="mx-auto w-full max-w-[860px] flex flex-col gap-5 py-2"><${Back}/>
+      <${MissionsPanel} meta=${meta}/>
+      <div><div className="sect-title">${t('start.route')}</div><${Journey} idx=${-1} over=${null}/></div>
+    </div>`;
+
+  if (view === 'captain') return html`
+    <div className="mx-auto w-full max-w-[860px] flex flex-col gap-5 py-2"><${Back}/>
       <div>
-        <div className="sect-title">${t('start.route')}</div>
-        <${Journey} idx=${-1} over=${null}/>
-      </div>
-      <${FlagSection} flag=${flag} setFlag=${setFlag}/>
-      ${caps.length > 1 ? html`<div>
         <div className="sect-title">${t('start.pickCaptain')}</div>
         <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label=${t('start.pickCaptain')}>
           ${caps.map(c => {
             const lock = c.hero && !heroUnlocked(meta, c.id), ms = lock ? missionFor('hero', c.id) : null;
             return html`
             <button key=${c.id} type="button" role="radio" aria-checked=${cap.id === c.id} disabled=${lock} className=${'pick-card' + (lock ? ' locked' : '')} onClick=${() => setCaptainId(c.id)}>
-              <${Face} look=${c.look} color=${c.color} size=${68} avatar=${c.avatar}/>
+              <${Face} look=${c.look} color=${c.color} size=${68} avatar=${c.hero ? c.avatar : youAvatar(null)}/>
               <div className="min-w-0 flex-1"><div className="name" style=${{ font:'700 22px var(--font-ui)' }}>${c.hero ? L(c.name) : t('start.you')}</div><div className="eyebrow">${lock ? '🔒 ' + missionText(ms) : c.hero ? L(c.role) : t('start.youHelp')}</div></div>
             </button>`; })}
-        </div></div>` : null}
+        </div>
+      </div>
       ${isHero ? html`
       <div className="pick-card" style=${{ flexDirection:'column', alignItems:'stretch', cursor:'default' }}>
         <div className="flex items-center gap-2"><${RoleChip} role=${cap.frole}/><span className="name" style=${{ font:'700 22px var(--font-ui)' }}>${L(cap.name)}</span></div>
@@ -3488,16 +3499,43 @@ function StartScreen({ meta, flag, setFlag, hardcore, setHardcore, saved, onCont
         </div>
         <p className="text-sm mt-3 mb-0" style=${{ color:'var(--mist)' }}>${t('start.solo')}</p>
       </div><//>`}
-      <${MissionsPanel} meta=${meta}/>
-      <div className="flex flex-col items-center gap-2">
-        <label className="hc-toggle" htmlFor="hc"><input id="hc" type="checkbox" checked=${hardcore} onChange=${e => setHardcore(e.target.checked)}/><span><b>${t('hc.name')}</b> · ${t('hc.desc')}</span></label>
-        ${saved ? html`<div className="flex gap-2 flex-wrap justify-center items-center mb-2">
-          <button type="button" className="btn big" onClick=${onContinue}>${t('save.continue', { s:saved.stage + 1, n:saved.crew.length, b:saved.berries })}</button>
-          <button type="button" className="btn ghost small" onClick=${onDiscardSave}>${t('save.discard')}</button>
-        </div>` : null}
-        <button type="button" className=${'btn big' + (saved ? ' ghost' : '')} onClick=${onStart}>${t('start.go')}</button>
-        <span className="text-xs" style=${{ color:'var(--mist)' }}>${t('start.counts', { n:NAKAMAS.length, b:BOSSES.length, f:FRUITS.length, s:STAGES.length })}</span>
+      <button type="button" className="btn big self-center" onClick=${() => setView(null)}>${t('start.done')}</button>
+    </div>`;
+
+  /* ---- portada: zarpar en grande y accesos a cada apartado ---- */
+  return html`
+    <div className="mx-auto w-full max-w-[760px] flex flex-col gap-5 py-2 hub">
+      <div className="text-center flex flex-col gap-2 items-center">
+        <div className="eyebrow">${t('app.tagline')}</div>
+        <h2 className="start-title">OnePieceLike</h2>
+        <p className="m-0 text-lg" style=${{ fontFamily:'var(--font-ui)', letterSpacing:'.06em', textTransform:'uppercase' }}>${t('start.tagline', { s:STAGES.length, y:yonko })}</p>
       </div>
+      <div className="flex flex-col items-center gap-2">
+        ${saved ? html`<button type="button" className="btn big sail-btn" onClick=${onContinue}>${t('save.continue', { s:saved.stage + 1, n:saved.crew.length, b:saved.berries })}</button>
+          <button type="button" className="btn ghost small" onClick=${onDiscardSave}>${t('save.discard')}</button>
+          <button type="button" className="btn ghost" onClick=${onStart}>${t('start.go')}</button>`
+        : html`<button type="button" className="btn big sail-btn" onClick=${onStart}>⚓ ${t('start.go')}</button>`}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button type="button" className="hub-tile" onClick=${() => setView('captain')}>
+          <${Face} look=${myFace.look} color=${myFace.color} size=${64} avatar=${myFace.avatar}/>
+          <span className="hub-txt"><b>${t('hub.captain')}</b><small>${isHero ? L(cap.name) : t('start.you') + ' · ' + L(arch.name)}</small></span>
+        </button>
+        <button type="button" className="hub-tile" onClick=${() => setView('flag')}>
+          <${Flag} flag=${flag} size=${64}/>
+          <span className="hub-txt"><b>${t('hub.flag')}</b><small>${flag.name || t('flag.yours')}</small></span>
+        </button>
+        <button type="button" className="hub-tile" onClick=${() => setView('missions')}>
+          <span className="hub-ico">🏆</span>
+          <span className="hub-txt"><b>${t('hub.missions')}</b><small>${t('hub.missionsSub', { a:done, b:MISSIONS.length })}</small></span>
+        </button>
+        <button type="button" className="hub-tile" onClick=${onManual}>
+          <span className="hub-ico">📖</span>
+          <span className="hub-txt"><b>${t('hub.manual')}</b><small>${t('man.menuT')}</small></span>
+        </button>
+      </div>
+      <label className="hc-toggle self-center" htmlFor="hc"><input id="hc" type="checkbox" checked=${hardcore} onChange=${e => setHardcore(e.target.checked)}/><span><b>${t('hc.name')}</b> · ${t('hc.desc')}</span></label>
+      <span className="text-xs text-center" style=${{ color:'var(--mist)' }}>${t('start.counts', { n:NAKAMAS.length, b:BOSSES.length, f:FRUITS.length, s:STAGES.length })}</span>
     </div>`;
 }
 
