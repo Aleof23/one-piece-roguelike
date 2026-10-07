@@ -57,6 +57,10 @@
 .foe-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
 .coach{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:2px solid var(--gold);border-radius:4px;background:rgba(246,183,60,.12);color:var(--foam);font:500 14px/1.35 var(--font-body)}
 .coach .eyebrow{color:var(--gold)}
+.mission{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:2px solid #000;border-radius:4px;background:rgba(0,0,0,.28);opacity:.8}.mission.done{opacity:1;box-shadow:inset 0 0 0 1px var(--kelp);background:rgba(61,214,160,.08)}.mission-ico{font-size:18px;line-height:1.2;flex:none}
+.pick-card.locked{opacity:.5;cursor:not-allowed;filter:grayscale(.6)}.lock-tag{margin-left:auto;font:600 12px var(--font-ui);color:var(--gold);text-transform:none}
+.mission-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:80;max-width:min(92vw,520px);padding:10px 14px;border:3px solid #000;border-radius:6px;background:#0e2b3a;box-shadow:0 0 0 2px var(--gold),0 8px 30px rgba(0,0,0,.6);color:var(--foam);font:500 14px/1.35 var(--font-body);cursor:pointer;animation:toastin .35s ease-out}.mission-toast b{color:var(--gold)}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,16px)}}
 .tut-box{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 10px;border:2px solid var(--gold);border-radius:4px;background:rgba(246,183,60,.1);font-size:13px;line-height:1.35}.tut-box .tut-txt{flex:1 1 260px;min-width:0}.tut-box .tut-btns{display:flex;gap:6px}
 .tut-stance .stances{animation:tutglow 1.1s ease-in-out infinite}.tut-prot .prot-btn:not(:disabled){animation:tutglow 1.1s ease-in-out infinite}.tut-special .gauge{animation:tutglow 1.1s ease-in-out infinite}
 @keyframes tutglow{50%{box-shadow:0 0 0 3px var(--gold),0 0 16px rgba(246,183,60,.8)}}
@@ -503,7 +507,7 @@ function buildData(raw){
     return { id, name:n.name || id, role:n.role || (Array.isArray(n.classes) ? n.classes.join(' · ') : ''), captain, recruitable: n.recruitable !== undefined ? !!n.recruitable : !captain,
       cost:Math.max(1, Math.round(num(n.cost, 2))), baseHp:num(n.baseHp, 50), baseAtk:num(n.baseAtk, 8), color:n.color || '#7be0ff',
       look:Math.abs(Math.round(num(n.look, 0))) % 6, avatar:n.avatar || null, minStage:num(n.minStage, 1), weight:num(n.weight, 1),
-      ...combatProfile(n), desc:n.desc || null, groups:Array.isArray(n.groups) ? n.groups : [], hakiBase:parseHaki(n.haki_unlocked), powerSource:n.power_source || null };
+      ...combatProfile(n), desc:n.desc || null, groups:Array.isArray(n.groups) ? n.groups : [], hakiBase:parseHaki(n.haki_unlocked), powerSource:n.power_source || null, hero:!!n.hero, alias:n.alias || null, perk:n.perk || null };
   });
   need(nakamas.some(n => n.captain), 'characters.json: at least one nakama needs "captain": true');
 
@@ -567,7 +571,10 @@ function installData(d){
 }
 
 /* ---------- reclutas y frutas disponibles ---------- */
-const recruitCandidates = g => NAKAMAS.filter(n => n.recruitable && n.minStage <= g.stage + 1 && !g.crew.some(c => c.charId === n.id) && !(g.dismissed || []).includes(n.id));
+const recruitCandidates = g => {
+  const taken = new Set(g.crew.flatMap(c => { const d = NAKAMAS.find(x => x.id === c.charId); return d && d.alias ? [c.charId, d.alias] : [c.charId]; }));
+  return NAKAMAS.filter(n => n.recruitable && n.minStage <= g.stage + 1 && !taken.has(n.id) && !(g.dismissed || []).includes(n.id));
+};
 const availableFruits = g => FRUITS.filter(f => !g.crew.some(c => c.fruit && c.fruit.id === f.id) && !(g.lostFruits || []).includes(f.id));
 const ctxOf = g => ({ recruit: recruitCandidates(g).length > 0, fruit: availableFruits(g).length > 0 });
 const usedLead = g => g.crew.reduce((s, c) => s + c.cost, 0);
@@ -662,14 +669,14 @@ function makeMember(def, lvl, id, over){
   const atk = Math.max(1, Math.round((o.baseAtk || def.baseAtk) * SETTINGS.allyAtkK * Math.pow(SETTINGS.levelUpAtkMult, lvl - 1)));
   const maxHp = Math.max(5, Math.round((o.baseHp || def.baseHp) * SETTINGS.allyHpK * Math.pow(SETTINGS.levelUpHpMult, lvl - 1)));
   return { id, charId:def.id, name:def.name, role:o.role || def.role, color:def.color, look:def.look, avatar:o.avatar !== undefined ? o.avatar : def.avatar, cost:def.cost, captain:def.captain, lvl, atk, maxHp, hp:maxHp, fruit:null,
-    frole:o.frole || def.frole, style:o.style || def.style, stats:o.stats || def.stats, groups:def.groups || [], desc:o.desc || def.desc, hakiBase:o.hakiBase || def.hakiBase, perk:o.perk || null, powerSource:def.powerSource || null, archetype:o.archetype || null };
+    frole:o.frole || def.frole, style:o.style || def.style, stats:o.stats || def.stats, groups:def.groups || [], desc:o.desc || def.desc, hakiBase:o.hakiBase || def.hakiBase, perk:o.perk || def.perk || null, powerSource:def.powerSource || null, archetype:o.archetype || null };
 }
 /* La run empieza con UN solo personaje: el Capitan elegido, con su arquetipo y su retrato. */
 function newGame(captainId, opts = {}){
   const seed = Math.floor(Math.random() * 1e9);
   const cap = NAKAMAS.find(n => n.id === captainId) || NAKAMAS.find(n => n.captain);
-  const arch = ARCHETYPES.find(a => a.id === opts.archetypeId) || null;
-  const av = AVATARS.find(a => a.id === opts.avatarId) || null;
+  const arch = cap.hero ? null : (ARCHETYPES.find(a => a.id === opts.archetypeId) || null);
+  const av = cap.hero ? null : (AVATARS.find(a => a.id === opts.avatarId) || null);
   const over = {};
   if (arch) Object.assign(over, { baseHp:arch.baseHp, baseAtk:arch.baseAtk, frole:arch.frole, style:arch.style, stats:arch.stats, hakiBase:arch.hakiBase, perk:arch.perk, role:arch.name, desc:arch.desc, archetype:arch.id });
   if (av && av.avatar) over.avatar = av.avatar;
@@ -1530,6 +1537,9 @@ const i18n = {
     "bt.focus":"Focus",
     "bt.focusHelp":"Tap an enemy to focus it. Tap a charged special to fire it. Use Protect to shield a nakama this round.",
     "bt.sumTitle":"Battle report", "bt.sumDmg":"Damage", "bt.sumTaken":"Taken", "bt.sumBlock":"Blocks", "bt.sumHeal":"Healing", "bt.mvp":"MVP", "bt.targeted":"The boss is aiming at this nakama", "bt.roarNext":"Next round: ROAR! It will hit the whole crew",
+    "ms.title":"Main missions", "ms.help":"Complete missions to unlock new Captain styles and playable characters. Progress is saved in this browser.", "ms.done":"Mission complete!",
+    "ms.best":"Defeat Route Boss #{n}", "ms.maxCrew":"Have {n} nakamas in your crew at once", "ms.fruits":"Have {n} Devil Fruits eaten in your crew at once", "ms.berries":"Hold {n} berries at once", "ms.events":"Complete {n} sea events",
+    "ms.rewardArch":"Unlocks the style: {name}", "ms.rewardHero":"Unlocks the character: {name}", "start.you":"You", "start.youHelp":"Your own legend: pick your look and style",
     "ev.eyebrow":"Sea event",
     "ev.castaway.title":"A castaway", "ev.castaway.desc":"A man clings to a barrel in the middle of the sea, waving his arms. He says he is a great fighter. Or maybe he is only a great liar.", "ev.castaway.help":"Pull him aboard", "ev.castaway.leave":"Sail past",
     "ev.trapchest.title":"A chest on the rocks", "ev.trapchest.desc":"A chest sits alone on a reef. Too easy. Something here smells of powder.", "ev.trapchest.open":"Open it (risky)", "ev.trapchest.haki":"Read it with Observation Haki (safe)", "ev.trapchest.leave":"Leave it",
@@ -1924,6 +1934,9 @@ const i18n = {
     "bt.focus":"Objetivo",
     "bt.focusHelp":"Toca un enemigo para fijarlo. Toca un especial cargado para lanzarlo. Usa Proteger para resguardar a un nakama esta ronda.",
     "bt.sumTitle":"Informe del combate", "bt.sumDmg":"Daño", "bt.sumTaken":"Recibido", "bt.sumBlock":"Bloqueos", "bt.sumHeal":"Curación", "bt.mvp":"MVP", "bt.targeted":"El jefe apunta a este nakama", "bt.roarNext":"Próxima ronda: ¡RUGIDO! Golpeará a toda la banda",
+    "ms.title":"Misiones principales", "ms.help":"Cumple misiones para desbloquear nuevos estilos de Capitán y personajes jugables. El progreso se guarda en este navegador.", "ms.done":"¡Misión cumplida!",
+    "ms.best":"Derrota al Jefe de Ruta nº {n}", "ms.maxCrew":"Ten {n} nakamas a la vez en tu tripulación", "ms.fruits":"Ten {n} Frutas del Diablo comidas a la vez en tu tripulación", "ms.berries":"Llega a tener {n} berries a la vez", "ms.events":"Completa {n} sucesos en el mar",
+    "ms.rewardArch":"Desbloquea el estilo: {name}", "ms.rewardHero":"Desbloquea el personaje: {name}", "start.you":"Tú", "start.youHelp":"Tu propia leyenda: elige aspecto y estilo",
     "ev.eyebrow":"Suceso en el mar",
     "ev.castaway.title":"Un náufrago", "ev.castaway.desc":"Un hombre se agarra a un barril en mitad del mar y agita los brazos. Dice que es un gran luchador. O quizá solo un gran mentiroso.", "ev.castaway.help":"Subirlo a bordo", "ev.castaway.leave":"Pasar de largo",
     "ev.trapchest.title":"Un cofre en los arrecifes", "ev.trapchest.desc":"Un cofre solitario sobre un arrecife. Demasiado fácil. Aquí huele a pólvora.", "ev.trapchest.open":"Abrirlo (arriesgado)", "ev.trapchest.haki":"Leerlo con Haki de Observación (seguro)", "ev.trapchest.leave":"Dejarlo",
@@ -3355,12 +3368,66 @@ function ManualScreen({ onClose }){
     </div>`;
 }
 
-function StartScreen({ flag, setFlag, hardcore, setHardcore, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
-  const caps = NAKAMAS.filter(n => n.captain);
+/* ================= MISIONES PRINCIPALES: progreso permanente guardado en el navegador ================= */
+const META_KEY = 'lp-meta-v1';
+const META0 = { best:0, maxCrew:0, fruits:0, berries:0, events:0, notified:[] };
+function readMeta(){ try { const m = JSON.parse(localStorage.getItem(META_KEY) || '{}'); return { ...META0, ...m, notified:Array.isArray(m.notified) ? m.notified : [] }; } catch (e) { return { ...META0 }; } }
+function writeMeta(m){ try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
+/* stat: lo que se mide (best = jefes de ruta derrotados en la mejor partida); goal: lo que hay que alcanzar; unlock: lo que se consigue */
+const MISSIONS = [
+  { id:'boss2',  stat:'best',    goal:2,    unlock:{ arch:'swordsman' } },
+  { id:'boss4',  stat:'best',    goal:4,    unlock:{ arch:'gunner' } },
+  { id:'boss6',  stat:'best',    goal:6,    unlock:{ arch:'strategist' } },
+  { id:'crew5',  stat:'maxCrew', goal:5,    unlock:{ hero:'hero_nami' } },
+  { id:'fruit2', stat:'fruits',  goal:2,    unlock:{ hero:'hero_usopp' } },
+  { id:'boss5',  stat:'best',    goal:5,    unlock:{ hero:'hero_zoro' } },
+  { id:'rich',   stat:'berries', goal:2000, unlock:{ hero:'hero_sanji' } },
+  { id:'events', stat:'events',  goal:4,    unlock:{ hero:'hero_chopper' } },
+  { id:'boss7',  stat:'best',    goal:7,    unlock:{ hero:'hero_luffy' } },
+];
+const missionDone = (m, mt) => (mt[m.stat] || 0) >= m.goal;
+const missionFor = (kind, id) => MISSIONS.find(m => m.unlock[kind] === id) || null;
+const archUnlocked = (mt, id) => { const m = missionFor('arch', id); return !m || missionDone(m, mt); };
+const heroUnlocked = (mt, id) => { const m = missionFor('hero', id); return !m || missionDone(m, mt); };
+const effArch = (mt, id) => ARCHETYPES.find(a => a.id === id && archUnlocked(mt, a.id)) || ARCHETYPES.find(a => archUnlocked(mt, a.id)) || ARCHETYPES[0];
+const effCaptain = (mt, id) => { const caps = NAKAMAS.filter(n => n.captain); return caps.find(c => c.id === id && (!c.hero || heroUnlocked(mt, c.id))) || caps.find(c => !c.hero) || caps[0]; };
+function metaFromRun(mt, g){
+  const best = g.over === 'win' ? STAGES.length : g.stage;
+  const n = { ...mt, best:Math.max(mt.best, best), maxCrew:Math.max(mt.maxCrew, g.crew.length), fruits:Math.max(mt.fruits, g.crew.filter(c => c.fruit).length), berries:Math.max(mt.berries, g.berries) };
+  return ['best', 'maxCrew', 'fruits', 'berries'].some(k => n[k] !== mt[k]) ? n : mt;
+}
+const rewardName = m => m.unlock.arch ? L((ARCHETYPES.find(a => a.id === m.unlock.arch) || {}).name) : L((NAKAMAS.find(n => n.id === m.unlock.hero) || {}).name);
+const missionText = m => t('ms.' + m.stat, { n:m.goal });
+function MissionsPanel({ meta }){
+  const done = MISSIONS.filter(m => missionDone(m, meta)).length;
+  return html`
+    <div>
+      <div className="sect-title">${t('ms.title')} · ${done}/${MISSIONS.length}</div>
+      <p className="text-sm mt-0 mb-2" style=${{ color:'var(--mist)' }}>${t('ms.help')}</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        ${MISSIONS.map(m => {
+          const ok = missionDone(m, meta), cur = Math.min(m.goal, meta[m.stat] || 0);
+          return html`
+            <div key=${m.id} className=${'mission' + (ok ? ' done' : '')}>
+              <span className="mission-ico" aria-hidden="true">${ok ? '✔' : '🔒'}</span>
+              <div className="min-w-0 flex-1">
+                <div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'16px' }}>${missionText(m)}</div>
+                <div className="text-xs" style=${{ color:'var(--mist)' }}>${t(m.unlock.arch ? 'ms.rewardArch' : 'ms.rewardHero', { name:rewardName(m) })}</div>
+                <div className="pbar" style=${{ marginTop:4 }}><i style=${{ width:(cur / m.goal * 100) + '%', background: ok ? 'var(--kelp)' : 'var(--gold)' }}></i></div>
+                <div className="text-xs tabular-nums" style=${{ color:'var(--mist)' }}>${cur} / ${m.goal}</div>
+              </div>
+            </div>`; })}
+      </div>
+    </div>`;
+}
+
+function StartScreen({ meta, flag, setFlag, hardcore, setHardcore, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
+  const caps = NAKAMAS.filter(n => n.captain).sort((a, b) => (a.hero ? 1 : 0) - (b.hero ? 1 : 0));
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
-  const arch = ARCHETYPES.find(a => a.id === archId) || ARCHETYPES[0];
+  const arch = effArch(meta, archId);
   const av = AVATARS.find(a => a.id === avatarId) || AVATARS[0];
-  const cap = caps.find(c => c.id === captainId) || caps[0];
+  const cap = effCaptain(meta, captainId);
+  const isHero = !!(cap && cap.hero);
   return html`
     <div className="mx-auto w-full max-w-[860px] flex flex-col gap-6 py-2">
       <div className="text-center flex flex-col gap-2 items-center">
@@ -3380,12 +3447,22 @@ function StartScreen({ flag, setFlag, hardcore, setHardcore, saved, onContinue, 
       ${caps.length > 1 ? html`<div>
         <div className="sect-title">${t('start.pickCaptain')}</div>
         <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label=${t('start.pickCaptain')}>
-          ${caps.map(c => html`
-            <button key=${c.id} type="button" role="radio" aria-checked=${captainId === c.id} className="pick-card" onClick=${() => setCaptainId(c.id)}>
+          ${caps.map(c => {
+            const lock = c.hero && !heroUnlocked(meta, c.id), ms = lock ? missionFor('hero', c.id) : null;
+            return html`
+            <button key=${c.id} type="button" role="radio" aria-checked=${cap.id === c.id} disabled=${lock} className=${'pick-card' + (lock ? ' locked' : '')} onClick=${() => setCaptainId(c.id)}>
               <${Face} look=${c.look} color=${c.color} size=${68} avatar=${c.avatar}/>
-              <div className="min-w-0 flex-1"><div className="name" style=${{ font:'700 22px var(--font-ui)' }}>${L(c.name)}</div><div className="eyebrow">${L(c.role)}</div></div>
-            </button>`)}
+              <div className="min-w-0 flex-1"><div className="name" style=${{ font:'700 22px var(--font-ui)' }}>${c.hero ? L(c.name) : t('start.you')}</div><div className="eyebrow">${lock ? '🔒 ' + missionText(ms) : c.hero ? L(c.role) : t('start.youHelp')}</div></div>
+            </button>`; })}
         </div></div>` : null}
+      ${isHero ? html`
+      <div className="pick-card" style=${{ flexDirection:'column', alignItems:'stretch', cursor:'default' }}>
+        <div className="flex items-center gap-2"><${RoleChip} role=${cap.frole}/><span className="name" style=${{ font:'700 22px var(--font-ui)' }}>${L(cap.name)}</span></div>
+        <div className="text-sm" style=${{ color:'var(--mist)' }}>${L(cap.desc)}</div>
+        <${StatBars} stats=${cap.stats}/>
+        <div className="flex flex-wrap gap-2 items-center text-sm"><span className="chip">${t('common.hp')} ${cap.baseHp}</span><span className="chip">${t('common.atk')} ${cap.baseAtk}</span><${HakiChips} h=${cap.hakiBase}/>${cap.perk ? html`<span style=${{ color:'var(--gold)' }}>★ ${t('perk.' + cap.perk)}</span>` : null}</div>
+        <div className="sp-card"><b>${t('sp.' + cap.frole)}</b><span>${t('spd.' + cap.frole)}</span></div>
+      </div>` : html`<${React.Fragment}>
       <div>
         <div className="sect-title">${t('start.who')} · ${t('start.hair')}</div>
         <div className="grid gap-3 grid-cols-2" role="radiogroup" aria-label=${t('start.hair')}>
@@ -3400,17 +3477,18 @@ function StartScreen({ flag, setFlag, hardcore, setHardcore, saved, onContinue, 
         <div className="sect-title">${t('start.arch')}</div>
         <p className="text-sm mt-0 mb-2" style=${{ color:'var(--mist)' }}>${t('start.archHelp')}</p>
         <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label=${t('start.arch')}>
-          ${ARCHETYPES.map(a => html`
-            <button key=${a.id} type="button" role="radio" aria-checked=${archId === a.id} className="pick-card arch-pick" style=${{ alignItems:'stretch', flexDirection:'column' }} onClick=${() => setArchId(a.id)}>
-              <div className="flex items-center gap-2"><${RoleChip} role=${a.frole}/><span className="name" style=${{ font:'700 22px var(--font-ui)' }}>${L(a.name)}</span></div>
+          ${ARCHETYPES.map(a => { const lock = !archUnlocked(meta, a.id), ms = lock ? missionFor('arch', a.id) : null; return html`
+            <button key=${a.id} type="button" role="radio" aria-checked=${arch.id === a.id} disabled=${lock} className=${'pick-card arch-pick' + (lock ? ' locked' : '')} style=${{ alignItems:'stretch', flexDirection:'column' }} onClick=${() => setArchId(a.id)}>
+              <div className="flex items-center gap-2"><${RoleChip} role=${a.frole}/><span className="name" style=${{ font:'700 22px var(--font-ui)' }}>${L(a.name)}</span>${lock ? html`<span className="lock-tag">🔒 ${missionText(ms)}</span>` : null}</div>
               <div className="text-sm" style=${{ color:'var(--mist)' }}>${L(a.desc)}</div>
               <${StatBars} stats=${a.stats}/>
               <div className="flex flex-wrap gap-2 items-center text-sm"><span className="chip">${t('common.hp')} ${a.baseHp}</span><span className="chip">${t('common.atk')} ${a.baseAtk}</span><${HakiChips} h=${a.hakiBase}/><span style=${{ color:'var(--gold)' }}>★ ${t('perk.' + a.perk)}</span></div>
               <div className="sp-card"><b>${t('sp.' + a.frole)}</b><span>${t('spd.' + a.frole)}</span></div>
-            </button>`)}
+            </button>`; })}
         </div>
         <p className="text-sm mt-3 mb-0" style=${{ color:'var(--mist)' }}>${t('start.solo')}</p>
-      </div>
+      </div><//>`}
+      <${MissionsPanel} meta=${meta}/>
       <div className="flex flex-col items-center gap-2">
         <label className="hc-toggle" htmlFor="hc"><input id="hc" type="checkbox" checked=${hardcore} onChange=${e => setHardcore(e.target.checked)}/><span><b>${t('hc.name')}</b> · ${t('hc.desc')}</span></label>
         ${saved ? html`<div className="flex gap-2 flex-wrap justify-center items-center mb-2">
@@ -3684,6 +3762,9 @@ function App(){
   const [sheet, setSheet] = useState(null);
   const [manualOpen, setManualOpen] = useState(false);
   const [tutOn, setTutOn] = useState(false);
+  const [meta, setMetaState] = useState(readMeta);
+  const [toast, setToast] = useState(null);
+  const updateMeta = fn => setMetaState(m => { const n = fn(m); if (n !== m) writeMeta(n); return n; });
   const [g, setG] = useState(null);
   const [tab, setTab] = useState('map');
   const [modal, setModal] = useState(null);
@@ -3730,11 +3811,18 @@ function App(){
     setErrors([]); installData(res.data); goStart();
   };
 
-  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(captainId, { avatarId, archetypeId:archId, hardcore, flag:normFlag(flag) })); setTab('map'); setPhase('play'); };
+  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(effCaptain(meta, captainId).id, { avatarId, archetypeId:effArch(meta, archId).id, hardcore, flag:normFlag(flag) })); setTab('map'); setPhase('play'); };
 
   const continueSave = () => { const sv = readSave(); if (!sv) { setSaved(null); return; } BATTLE_PREFS.auto = !!sv.auto; BATTLE_PREFS.fast = !!sv.fast; setG(sv.g); setModal(null); setTab('map'); setPhase('play'); };
   const discardSave = () => { clearSave(); setSaved(null); };
   useEffect(() => { if (phase === 'play' && g && !modal) writeSave(g); }, [g, modal, phase]);
+  useEffect(() => { if (phase === 'play' && g) updateMeta(m => metaFromRun(m, g)); }, [g, phase]);
+  useEffect(() => {
+    const fresh = MISSIONS.filter(m => missionDone(m, meta) && !meta.notified.includes(m.id));
+    if (!fresh.length) return;
+    setToast(fresh); updateMeta(m => ({ ...m, notified:[...m.notified, ...fresh.map(f => f.id)] }));
+    const id = setTimeout(() => setToast(null), 7000); return () => clearTimeout(id);
+  }, [meta]);
 
   const pick = node => {
     if (modal || burst || g.over) return;
@@ -3790,7 +3878,7 @@ function App(){
           </div>
         </main>` : null}
 
-      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} flag=${flag} setFlag=${setFlag} hardcore=${hardcore} setHardcore=${setHardcore} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
+      ${phase === 'start' ? html`<main className="flex-1 min-h-0 panel overflow-y-auto"><${StartScreen} meta=${meta} onManual=${() => setManualOpen(true)} captainId=${captainId} setCaptainId=${setCaptainId} avatarId=${avatarId} setAvatarId=${setAvatarId} archId=${archId} setArchId=${setArchId} flag=${flag} setFlag=${setFlag} hardcore=${hardcore} setHardcore=${setHardcore} saved=${saved} onContinue=${continueSave} onDiscardSave=${discardSave} onStart=${start}/></main>` : null}
 
       ${playing ? html`
         <main className="flex-1 min-h-0 grid gap-3 lg:grid-cols-[300px_minmax(0,1fr)_320px]">
@@ -3807,9 +3895,10 @@ function App(){
         : node.type === 'market'  ? html`<${MarketEvent}  key=${node.id} g=${g} setG=${setG} done=${close}/>`
         : node.type === 'recruit' ? html`<${RecruitEvent} key=${node.id} g=${g} setG=${setG} done=${close}/>`
         : node.type === 'camp'    ? html`<${CampEvent}    key=${node.id} g=${g} setG=${setG} done=${close}/>`
-        : node.type === 'event'   ? html`<${MapEvent}     key=${node.id} g=${g} setG=${setG} node=${node} done=${close}/>`
+        : node.type === 'event'   ? html`<${MapEvent}     key=${node.id} g=${g} setG=${setG} node=${node} done=${() => { updateMeta(m => ({ ...m, events:m.events + 1 })); close(); }}/>`
         : html`<${ChestEvent} key=${node.id} g=${g} setG=${setG} done=${close}/>`
       ) : null}
+      ${toast ? html`<div className="mission-toast" role="status" onClick=${() => setToast(null)}><b>🏴‍☠️ ${t('ms.done')}</b>${toast.map(m => html`<div key=${m.id}>${missionText(m)} → <b>${t(m.unlock.arch ? 'ms.rewardArch' : 'ms.rewardHero', { name:rewardName(m) })}</b></div>`)}</div>` : null}
       ${playing && g.over ? html`<${EndScreen} g=${g} onRestart=${goStart}/>` : null}
       ${playing && dismissId && !g.over ? html`<${DismissDialog} key=${dismissId} g=${g} id=${dismissId} setG=${setG} onClose=${() => setDismissId(null)}/>` : null}
       ${dataOpen ? html`<${DataDialog} raw=${raw} src=${src} errors=${errors} onFile=${loadLocal} onReload=${() => { setDataOpen(false); boot(); }} onClose=${() => setDataOpen(false)}/>` : null}
