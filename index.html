@@ -492,6 +492,15 @@ function combatProfile(n){
   return { frole, style:ROLE_STYLE[n.style] ? n.style : ROLE_STYLE[frole], stats:st };
 }
 /* ---------- validacion y construccion de los datos ---------- */
+const FX_NUM = ['spd','dodge','crit','acc','charge','regen','guard','lifesteal','dbl','splash','stun','rez','thorns','aggro'];
+const FX_TEAM = ['atk','guard','regen','dodge','crit','charge','foeAtk'];
+function cleanFx(x){
+  const o = {}; if (!x || typeof x !== 'object') return o;
+  FX_NUM.forEach(k => { const v = Number(x[k]); if (isFinite(v) && v) o[k] = v; });
+  if (x.pierce) o.pierce = true;
+  if (x.team && typeof x.team === 'object') { const t = {}; FX_TEAM.forEach(k => { const v = Number(x.team[k]); if (isFinite(v) && v) t[k] = v; }); if (Object.keys(t).length) o.team = t; }
+  return o;
+}
 function buildData(raw){
   const errors = [];
   const need = (cond, msg) => { if (!cond) errors.push(msg); };
@@ -531,7 +540,7 @@ function buildData(raw){
   const fruits = fr.fruits.map((f, i) => {
     need(f && f.id, 'fruits.json: fruits[' + i + '] needs an "id"');
     const id = String(f && f.id); seen(fids, id, 'fruits.json');
-    return { id, name:f.name || id, type:f.type || '', atk:num(f.atk, 1), hp:num(f.hp, 1), color:f.color || '#b66dff', desc:f.desc || null, weight:num(f.weight, 1) };
+    return { id, name:f.name || id, type:f.type || '', atk:num(f.atk, 1), hp:num(f.hp, 1), color:f.color || '#b66dff', desc:f.desc || null, weight:num(f.weight, 1), fx:cleanFx(f.fx) };
   });
 
   const iids = [];
@@ -582,6 +591,24 @@ const recruitCandidates = g => {
   return NAKAMAS.filter(n => n.recruitable && n.minStage <= g.stage + 1 && !taken.has(n.id) && !(g.dismissed || []).includes(n.id));
 };
 const availableFruits = g => FRUITS.filter(f => !g.crew.some(c => c.fruit && c.fruit.id === f.id) && !(g.lostFruits || []).includes(f.id));
+/* ofertas de reclutamiento: 3 por parada, siempre caras nuevas (no repite las ya ofrecidas en la partida), de roles distintos,
+   favoreciendo los roles que a la tripulacion le faltan y garantizando que al menos una se pueda pagar */
+function recruitOffers(g, k = 3){
+  const pool = recruitCandidates(g), seen = new Set(g.offered || []);
+  let fresh = pool.filter(n => !seen.has(n.id)); if (fresh.length < k) fresh = pool;
+  const have = r => g.crew.filter(c => c.frole === r).length;
+  const chosen = [];
+  const draw = (list, wf) => { const o = list.map(x => ({ x, k:-Math.log(Math.random() || 1e-9) / Math.max(.01, wf(x)) })).sort((a, b) => a.k - b.k)[0]; return o ? o.x : null; };
+  const base = n => (n.weight || 1) * (have(n.frole) === 0 ? 2 : have(n.frole) >= (ROLE_CAP[n.frole] || 3) ? .4 : 1);
+  const first = draw(fresh.filter(n => canRecruit(n, g)), base) || draw(fresh, base);
+  if (first) chosen.push(first);
+  while (chosen.length < k) {
+    const rest = fresh.filter(n => !chosen.includes(n));
+    const nx = draw(rest, n => base(n) * (chosen.some(c => c.frole === n.frole) ? .3 : 1));
+    if (!nx) break; chosen.push(nx);
+  }
+  return chosen.sort(() => Math.random() - .5);
+}
 const ctxOf = g => ({ recruit: recruitCandidates(g).length > 0, fruit: availableFruits(g).length > 0 });
 const usedLead = g => g.crew.reduce((s, c) => s + c.cost, 0);
 const leadRoom = g => g.lead - usedLead(g);
@@ -902,12 +929,14 @@ function mkAlly(c, m = {}){
   const eq = (c.gear && c.gear.equip) || {}, gs = eq.stats || {}, gh = eq.haki || {};
   const stats = { ...c.stats };
   for (const k in gs) stats[k] = clamp((stats[k] || 0) + gs[k], 0, 12);
-  stats.spd = clamp((stats.spd || 0) + (m.spd || 0), 0, 12);
+  const fx = (c.fruit && c.fruit.fx) || {};
+  stats.spd = clamp((stats.spd || 0) + (m.spd || 0) + (fx.spd || 0), 0, 20);
   const hb = hakiSet(c), haki = { arm:Math.min(3, hb.arm + (gh.arm || 0)), obs:Math.min(3, hb.obs + (gh.obs || 0)), con:Math.min(3, hb.con + (gh.con || 0)) };
   return { id:c.id, charId:c.charId, name:c.name, color:c.color, look:c.look, avatar:c.avatar, captain:!!c.captain, frole:c.frole, style:c.style, stats, perk:c.perk || null,
     lvl:c.lvl, hp:c.hp, maxHp:c.maxHp, atk:Math.round(c.atk * (1 + (eq.atkPct || 0))), haki, logia:!!(c.fruit && c.fruit.type === 'logia'), gauge:0, stun:0,
-    acc:(eq.acc || 0) + (m.acc || 0), crit:(eq.crit || 0) + (m.crit || 0), dodgeB:(eq.dodge || 0) + (m.dodge || 0), charge:(eq.charge || 0) + (m.charge || 0),
-    guardPct:eq.guardPct || 0, aggro:eq.aggro || 1, pierce:!!eq.pierce, gearIcon:c.gear ? c.gear.icon : null };
+    acc:(eq.acc || 0) + (m.acc || 0) + (fx.acc || 0), crit:(eq.crit || 0) + (m.crit || 0) + (fx.crit || 0), dodgeB:(eq.dodge || 0) + (m.dodge || 0) + (fx.dodge || 0), charge:(eq.charge || 0) + (m.charge || 0) + (fx.charge || 0),
+    guardPct:1 - (1 - (eq.guardPct || 0)) * (1 - (fx.guard || 0)), aggro:(eq.aggro || 1) * (fx.aggro || 1), pierce:!!(eq.pierce || fx.pierce),
+    lifesteal:fx.lifesteal || 0, dbl:fx.dbl || 0, splash:fx.splash || 0, stunP:fx.stun || 0, rez:fx.rez || 0, thorns:fx.thorns || 0, regenSelf:fx.regen || 0, gearIcon:c.gear ? c.gear.icon : null };
 }
 function battleInit(g, node){
   const crew = g.crew.filter(c => c.hp > 0), H = harmony(g.crew), m = mods(g);
@@ -915,6 +944,10 @@ function battleInit(g, node){
   const st = { round:0, node:{ id:node.id, type:node.type, f:node.f }, allies:crew.map(c => mkAlly(c, m)), foes:genFoes(g, node), H:Hs,
     atkMult:1 + Hs / 100, takenMult:1 - Hs / 200, power:1 + m.power, guard:clamp(m.guard, 0, .6), shield:Math.round(m.ward || 0), stance:'bal', over:null, rounds:0,
     regen:m.regen || 0, calm:clamp(m.calm || 0, 0, .7), revive:Math.round(m.revive || 0), reviveUsed:0 };
+  const T = { atk:0, guard:0, regen:0, dodge:0, crit:0, charge:0, foeAtk:0 };
+  crew.forEach(c => { const tm = c.fruit && c.fruit.fx && c.fruit.fx.team; if (tm) for (const k in T) T[k] += tm[k] || 0; });
+  st.power += T.atk; st.guard = clamp(st.guard + T.guard, 0, .6); st.regen += T.regen; st.foeAtk = clamp(T.foeAtk, 0, .3);
+  st.allies.forEach(a => { a.dodgeB += T.dodge; a.crit += T.crit; a.charge += T.charge; });
   if (m.ambush > 0) st.foes.forEach(f => { f.hp = Math.max(1, Math.round(f.maxHp * (1 - m.ambush * (f.boss ? .5 : 1)))); });
   st.tactician = crew.some(c => c.perk === 'tactician'); st.tally = {};
   st.foes.filter(f => f.boss).forEach(f => { const w = weightedAlly(st, Math.random); if (w) f.tgt = w.id; }); /* el jefe fija su primer objetivo y se ve en pantalla */
@@ -983,6 +1016,9 @@ function allyAttack(st, a, f, ev, rnd, o = {}){
   let dmg = Math.max(1, Math.round(allyBase(st, a) * (o.ignoreStyle ? 1 : styleMult(f, a)) * (.88 + rnd() * .24) * (crit ? 1.6 : 1) * mult));
   const weak = f.weak === a.style, resist = f.resist === a.style && !a.pierce;
   damageFoe(st, f, dmg, ev, a, { crit, weak, resist, arm:a.haki.arm > 0, style:a.style, special:o.special || null });
+  if (a.lifesteal && a.hp > 0) { const h = Math.min(a.maxHp - a.hp, Math.round(dmg * a.lifesteal)); if (h > 0) { a.hp += h; ev.push({ t:'heal', id:a.id, n:h, src:a.id }); } }
+  if (a.splash && !o.ignoreStyle) aliveF(st).forEach(x => { if (x !== f) damageFoe(st, x, Math.max(1, Math.round(dmg * a.splash)), ev, a, { splash:true, style:a.style }); });
+  if (a.stunP && f.hp > 0 && !f.stun && !f.stunImm && rnd() < a.stunP * (f.boss ? .4 : 1)) { f.stun = 1; f.stunImm = f.boss ? 3 : 0; ev.push({ t:'stun', id:f.id, side:'f' }); }
   if (f.hp > 0 && f.traits.includes('burn') && !a.haki.arm && (a.style === 'sword' || a.style === 'brawl')) {
     const b = Math.max(1, Math.round(a.maxHp * .05)); a.hp = Math.max(0, a.hp - b);
     ev.push({ t:'burn', id:a.id, dmg:b }); if (a.hp <= 0) ev.push({ t:'ko', id:a.id, side:'a' });
@@ -995,9 +1031,10 @@ function foeAttack(st, f, a, ev, rnd, mult = 1){
   if (rnd() < dodge) { ev.push({ t:'miss', src:f.id, dst:a.id, side:'f', foresee:a.haki.obs > 0 }); a.gauge = Math.min(100, a.gauge + 4); return; }
   const red = a.stats.def / (a.stats.def + 14);
   const crit = rnd() < (f.traits.includes('swordmaster') ? .25 : .06);
-  const dmg = Math.max(1, Math.round(f.atk * mult * (.85 + rnd() * .3) * (crit ? 1.5 : 1) * (1 - red) * (1 - .05 * a.haki.arm) * (1 - (a.guardPct || 0)) * stanceMods(st).taken * (st.shield > 0 ? .55 : 1) * st.takenMult * (1 - st.guard)));
+  const dmg = Math.max(1, Math.round(f.atk * mult * (.85 + rnd() * .3) * (crit ? 1.5 : 1) * (1 - red) * (1 - .05 * a.haki.arm) * (1 - (a.guardPct || 0)) * stanceMods(st).taken * (st.shield > 0 ? .55 : 1) * st.takenMult * (1 - st.guard) * (1 - (st.foeAtk || 0))));
   a.hp = Math.max(0, a.hp - dmg); a.gauge = Math.min(100, a.gauge + 6);
   ev.push({ t:'atk', src:f.id, dst:a.id, side:'f', dmg, crit, style:f.style, arm:f.haki.arm > 0 });
+  if (a.thorns && f.hp > 0) { const r = Math.max(1, Math.round(dmg * a.thorns)); f.hp = Math.max(0, f.hp - r); ev.push({ t:'atk', src:a.id, dst:f.id, side:'a', dmg:r, thorns:true }); if (f.hp <= 0) ev.push({ t:'ko', id:f.id, side:'f' }); }
   if (f.traits.includes('dark') && f.hp > 0) { const h = Math.round(dmg * .25); f.hp = Math.min(f.maxHp, f.hp + h); ev.push({ t:'drain', id:f.id, n:h }); }
   if (a.hp <= 0) ev.push({ t:'ko', id:a.id, side:'a' });
 }
@@ -1061,6 +1098,8 @@ function foeAct(st, f, ev, rnd){
   }
 }
 function reviveCheck(st, ev){
+  const p = st.allies.find(x => x.hp <= 0 && x.rez && !x.rezUsed);
+  if (p) { p.rezUsed = true; p.hp = Math.max(1, Math.round(p.maxHp * p.rez)); ev.push({ t:'revive', id:p.id, n:p.hp }); }
   if (!st.revive || st.reviveUsed >= st.revive) return;
   const a = st.allies.find(x => x.hp <= 0 && !x.revived);
   if (!a) return;
@@ -1101,7 +1140,10 @@ function stepRound(st, orders = {}, rnd = Math.random){
       const ready = u.gauge >= 100;
       if (u.prot) { /* se protege: no ataca ni lanza especial */ }
       else if (ready && (orders.auto || (orders.fire || []).includes(u.id))) special(st, u, orders, ev, rnd);
-      else allyAttack(st, u, pickFoe(st, u, orders, rnd), ev, rnd);
+      else {
+        allyAttack(st, u, pickFoe(st, u, orders, rnd), ev, rnd);
+        if (u.dbl && u.hp > 0 && aliveF(st).length && rnd() < u.dbl) allyAttack(st, u, pickFoe(st, u, orders, rnd), ev, rnd, { mult:.6 });
+      }
       u.gauge = Math.min(100, u.gauge + 16 * sm.gauge + (u.charge || 0));
     } else foeAct(st, u, ev, rnd);
     reviveCheck(st, ev);
@@ -1109,6 +1151,7 @@ function stepRound(st, orders = {}, rnd = Math.random){
   }
   if (!st.over) {
     if (st.regen > 0) aliveA(st).forEach(a => { const hh = Math.min(a.maxHp - a.hp, Math.max(1, Math.round(a.maxHp * st.regen))); if (hh > 0) { a.hp += hh; ev.push({ t:'heal', id:a.id, n:hh, src:'regen' }); } });
+    aliveA(st).forEach(a => { if (a.regenSelf) { const hh = Math.min(a.maxHp - a.hp, Math.max(1, Math.round(a.maxHp * a.regenSelf))); if (hh > 0) { a.hp += hh; ev.push({ t:'heal', id:a.id, n:hh, src:'regen' }); } } });
     aliveA(st).filter(a => a.frole === 'support').forEach(s => {
       const t = aliveA(st).slice().sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
       if (t && t.hp < t.maxHp) { const h = Math.min(t.maxHp - t.hp, Math.round(t.maxHp * (.05 + .006 * s.stats.int))); t.hp += h; ev.push({ t:'heal', id:t.id, n:h, src:s.id }); }
@@ -1144,8 +1187,7 @@ function smartOrders(st){
   }).map(a => a.id);
   let protect = null;
   if (boss || fs.length >= 2) {
-    const tg = boss && boss.tgt && as.find(a => a.id === boss.tgt);
-    const wk = st.protLast === st.round ? null : tg && tg.hp / tg.maxHp < .5 ? tg : as.filter(a => a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
+    const wk = st.protLast === st.round ? null : as.filter(a => a.hp / a.maxHp < .3).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp)[0];
     if (wk && as.length > 1) protect = wk.id;
   }
   return { stance, focus, fire: fire.filter(id => id !== protect), protect };
@@ -1204,7 +1246,7 @@ function eventRun(g, node, id, choice, rnd = Math.random){
   const berries = eventBerries(g, node);
   if (id === 'castaway' && choice === 'help') {
     if (rnd() < .3) { const lost = Math.min(g.berries, Math.max(20, Math.round(g.berries * .12))); return { g:{ ...g, berries:g.berries - lost }, key:'thief', n:lost, bad:true }; }
-    const def = weightedPick(recruitCandidates(g).filter(d => canRecruit(d, g)), 1)[0];
+    const def = recruitOffers(g, 1).find(d => canRecruit(d, g));
     if (def) return { g:{ ...g, crew:[...g.crew, makeMember(def, g.stage + 1, 'c' + g.uid)], uid:g.uid + 1 }, key:'joined', def };
     return { g:{ ...g, berries:g.berries + berries }, key:'thanks', n:berries };
   }
@@ -1357,7 +1399,7 @@ const i18n = {
     "man.items.price":"Price",
     "man.fx.hp":"Max HP +{n}",
     "man.fx.lead":"Leadership +{n}",
-    "man.fruits.hint":"A Devil Fruit multiplies a crew member’s ATK and HP once. Each fruit can only be eaten by one member per run, and only members without a fruit can eat one.",
+    "man.fruits.hint":"A Devil Fruit multiplies a crew member’s ATK and HP once and grants special powers in battle. Each fruit can only be eaten by one member per run, and only members without a fruit can eat one.",
     "man.fruits.mult":"ATK ×{a} · HP ×{h}",
     "man.bosses.hint":"One Route Boss waits at the end of each sea, in this order. Each has traits that change how the fight plays.",
     "man.bosses.weak":"Weak to",
@@ -1559,7 +1601,7 @@ const i18n = {
     "tut.skip":"Skip tutorial", "tut.ok":"Got it", "tut.step":"Tip {n}/{m}",
     "tut.stance":"Pick how your crew fights each round: Quick hits first and dodges more, Power hits harder but last, Balanced is in between.",
     "tut.special":"Each nakama fills a bar as they fight. When it is full, a Special button appears: tap it before pressing Next to unleash it.",
-    "tut.protect":"Press 🛡 Protect on a nakama: they skip their attack but take NO damage that round. Use it on the one the 🎯 boss is aiming at. If you protect someone, nobody can be protected the next round.",
+    "tut.protect":"Press 🛡 Protect on a nakama: they skip their attack but take NO damage that round. Use it on a wounded nakama: if the enemy picks them, they take nothing. If you protect someone, nobody can be protected the next round.",
     "bt.protect":"Protect", "bt.protectOn":"Protecting", "bt.protectCd":"Nobody can be protected the round after a protection", "bt.protectTip":"This nakama doesn't act this round and takes no damage if targeted. If you protect someone, nobody can be protected next round.", "bt.blocked":"Blocked!", "bt.protecting":"Shielded", "log.protect":"{a} braces and protects", "log.block":"{b} blocks {a}'s attack",
     "bt.noFocus":"No focus — crew picks its own targets",
     "bt.ready":"READY",
@@ -1621,6 +1663,8 @@ const i18n = {
     'chest.noneLeft':'Everyone already ate a fruit. You sell this one for 150 berries.', 'chest.sell':'Sell fruit',
     'chest.empty':'Only a pile of berries inside: every Devil Fruit is already taken. +150 berries.', 'chest.take':'Take the berries',
     'fruit.auto':'ATK ×{atk} · HP ×{hp}',
+    'fx.spd':'+{n} Speed', 'fx.dodge':'+{n}% dodge', 'fx.acc':'+{n}% accuracy', 'fx.crit':'+{n}% crit', 'fx.charge':'Special +{n}/round', 'fx.guard':'-{n}% damage taken', 'fx.regen':'Heals {n}% HP/round', 'fx.lifesteal':'Heals {n}% of damage dealt', 'fx.dbl':'{n}% chance to strike twice', 'fx.splash':'Hits all enemies for {n}%', 'fx.stun':'{n}% to stun', 'fx.pierce':'Ignores resistances', 'fx.thorns':'Reflects {n}% damage', 'fx.aggroUp':'Draws enemy attacks', 'fx.aggroDown':'Less targeted', 'fx.rez':'Revives once ({n}% HP)',
+    'fx.t.atk':'Crew: +{n}% damage', 'fx.t.guard':'Crew: -{n}% damage taken', 'fx.t.regen':'Crew: heals {n}% HP/round', 'fx.t.dodge':'Crew: +{n}% dodge', 'fx.t.crit':'Crew: +{n}% crit', 'fx.t.charge':'Crew: special +{n}/round', 'fx.t.foeAtk':'Enemies deal -{n}% damage',
     'ftype.logia':'Logia', 'ftype.paramecia':'Paramecia', 'ftype.zoan':'Zoan', 'ftype.ancientZoan':'Ancient Zoan', 'ftype.mythicalZoan':'Mythical Zoan',
     'end.win':'King of the Pirates',
     'end.winText':'All {y} Emperors fell in a row and the Great Treasure is yours. Your bounties add up to {n}.',
@@ -1754,7 +1798,7 @@ const i18n = {
     "man.items.price":"Precio",
     "man.fx.hp":"Vida máx. +{n}",
     "man.fx.lead":"Liderazgo +{n}",
-    "man.fruits.hint":"Una Fruta del Diablo multiplica una sola vez el ATQ y la vida de un tripulante. Cada fruta solo la puede comer un miembro por partida, y solo los que no tengan fruta.",
+    "man.fruits.hint":"Una Fruta del Diablo multiplica una sola vez el ATQ y la vida de un tripulante y le da poderes especiales en combate. Cada fruta solo la puede comer un miembro por partida, y solo los que no tengan fruta.",
     "man.fruits.mult":"ATQ ×{a} · Vida ×{h}",
     "man.bosses.hint":"Al final de cada mar espera un Jefe de Ruta, en este orden. Cada uno tiene rasgos que cambian cómo se juega el combate.",
     "man.bosses.weak":"Débil a",
@@ -1956,7 +2000,7 @@ const i18n = {
     "tut.skip":"Saltar tutorial", "tut.ok":"Entendido", "tut.step":"Consejo {n}/{m}",
     "tut.stance":"Elige cómo lucha tu banda cada ronda: Rápido golpea antes y esquiva más, Poderoso pega más fuerte pero el último, Equilibrado es el punto medio.",
     "tut.special":"Cada nakama llena una barra mientras lucha. Cuando está llena aparece un botón de Especial: púlsalo antes de dar a Siguiente para lanzarlo.",
-    "tut.protect":"Pulsa 🛡 Proteger en un nakama: no ataca pero NO recibe daño esa ronda. Úsalo en el que apunta el jefe 🎯. Si proteges a alguien, nadie podrá ser protegido la ronda siguiente.",
+    "tut.protect":"Pulsa 🛡 Proteger en un nakama: no ataca pero NO recibe daño esa ronda. Úsalo en un nakama herido: si el enemigo lo elige, no recibe nada. Si proteges a alguien, nadie podrá ser protegido la ronda siguiente.",
     "bt.protect":"Proteger", "bt.protectOn":"Protegiendo", "bt.protectCd":"Nadie puede ser protegido la ronda siguiente a una protección", "bt.protectTip":"Este nakama no actúa esta ronda y no recibe daño si es el objetivo. Si proteges a alguien, nadie podrá ser protegido en la ronda siguiente.", "bt.blocked":"¡Bloqueado!", "bt.protecting":"Protegido", "log.protect":"{a} se cubre y se protege", "log.block":"{b} bloquea el ataque de {a}",
     "bt.noFocus":"Sin objetivo: la tripulación elige sola",
     "bt.ready":"LISTO",
@@ -2018,6 +2062,8 @@ const i18n = {
     'chest.noneLeft':'Todos tus Nakamas ya probaron una fruta. Esta la vendes por 150 berries.', 'chest.sell':'Vender fruta',
     'chest.empty':'Solo hay un montón de berries: todas las Frutas del Diablo ya tienen dueño. +150 berries.', 'chest.take':'Coger los berries',
     'fruit.auto':'ATQ ×{atk} · Vida ×{hp}',
+    'fx.spd':'+{n} Velocidad', 'fx.dodge':'+{n}% esquiva', 'fx.acc':'+{n}% precisión', 'fx.crit':'+{n}% crítico', 'fx.charge':'Especial +{n}/ronda', 'fx.guard':'-{n}% daño recibido', 'fx.regen':'Cura {n}% vida/ronda', 'fx.lifesteal':'Cura {n}% del daño hecho', 'fx.dbl':'{n}% de golpear dos veces', 'fx.splash':'Golpea a todos por {n}%', 'fx.stun':'{n}% de aturdir', 'fx.pierce':'Ignora resistencias', 'fx.thorns':'Refleja {n}% del daño', 'fx.aggroUp':'Atrae los ataques', 'fx.aggroDown':'Lo atacan menos', 'fx.rez':'Revive una vez ({n}% vida)',
+    'fx.t.atk':'Tripulación: +{n}% daño', 'fx.t.guard':'Tripulación: -{n}% daño recibido', 'fx.t.regen':'Tripulación: cura {n}% vida/ronda', 'fx.t.dodge':'Tripulación: +{n}% esquiva', 'fx.t.crit':'Tripulación: +{n}% crítico', 'fx.t.charge':'Tripulación: especial +{n}/ronda', 'fx.t.foeAtk':'Enemigos hacen -{n}% daño',
     'ftype.logia':'Logia', 'ftype.paramecia':'Paramecia', 'ftype.zoan':'Zoan', 'ftype.ancientZoan':'Zoan Ancestral', 'ftype.mythicalZoan':'Zoan Mítica',
     'end.win':'Rey de los Piratas',
     'end.winText':'Los {y} Emperadores cayeron en fila y el Gran Tesoro es tuyo. Tus recompensas suman {n}.',
@@ -2058,7 +2104,37 @@ function L(v){
 const numLocale = () => LANG === 'es' ? 'es-ES' : 'en-US';
 const fmtMult = n => n.toLocaleString(numLocale(), { minimumFractionDigits:1, maximumFractionDigits:2 });
 const bossName = b => b.placeholder ? t('boss.unknown', { rank:t('rank.' + b.rank) }) : L(b.name);
-const fruitDesc = f => L(f.desc) || t('fruit.auto', { atk:fmtMult(f.atk), hp:fmtMult(f.hp) });
+const pc = n => Math.round(n * 100);
+function fxLines(f){
+  const x = f.fx || {}, o = [];
+  if (x.spd) o.push(t('fx.spd', { n:x.spd }));
+  if (x.dodge) o.push(t('fx.dodge', { n:pc(x.dodge) }));
+  if (x.acc) o.push(t('fx.acc', { n:pc(x.acc) }));
+  if (x.crit) o.push(t('fx.crit', { n:pc(x.crit) }));
+  if (x.charge) o.push(t('fx.charge', { n:x.charge }));
+  if (x.guard) o.push(t('fx.guard', { n:pc(x.guard) }));
+  if (x.regen) o.push(t('fx.regen', { n:pc(x.regen) }));
+  if (x.lifesteal) o.push(t('fx.lifesteal', { n:pc(x.lifesteal) }));
+  if (x.dbl) o.push(t('fx.dbl', { n:pc(x.dbl) }));
+  if (x.splash) o.push(t('fx.splash', { n:pc(x.splash) }));
+  if (x.stun) o.push(t('fx.stun', { n:pc(x.stun) }));
+  if (x.pierce) o.push(t('fx.pierce'));
+  if (x.thorns) o.push(t('fx.thorns', { n:pc(x.thorns) }));
+  if (x.aggro) o.push(t(x.aggro > 1 ? 'fx.aggroUp' : 'fx.aggroDown'));
+  if (x.rez) o.push(t('fx.rez', { n:pc(x.rez) }));
+  const tm = x.team || {};
+  if (tm.atk) o.push(t('fx.t.atk', { n:pc(tm.atk) }));
+  if (tm.guard) o.push(t('fx.t.guard', { n:pc(tm.guard) }));
+  if (tm.regen) o.push(t('fx.t.regen', { n:+(tm.regen * 100).toFixed(1) }));
+  if (tm.dodge) o.push(t('fx.t.dodge', { n:pc(tm.dodge) }));
+  if (tm.crit) o.push(t('fx.t.crit', { n:pc(tm.crit) }));
+  if (tm.charge) o.push(t('fx.t.charge', { n:tm.charge }));
+  if (tm.foeAtk) o.push(t('fx.t.foeAtk', { n:pc(tm.foeAtk) }));
+  return o;
+}
+const fruitMult = f => t('fruit.auto', { atk:fmtMult(f.atk), hp:fmtMult(f.hp) });
+const fruitDesc = f => [fruitMult(f), ...fxLines(f)].join(' · ');
+const fruitLore = f => L(f.desc);
 const fruitType = f => { const k = 'ftype.' + f.type; return i18n.en[k] ? t(k) : String(f.type || ''); };
 const nodeLabel = (n, s) => n.type === 'boss' ? t('rank.' + s.bossRank) + ' · ' + bossName(s.boss)
   : n.type === 'marine' ? (L(n.enemyName) || t('type.marine'))
@@ -2666,7 +2742,7 @@ function FoeFace({ f, size }){
   const col = marine ? '#5aa9ff' : '#ff5d47';
   return html`<span className="foe-face" style=${{ width:size, height:size, '--fc':col }}><${Ico} n=${marine ? 'shield' : 'skull'} size=${size * .62} sw=${1.8}/></span>`;
 }
-function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire, canProtect, protectOn, protectCd, onProtect, targeted }){
+function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire, canProtect, protectOn, protectCd, onProtect }){
   const dead = u.hp <= 0, pct = Math.max(0, u.hp / u.maxHp * 100), tone = pct > 55 ? '' : pct > 25 ? 'mid' : 'low';
   const cls = ['bunit', side, dead ? 'dead' : '', anim && anim[u.id] ? 'a-' + anim[u.id] : '', u.stun > 0 ? 'stunned' : '', focus === u.id ? 'focus' : '', u.haki && u.haki.arm ? 'has-arm' : '', u.haki && u.haki.obs ? 'has-obs' : '', u.haki && u.haki.con ? 'has-con' : '', targeted ? 'targeted' : ''].join(' ');
   const weakK = side === 'f' && (st.revealed || known[u.id]);
@@ -2676,7 +2752,6 @@ function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firi
         ${side === 'a' ? html`<${Face} look=${u.look} color=${u.color} size=${54} avatar=${u.avatar}/>` : html`<${FoeFace} f=${u} size=${u.boss ? 66 : 54}/>`}
         ${u.stun > 0 && !dead ? html`<span className="stun-tag">💫</span>` : null}
         ${u.prot && !dead ? html`<span className="prot-tag">🛡</span>` : null}
-        ${targeted && !dead ? html`<span className="tgt-tag" title=${t('bt.targeted')}>🎯</span>` : null}
         ${(floats || []).filter(x => x.id === u.id).map(x => html`<span key=${x.k} className=${'float ' + x.cls}>${x.text}</span>`)}
       </div>
       <div className="bname truncate">${side === 'f' ? (u.boss ? bossName(STAGES[0] && STAGES.map(s => s.boss).find(b => b.id === u.bossId)) : L(u.name)) : L(u.name)}</div>
@@ -2815,7 +2890,7 @@ function BattleArena({ init, onEnd, boss }){
         <div className="side crew-side"><div className="side-title">${t('bt.crew')} · ${t('harm.title')} ${st.H > 0 ? '+' : ''}${st.H}%</div>
           <div className="units">${view.allies.map(a => {
             const real = st.allies.find(x => x.id === a.id) || a;
-            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${st.protLast === st.round} onProtect=${toggleProtect} targeted=${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0 && f.tgt === a.id)}/>`; })}</div></div>
+            return html`<${BUnit} key=${a.id} u=${{ ...a, gauge:real.gauge }} side="a" st=${view} anim=${anim} floats=${floats} known=${known} fireable=${real.gauge >= 100 && a.hp > 0 && !busy && !st.over && !auto} firing=${fire.includes(a.id)} onFire=${toggleFire} canProtect=${!busy && !st.over && !auto && st.allies.filter(x => x.hp > 0).length > 1} protectOn=${protect === a.id} protectCd=${st.protLast === st.round} onProtect=${toggleProtect}/>`; })}</div></div>
       </div>
       ${!st.over && !busy && st.foes.some(f => f.boss && f.hp > 0) && (st.round + 1) % SETTINGS.bossRoarEvery === 0 ? html`<div className="roar-warn">⚠ ${t('bt.roarNext')}</div>` : null}
       <div className="battle-log" aria-live="polite">${log.slice(-5).map((l, i, arr) => html`<div key=${log.length - arr.length + i} className=${i === arr.length - 1 ? 'last' : ''}>${l}</div>`)}${log.length === 0 ? html`<div>${t('bt.focusHelp')}</div>` : null}</div>
@@ -2967,7 +3042,8 @@ function MarketEvent({ g, setG, done }){
 
 function RecruitEvent({ g, setG, done }){
   const openSheet = React.useContext(SheetCtx);
-  const [cands] = useState(() => weightedPick(recruitCandidates(g), 2));
+  const [cands] = useState(() => recruitOffers(g, 3));
+  useEffect(() => { setG(cur => ({ ...cur, offered:[...new Set([...(cur.offered || []), ...cands.map(c => c.id)])] })); }, []);
   const [hired, setHired] = useState([]);
   const room = leadRoom(g);
   const full = g.crew.length >= SETTINGS.crewSlots;
@@ -3034,7 +3110,9 @@ function ChestEvent({ g, setG, done }){
           <div className="fruit-orb reveal" style=${{ '--fc': fruit.color, width:92, height:92 }}><${Ico} n="fruit" size=${54} sw=${1.8}/></div>
           <div className="victory-title" style=${{ fontSize:'32px' }}>${L(fruit.name)}</div>
           <div className="eyebrow">${fruitType(fruit)}</div>
-          <div className="text-lg font-bold" style=${{ fontFamily:'var(--font-ui)', color:'var(--gold)' }}>${fruitDesc(fruit)}</div>
+          <div className="text-lg font-bold" style=${{ fontFamily:'var(--font-ui)', color:'var(--gold)' }}>${fruitMult(fruit)}</div>
+          <div className="flex flex-wrap justify-center gap-1">${fxLines(fruit).map(l => html`<span key=${l} className="chip">${l}</span>`)}</div>
+          <div className="tiny" style=${{ fontStyle:'italic' }}>${fruitLore(fruit)}</div>
         </div>
         ${eligible.length ? html`
           <div className="eyebrow">${t('chest.who')}</div>
@@ -3342,8 +3420,8 @@ function ManualScreen({ onClose }){
     <div className="man-grid">${FRUITS.map(f => html`
       <div key=${f.id} className="man-card" style=${{ borderLeft:'8px solid ' + f.color }}>
         <div className="min-w-0 flex-1"><div className="nm">${L(f.name)}</div><div className="eyebrow">${fruitType(f)}</div>
-          <div className="tiny mt-1">${fruitDesc(f)}</div>
-          <div className="man-chips mt-1"><span className="chip" style=${{ color:'var(--gold)' }}>${t('man.fruits.mult', { a:fmtMult(f.atk), h:fmtMult(f.hp) })}</span></div></div>
+          <div className="tiny mt-1" style=${{ fontStyle:'italic' }}>${fruitLore(f)}</div>
+          <div className="man-chips mt-1"><span className="chip" style=${{ color:'var(--gold)' }}>${t('man.fruits.mult', { a:fmtMult(f.atk), h:fmtMult(f.hp) })}</span>${fxLines(f).map(l => html`<span key=${l} className="chip">${l}</span>`)}</div></div>
       </div>`)}</div>
   <//>`;
   const Bosses = () => html`<${React.Fragment}>

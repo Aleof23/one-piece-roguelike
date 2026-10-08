@@ -33,10 +33,10 @@
       1,
       1,
       0.95,
-      0.8,
-      0.72,
-      0.66,
-      0.62
+      0.75,
+      0.62,
+      0.55,
+      0.5
     ]
   },
   "commonEnemies": {
@@ -331,7 +331,7 @@
           "es": "Comida Viviente"
         }
       ],
-      "bossMult": 5.034,
+      "bossMult": 4.5,
       "rewardMult": 7.656
     },
     {
@@ -369,7 +369,7 @@
           "es": "Guerrero Numbers"
         }
       ],
-      "bossMult": 5.819,
+      "bossMult": 4.8,
       "rewardMult": 8.322
     },
     {
@@ -407,7 +407,7 @@
           "es": "Unidad de Seguridad de Egghead"
         }
       ],
-      "bossMult": 8.595,
+      "bossMult": 6.6,
       "rewardMult": 12.816
     },
     {
@@ -445,7 +445,7 @@
           "es": "Asaltante del Viaje Final"
         }
       ],
-      "bossMult": 13.109,
+      "bossMult": 9.8,
       "rewardMult": 17.836
     }
   ]
