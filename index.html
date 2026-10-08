@@ -2744,7 +2744,7 @@ function FoeFace({ f, size }){
 }
 function BUnit({ u, side, st, anim, floats, known, focus, onPick, fireable, firing, onFire, canProtect, protectOn, protectCd, onProtect }){
   const dead = u.hp <= 0, pct = Math.max(0, u.hp / u.maxHp * 100), tone = pct > 55 ? '' : pct > 25 ? 'mid' : 'low';
-  const cls = ['bunit', side, dead ? 'dead' : '', anim && anim[u.id] ? 'a-' + anim[u.id] : '', u.stun > 0 ? 'stunned' : '', focus === u.id ? 'focus' : '', u.haki && u.haki.arm ? 'has-arm' : '', u.haki && u.haki.obs ? 'has-obs' : '', u.haki && u.haki.con ? 'has-con' : '', targeted ? 'targeted' : ''].join(' ');
+  const cls = ['bunit', side, dead ? 'dead' : '', anim && anim[u.id] ? 'a-' + anim[u.id] : '', u.stun > 0 ? 'stunned' : '', focus === u.id ? 'focus' : '', u.haki && u.haki.arm ? 'has-arm' : '', u.haki && u.haki.obs ? 'has-obs' : '', u.haki && u.haki.con ? 'has-con' : ''].join(' ');
   const weakK = side === 'f' && (st.revealed || known[u.id]);
   return html`
     <div className=${cls} onClick=${side === 'f' && !dead ? () => onPick(u.id) : null} role=${side === 'f' ? 'button' : null}>
