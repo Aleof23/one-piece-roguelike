@@ -4029,4 +4029,15 @@ function App(){
 ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
 </script>
 
+<!-- Cloudflare Web Analytics: pega tu token en CF_TOKEN (Cloudflare > Analytics & Logs > Web Analytics > Add a site). Sin token no se carga nada. -->
+<script>
+(function(){ var CF_TOKEN = ''; if (!CF_TOKEN || location.protocol === 'file:' || /localhost|127\.0\.0\.1/.test(location.hostname)) return;
+  var s = document.createElement('script'); s.defer = true; s.src = 'https://static.cloudflareinsights.com/beacon.min.js'; s.setAttribute('data-cf-beacon', JSON.stringify({ token: CF_TOKEN })); document.head.appendChild(s); })();
+</script>
+
+
+
+<!-- Cloudflare Web Analytics -->
+<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "72daf7b436cb46028fc1bef28e25fa75"}'></script>
+<!-- End Cloudflare Web Analytics -->
 </body></html>
