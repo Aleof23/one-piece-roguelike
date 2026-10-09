@@ -436,6 +436,8 @@ button.offer:disabled{cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
+
+.dev-fab{position:fixed;left:8px;bottom:8px;z-index:45;font:700 11px var(--font-ui);padding:2px 7px;border:1px solid #7be0ff;border-radius:3px;background:rgba(5,20,28,.8);color:#7be0ff;opacity:.3;cursor:pointer}.dev-fab:hover{opacity:1}
 </style>
 
 </head>
@@ -806,6 +808,45 @@ function levelUp(c){
   const hp = c.hp <= 0 ? Math.round(maxHp * .4) : Math.min(maxHp, c.hp + Math.round(maxHp * .4));
   return { ...c, lvl:c.lvl + 1, atk, maxHp, hp };
 }
+
+/* ---------- modo desarrollador (oculto): clic x5 en el titulo o Ctrl+Mayus+D; pide contrasena ----------
+   Para cambiar la contrasena: abre la consola del navegador, escribe devHash('tu-clave') y pega el resultado en DEV_HASH. */
+const DEV_HASH = '163j14unety';
+const devHash = s => { let h1 = 0xdeadbeef ^ 7, h2 = 0x41c6ce57 ^ 7; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36); };
+const DEV_KEY = 'lp-dev';
+const rnd0 = () => Math.random() - .5;
+function devGiveFruits(g, n){
+  for (let i = 0; i < n; i++) { const f = availableFruits(g).sort(rnd0)[0], c = g.crew.find(x => !x.fruit && x.hp > 0); if (!f || !c) break; g = eat(g, c.id, f); }
+  return g;
+}
+function devGiveItems(g, n, gear){
+  for (let i = 0; i < n; i++) { const it = itemPool({ ...g, stage:STAGES.length }).filter(x => !!x.equip === !!gear && !slotFull(g, x)).sort(rnd0)[0]; if (!it) break; g = gainItem(g, it); }
+  return g;
+}
+function devHealAll(g){ return { ...g, crew:g.crew.map(c => ({ ...c, hp:c.maxHp })) }; }
+function devBuild(g0, o){
+  const stage = clamp(Math.round(o.stage || 1), 1, STAGES.length);
+  let g = { ...g0, dev:true, stage:stage - 1 };
+  g.crew = g.crew.map(c => { let x = c; for (let i = 1; i < stage; i++) x = levelUp(x); return { ...x, hp:x.maxHp }; });
+  const want = clamp(Math.round(o.crew || 1), 1, SETTINGS.crewSlots);
+  const cand = recruitCandidates(g).slice().sort(rnd0);
+  while (g.crew.length < want && cand.length) { const def = cand.pop(); g = { ...g, crew:[...g.crew, makeMember(def, stage, 'c' + g.uid)], uid:g.uid + 1 }; }
+  g.lead = Math.max(g.lead + SETTINGS.leadershipPerStage * (stage - 1), usedLead(g) + 2);
+  g.berries = Math.max(0, Math.round(o.berries || 0));
+  g = devGiveItems(g, o.relics || 0, false); g = devGiveItems(g, o.gear || 0, true); g = devGiveFruits(g, o.fruits || 0);
+  g = devHealAll(g); g.map = genMap(g.seed, g.stage, ctxOf(g));
+  return g;
+}
+/* salta a otro mar conservando la tripulacion (sube de nivel lo que falte) */
+function devJump(g, stage){
+  stage = clamp(Math.round(stage), 1, STAGES.length);
+  const crew = g.crew.map(c => { let x = c; while (x.lvl < stage) x = levelUp(x); return { ...x, hp:x.maxHp }; });
+  const g2 = { ...g, dev:true, over:null, stage:stage - 1, pos:null, visited:[], crew, lead:Math.max(g.lead, usedLead({ crew }) + 2) };
+  g2.map = genMap(g.seed, g2.stage, ctxOf(g2));
+  return g2;
+}
 function advance(g){
   if (g.stage >= STAGES.length - 1) return { ...g, over:'win' };
   
@@ -948,6 +989,8 @@ function battleInit(g, node){
   crew.forEach(c => { const tm = c.fruit && c.fruit.fx && c.fruit.fx.team; if (tm) for (const k in T) T[k] += tm[k] || 0; });
   st.power += T.atk; st.guard = clamp(st.guard + T.guard, 0, .6); st.regen += T.regen; st.foeAtk = clamp(T.foeAtk, 0, .3);
   st.allies.forEach(a => { a.dodgeB += T.dodge; a.crit += T.crit; a.charge += T.charge; });
+  if (g.devGod) st.takenMult = 0;
+  if (g.devPow) st.power *= g.devPow;
   if (m.ambush > 0) st.foes.forEach(f => { f.hp = Math.max(1, Math.round(f.maxHp * (1 - m.ambush * (f.boss ? .5 : 1)))); });
   st.tactician = crew.some(c => c.perk === 'tactician'); st.tally = {};
   st.foes.filter(f => f.boss).forEach(f => { const w = weightedAlly(st, Math.random); if (w) f.tgt = w.id; }); /* el jefe fija su primer objetivo y se ve en pantalla */
@@ -3482,6 +3525,59 @@ function metaFromRun(mt, g){
 }
 const rewardName = m => m.unlock.arch ? L((ARCHETYPES.find(a => a.id === m.unlock.arch) || {}).name) : L((NAKAMAS.find(n => n.id === m.unlock.hero) || {}).name);
 const missionText = m => t('ms.' + m.stat, { n:m.goal });
+
+function DevAsk({ onOk, onClose }){
+  const [v, setV] = useState(''), [bad, setBad] = useState(false);
+  const go = e => { e.preventDefault(); if (devHash(v.trim()) === DEV_HASH) onOk(); else { setBad(true); setV(''); } };
+  return html`<div className="modal-wrap" role="dialog" aria-modal="true" onClick=${onClose}>
+    <form className="modal" style=${{ '--tone':'#7be0ff', maxWidth:360 }} onClick=${e => e.stopPropagation()} onSubmit=${go}>
+      <div className="modal-body" style=${{ paddingTop:18 }}>
+        <input type="password" autoFocus className="flag-input" style=${{ maxWidth:'none' }} value=${v} onChange=${e => { setV(e.target.value); setBad(false); }} aria-label="Password" autoComplete="off"/>
+        ${bad ? html`<div className="errbox">✕</div>` : null}
+        <div className="flex gap-2 justify-end"><button type="button" className="btn ghost small" onClick=${onClose}>Cancel</button><button type="submit" className="btn small">OK</button></div>
+      </div>
+    </form></div>`;
+}
+function DevPanel({ g, phase, meta, onBuild, setG, updateMeta, onClose, onLock }){
+  const [o, setO] = useState({ stage:10, crew:9, berries:5000, relics:4, gear:4, fruits:3 });
+  const num = (k, min, max) => html`<input type="number" className="flag-input" style=${{ width:90, maxWidth:90 }} min=${min} max=${max} value=${o[k]} onChange=${e => setO({ ...o, [k]:clamp(+e.target.value || 0, min, max) })}/>`;
+  const row = (label, input) => html`<label className="flex items-center justify-between gap-3"><span>${label}</span>${input}</label>`;
+  const play = phase === 'play' && g;
+  const mut = fn => setG(cur => ({ ...fn(cur), dev:true }));
+  const [jump, setJump] = useState(STAGES.length);
+  return html`<div className="modal-wrap" role="dialog" aria-modal="true" onClick=${onClose}>
+    <div className="modal wide" style=${{ '--tone':'#7be0ff' }} onClick=${e => e.stopPropagation()}>
+      <header className="modal-head"><div className="modal-ico"><${Ico} n="key" size=${30}/></div><div className="min-w-0"><div className="eyebrow">DEV</div><h2>Developer mode</h2></div></header>
+      <div className="modal-body">
+        <p className="m-0 text-sm" style=${{ color:'var(--mist)' }}>Dev runs are never saved and never count for missions or unlocks.</p>
+        <div className="sect-title">New run (uses the captain picked on the start screen)</div>
+        ${row('Sea (1–' + STAGES.length + ')', num('stage', 1, STAGES.length))}
+        ${row('Crew size (1–' + SETTINGS.crewSlots + ')', num('crew', 1, SETTINGS.crewSlots))}
+        ${row('Berries', num('berries', 0, 99999))}
+        ${row('Relics', num('relics', 0, 6))}${row('Gear', num('gear', 0, 6))}${row('Devil Fruits', num('fruits', 0, 9))}
+        <button type="button" className="btn" onClick=${() => onBuild(o)}>Start dev run</button>
+        ${play ? html`
+          <div className="sect-title">Current run${g.dev ? ' (dev)' : ''}</div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="btn ghost small" onClick=${() => mut(devHealAll)}>Heal all</button>
+            <button type="button" className="btn ghost small" onClick=${() => mut(c => ({ ...c, berries:c.berries + 1000 }))}>+1000 berries</button>
+            <button type="button" className="btn ghost small" onClick=${() => mut(c => devGiveFruits(c, 1))}>+ random fruit</button>
+            <button type="button" className="btn ghost small" onClick=${() => mut(c => devGiveItems(c, 1, false))}>+ random relic</button>
+            <button type="button" className="btn ghost small" onClick=${() => mut(c => devGiveItems(c, 1, true))}>+ random gear</button>
+            <button type="button" className="btn ghost small" onClick=${() => mut(c => { const d = recruitCandidates(c).sort(rnd0)[0]; return d && c.crew.length < SETTINGS.crewSlots ? { ...c, lead:Math.max(c.lead, usedLead(c) + d.cost), crew:[...c.crew, makeMember(d, c.stage + 1, 'c' + c.uid)], uid:c.uid + 1 } : c; })}>+ random nakama</button>
+            <button type="button" className="btn ghost small" aria-pressed=${!!g.devGod} onClick=${() => mut(c => ({ ...c, devGod:!c.devGod }))}>${g.devGod ? '✓ ' : ''}Near-invincible</button>
+            <button type="button" className="btn ghost small" aria-pressed=${!!g.devPow} onClick=${() => mut(c => ({ ...c, devPow:c.devPow ? 0 : 10 }))}>${g.devPow ? '✓ ' : ''}Damage ×10</button>
+          </div>
+          ${row('Jump to sea', html`<span className="flex gap-2 items-center"><input type="number" className="flag-input" style=${{ width:80, maxWidth:80 }} min="1" max=${STAGES.length} value=${jump} onChange=${e => setJump(clamp(+e.target.value || 1, 1, STAGES.length))}/><button type="button" className="btn small" onClick=${() => { setG(c => devJump(c, jump)); onClose(); }}>Go</button></span>`)}` : null}
+        <div className="sect-title">Progress</div>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn ghost small" onClick=${() => updateMeta(m => ({ ...m, best:STAGES.length, maxCrew:SETTINGS.crewSlots, fruits:9, berries:99999, events:99 }))}>Unlock every mission reward</button>
+          <button type="button" className="btn ghost small" onClick=${onLock}>Lock dev mode</button>
+          <button type="button" className="btn ghost small" onClick=${onClose}>Close</button>
+        </div>
+      </div>
+    </div></div>`;
+}
 function MissionsPanel({ meta }){
   const done = MISSIONS.filter(m => missionDone(m, meta)).length;
   return html`
@@ -3893,6 +3989,12 @@ function App(){
   const [flag, setFlagState] = useState(readFlag);
   const setFlag = f => { setFlagState(f); try { localStorage.setItem('lp-flag', JSON.stringify(f)); } catch (e) {} };
   const [muted, setMuted] = useState(SND.muted);
+  const [devOn, setDevOn] = useState(() => { try { return localStorage.getItem(DEV_KEY) === '1'; } catch (e) { return false; } });
+  const [devAsk, setDevAsk] = useState(false), [devOpen, setDevOpen] = useState(false);
+  const devTaps = React.useRef([]);
+  const devTry = () => { if (devOn) setDevOpen(true); else setDevAsk(true); };
+  const devTap = () => { const n = Date.now(); devTaps.current = [...devTaps.current.filter(x => n - x < 2500), n]; if (devTaps.current.length >= 5) { devTaps.current = []; devTry(); } };
+  useEffect(() => { const f = e => { if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) { e.preventDefault(); devTry(); } }; window.addEventListener('keydown', f); return () => window.removeEventListener('keydown', f); });
   useEffect(() => { const f = () => SND.unlock(); window.addEventListener('pointerdown', f); window.addEventListener('keydown', f); return () => { window.removeEventListener('pointerdown', f); window.removeEventListener('keydown', f); }; }, []);
 
   const goStart = () => {
@@ -3931,8 +4033,8 @@ function App(){
 
   const continueSave = () => { const sv = readSave(); if (!sv) { setSaved(null); return; } BATTLE_PREFS.auto = !!sv.auto; BATTLE_PREFS.fast = !!sv.fast; setG(sv.g); setModal(null); setTab('map'); setPhase('play'); };
   const discardSave = () => { clearSave(); setSaved(null); };
-  useEffect(() => { if (phase === 'play' && g && !modal) writeSave(g); }, [g, modal, phase]);
-  useEffect(() => { if (phase === 'play' && g) updateMeta(m => metaFromRun(m, g)); }, [g, phase]);
+  useEffect(() => { if (phase === 'play' && g && !modal && !g.dev) writeSave(g); }, [g, modal, phase]);
+  useEffect(() => { if (phase === 'play' && g && !g.dev) updateMeta(m => metaFromRun(m, g)); }, [g, phase]);
   useEffect(() => {
     const fresh = MISSIONS.filter(m => missionDone(m, meta) && !meta.notified.includes(m.id));
     if (!fresh.length) return;
@@ -3967,7 +4069,7 @@ function App(){
     <div className="h-full flex flex-col gap-3 px-4 pt-3" style=${{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 0px))' }}>
       <header className="flex items-center gap-3 justify-between flex-wrap">
         <div className="flex items-baseline gap-3 min-w-0">
-          ${playing ? html`<span title=${(g.flag && g.flag.name) || ''}><${Flag} flag=${g.flag || flag} size=${46}/></span>` : null}<h1 className="m-0" style=${{ fontFamily:'var(--font-display)', fontSize:'34px', lineHeight:1, color:'var(--gold)', textShadow:'0 3px 0 #000' }}>OnePieceLike</h1>
+          ${playing ? html`<span title=${(g.flag && g.flag.name) || ''}><${Flag} flag=${g.flag || flag} size=${46}/></span>` : null}<h1 className="m-0" onClick=${devTap} style=${{ fontFamily:'var(--font-display)', fontSize:'34px', lineHeight:1, color:'var(--gold)', textShadow:'0 3px 0 #000' }}>OnePieceLike</h1>
           <span className="eyebrow hidden md:inline">${t('app.tagline')}</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -4019,6 +4121,9 @@ function App(){
       ${playing && dismissId && !g.over ? html`<${DismissDialog} key=${dismissId} g=${g} id=${dismissId} setG=${setG} onClose=${() => setDismissId(null)}/>` : null}
       ${dataOpen ? html`<${DataDialog} raw=${raw} src=${src} errors=${errors} onFile=${loadLocal} onReload=${() => { setDataOpen(false); boot(); }} onClose=${() => setDataOpen(false)}/>` : null}
       ${manualOpen ? html`<${ManualScreen} onClose=${() => setManualOpen(false)}/>` : null}
+      ${devAsk ? html`<${DevAsk} onClose=${() => setDevAsk(false)} onOk=${() => { try { localStorage.setItem(DEV_KEY, '1'); } catch (e) {} setDevOn(true); setDevAsk(false); setDevOpen(true); }}/>` : null}
+      ${devOn && !devOpen ? html`<button type="button" className="dev-fab" onClick=${() => setDevOpen(true)} aria-label="Developer mode">DEV</button>` : null}
+      ${devOpen ? html`<${DevPanel} g=${g} phase=${phase} meta=${meta} setG=${setG} updateMeta=${updateMeta} onClose=${() => setDevOpen(false)} onLock=${() => { try { localStorage.removeItem(DEV_KEY); } catch (e) {} setDevOn(false); setDevOpen(false); }} onBuild=${o => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(devBuild(newGame(effCaptain(meta, captainId).id, { avatarId, archetypeId:effArch(meta, archId).id, hardcore:false, flag:normFlag(flag) }), o)); setModal(null); setTab('map'); setPhase('play'); setDevOpen(false); }}/>` : null}
       ${sheet ? html`<${CharSheet} c=${sheet} onClose=${() => setSheet(null)}/>` : null}
       ${zoom ? html`<${ZoomModal} z=${zoom} onClose=${() => setZoom(null)}/>` : null}
     </div>
