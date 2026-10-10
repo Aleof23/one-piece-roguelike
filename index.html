@@ -945,7 +945,7 @@ function enemyPower(g, node){
   const s = STAGES[g.stage], boss = node.type === 'boss';
   const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n, diff = SETTINGS.difficulty != null ? SETTINGS.difficulty : 1;
   if (boss) return Math.round((12 + 3.2 * 5) * s.powerMult * SETTINGS.pirateMult * (s.bossMult != null ? s.bossMult : 1.25) * diff * crewK);
-  const k = (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
+  const k = SETTINGS.marineMult * /* piratas = misma dificultad que marina */ (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
   return Math.round((12 + node.f * 3.2) * s.powerMult * k * diff * crewK);
 }
 function genFoes(g, node){

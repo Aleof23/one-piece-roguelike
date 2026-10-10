@@ -369,7 +369,7 @@
      "es": "Guerrero Numbers"
     }
    ],
-   "bossMult": 0.114,
+   "bossMult": 0.1,
    "rewardMult": 8.322
   },
   {
@@ -407,7 +407,7 @@
      "es": "Unidad de Seguridad de Egghead"
     }
    ],
-   "bossMult": 0.141,
+   "bossMult": 0.125,
    "rewardMult": 12.816
   },
   {
@@ -445,7 +445,7 @@
      "es": "Asaltante del Viaje Final"
     }
    ],
-   "bossMult": 0.239,
+   "bossMult": 0.21,
    "rewardMult": 17.836
   }
  ]
