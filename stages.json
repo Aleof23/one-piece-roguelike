@@ -342,7 +342,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_kaido",
-   "powerMult": 212.544,
+   "powerMult": 229.548,
    "sea": [
     "#5a2d6b",
     "#1a0c24"
@@ -369,7 +369,7 @@
      "es": "Guerrero Numbers"
     }
    ],
-   "bossMult": 0.1,
+   "bossMult": 0.093,
    "rewardMult": 8.322
   },
   {
@@ -380,7 +380,7 @@
    },
    "bossRank": "yonko",
    "bossId": "boss_shanks",
-   "powerMult": 372.63,
+   "powerMult": 409.893,
    "sea": [
     "#1d5a5a",
     "#071f26"
@@ -407,7 +407,7 @@
      "es": "Unidad de Seguridad de Egghead"
     }
    ],
-   "bossMult": 0.125,
+   "bossMult": 0.097,
    "rewardMult": 12.816
   },
   {
@@ -445,7 +445,7 @@
      "es": "Asaltante del Viaje Final"
     }
    ],
-   "bossMult": 0.21,
+   "bossMult": 0.178,
    "rewardMult": 17.836
   }
  ]
