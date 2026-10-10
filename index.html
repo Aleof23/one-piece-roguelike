@@ -550,7 +550,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.6'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.7'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -2719,7 +2719,7 @@ function BossIntel({ s }){
   const [open, setOpen] = useState(false);
   const b = s.boss, tr = (b.traits || []).filter(x => i18n.en['trait.' + x]);
   return html`<div className="boss-intel"><button type="button" className="eyebrow w-full text-left flex items-center gap-2" aria-expanded=${open} onClick=${() => setOpen(o => !o)} style=${{ background:'none', border:0, padding:0, cursor:'pointer', color:'inherit' }}><span aria-hidden="true">${open ? '▾' : '▸'}</span><span className="truncate">${t('map.intel', { name: L(b.name) })}</span></button>
-    ${open ? html`<div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}${b.escort ? html`<span className="tg unk">${t('intel.escort', { n:b.escort.n })}</span>` : null}${b.summon ? html`<span className="tg unk">${t('intel.summon', { n:b.summon.every })}</span>` : null}${!b.escort && !b.summon ? html`<span className="tg unk">${t('intel.solo')}</span>` : null}</div>
+    ${open ? html`<div><div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}${b.escort ? html`<span className="tg unk">${t('intel.escort', { n:b.escort.n })}</span>` : null}${b.summon ? html`<span className="tg unk">${t('intel.summon', { n:b.summon.every })}</span>` : null}${!b.escort && !b.summon ? html`<span className="tg unk">${t('intel.solo')}</span>` : null}</div>
     ${tr.length ? html`<div className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${tr.map(x => t('trait.' + x + 'D')).join(' ')}</div>` : null}</div>` : null}</div>`;
 }
 function Compass({ angle }){
