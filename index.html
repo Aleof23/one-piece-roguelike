@@ -198,7 +198,7 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 .sect{margin-top:14px}
 .panel-head{margin-bottom:10px}
 *{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.fin-chest .glow{opacity:1}.fin-map .ln{stroke-dashoffset:0}.fin-chest .lid{transform:rotate(-58deg)}.fin-lantern{display:none}.fin-voice{height:auto}.fin-voice .fin-line{position:static;transform:none;opacity:1}}
 </style>
 <title>One Piece Like - One Piece Roguelike</title>
 <meta name="description" content="One Piece Like is a free One Piece roguelike autobattler you play in your browser: build a pirate crew of up to 9 nakama, sail the Grand Line, beat the bosses and design your own Jolly Roger.">
@@ -405,6 +405,60 @@ button{font-family:inherit;color:inherit}
 .reveal{animation:reveal .9s cubic-bezier(.2,1.6,.4,1)}
 @keyframes reveal{0%{transform:scale(0) rotate(-200deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 .victory-title{font-family:var(--font-display);font-size:44px;line-height:1;color:var(--gold);text-align:center;text-shadow:0 3px 0 #000}
+/* ---------- final cinematico ---------- */
+.fin-root{position:fixed;inset:0;z-index:90;overflow:hidden;color:#f3ead0;font-family:var(--font-body);cursor:pointer;user-select:none;background:#02040a}
+.fin-sky{position:absolute;inset:0;transition:background 4s ease}
+.fin-sky.s0{background:linear-gradient(#02040a,#08122b 60%,#10244a)}
+.fin-sky.s1{background:linear-gradient(#050a1c,#0c1d44 55%,#1f3a6b)}
+.fin-sky.s2{background:linear-gradient(#0a1230,#1d2c5e 55%,#4a4f86)}
+.fin-sky.s3{background:radial-gradient(ellipse at 50% 55%,#6a4a1c 0%,#1d1a33 55%,#05070f 100%)}
+.fin-sky.s4{background:linear-gradient(#02040a,#050d22 60%,#0b1a38)}
+.fin-sky.s5{background:linear-gradient(#1a2a5c 0%,#7a5a8c 38%,#ffb26b 70%,#ffd98a 100%)}
+.fin-star{position:absolute;border-radius:50%;background:#fff;animation:finTw 3.4s ease-in-out infinite}
+@keyframes finTw{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.fin-sea{position:absolute;left:-10%;right:-10%;bottom:0;height:22%;pointer-events:none}
+.fin-sea svg{position:absolute;bottom:0;left:0;width:200%;height:100%;animation:finWave 14s linear infinite}
+.fin-sea svg.b{animation-duration:22s;opacity:.7;bottom:-6%}
+@keyframes finWave{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.fin-ship{position:absolute;left:50%;bottom:15%;width:170px;margin-left:-85px;animation:finBob 5s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(255,200,120,.25))}
+@keyframes finBob{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-8px) rotate(1.4deg)}}
+.fin-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 24px 60px;text-align:center;animation:finIn 1.6s ease both}
+@keyframes finIn{from{opacity:0}}
+.fin-line{font:500 clamp(20px,3.4vw,34px)/1.35 var(--font-ui);max-width:760px;text-shadow:0 2px 18px rgba(0,0,0,.65);animation:finUp 1.8s ease both;animation-delay:var(--d,0s)}
+.fin-line.big{font-size:clamp(26px,4.6vw,48px);color:#ffd98a}
+.fin-line.sea{color:#8fd3ff}.fin-line.soft{opacity:.8;font-size:clamp(16px,2.4vw,22px)}
+@keyframes finUp{from{opacity:0;transform:translateY(14px);filter:blur(6px)}}
+.fin-crew{display:flex;flex-wrap:wrap;gap:18px 22px;justify-content:center;max-width:860px}
+.fin-mate{display:flex;flex-direction:column;align-items:center;gap:6px;width:92px;animation:finUp 1.6s ease both;animation-delay:var(--d,0s)}
+.fin-mate img,.fin-mate .face{box-shadow:0 0 22px rgba(255,217,138,.35);border-radius:50%}
+.fin-mate b{font:600 14px var(--font-ui);line-height:1.1}.fin-mate i{font:400 11px var(--font-body);opacity:.7;font-style:normal}
+.fin-chest{width:210px;animation:finUp 2s ease both}
+.fin-chest .lid{transform-origin:20px 78px;animation:finLid 3.2s ease .8s both}
+@keyframes finLid{to{transform:rotate(-58deg)}}
+.fin-chest .glow{opacity:0;animation:finGlow 3.4s ease 1.1s forwards}
+@keyframes finGlow{to{opacity:1}}
+.fin-map{width:min(900px,92vw);height:auto}
+.fin-map .ln{stroke:#ffd98a;stroke-width:2;fill:none;stroke-dasharray:140;stroke-dashoffset:140;animation:finDraw 1.4s ease forwards;animation-delay:var(--d,0s);opacity:.7}
+@keyframes finDraw{to{stroke-dashoffset:0}}
+.fin-map .pt{fill:#fff;animation:finPt .8s ease both;animation-delay:var(--d,0s);filter:drop-shadow(0 0 6px #ffd98a)}
+@keyframes finPt{from{opacity:0;transform:scale(0)}}
+.fin-map text{fill:#f3ead0;font:500 13px var(--font-ui);text-anchor:middle;animation:finUp 1.2s ease both;animation-delay:var(--d,0s)}
+.fin-lantern{position:absolute;bottom:-40px;width:14px;height:18px;border-radius:5px 5px 7px 7px;background:radial-gradient(#fff3c4,#ffb44d);box-shadow:0 0 18px 6px rgba(255,170,70,.55);animation:finRise linear infinite;opacity:0}
+@keyframes finRise{0%{transform:translate(0,0);opacity:0}10%{opacity:.95}100%{transform:translate(var(--dx,20px),-110vh);opacity:0}}
+.fin-flagwrap{filter:drop-shadow(0 0 40px rgba(255,200,110,.55));animation:finUp 2.4s ease both}
+.fin-title{font-family:var(--font-display);font-size:clamp(40px,8vw,84px);line-height:1;color:#ffd98a;text-shadow:0 4px 0 #000,0 0 40px rgba(255,170,70,.6);animation:finUp 2.2s ease .6s both}
+.fin-stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:720px;animation:finUp 2s ease 1.8s both}
+.fin-stats span{border:1.5px solid rgba(255,217,138,.55);border-radius:999px;padding:4px 12px;font:600 14px var(--font-ui);background:rgba(0,0,0,.28)}
+.fin-ctl{position:absolute;top:14px;right:14px;z-index:3;display:flex;gap:8px}
+.fin-dots{position:absolute;left:0;right:0;bottom:16px;display:flex;gap:8px;justify-content:center;z-index:3}
+.fin-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}.fin-dots i.on{background:#ffd98a;box-shadow:0 0 10px #ffd98a}
+.fin-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;animation:finUp 2s ease 3s both}
+.fin-voice{position:relative;width:min(780px,92vw);height:230px}
+.fin-voice .fin-line{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);animation:finSeq 4.6s ease both;animation-delay:var(--d,0s);opacity:0}
+.fin-voice .fin-line.last{animation-name:finSeqLast;animation-duration:3s}
+@keyframes finSeq{0%{opacity:0;filter:blur(6px)}14%,80%{opacity:1;filter:none}100%{opacity:0;filter:blur(4px)}}
+@keyframes finSeqLast{0%{opacity:0;filter:blur(6px)}100%{opacity:1;filter:none}}
+.fin-hint{position:absolute;bottom:34px;left:0;right:0;text-align:center;font:500 12px var(--font-ui);letter-spacing:.2em;text-transform:uppercase;opacity:.4;z-index:3}
 .shine{animation:shine 2.4s ease-in-out infinite}
 @keyframes shine{50%{filter:brightness(1.35) drop-shadow(0 0 10px var(--gold))}}
 .navbtn{font:700 16px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;padding:10px 4px;border:3px solid #000;border-radius:4px;background:var(--hull);box-shadow:inset 0 0 0 2px var(--line);color:var(--mist);cursor:pointer}
@@ -457,7 +511,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.5.1'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.6.0'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -1797,6 +1851,7 @@ const i18n = {
     'end.lose':'The tide swallowed you',
     'end.loseText':'You fell at stage {n} of {m} ({name}). Every run is different: the map reshuffles.',
     'end.again':'Set sail again', 'end.retry':'Retry the route',
+    "fin.d1":"The last boss has fallen. And the sea, for the first time, is silent.", "fin.d2":"Ahead, an island that appears on no map.", "fin.r1":"You crossed {n} seas.", "fin.r2":"You stood against {y} Emperors, and against more ships than anyone could count.", "fin.r3":"It all began with a single sailor and a hunger to see what lay beyond.", "fin.r3f":"It all began with a single sailor and a flag: “{flag}”.", "fin.c1":"But you did not arrive alone.", "fin.c2":"{crew} names. None of them made it easy. All of them stayed.", "fin.h1":"You opened the chest.", "fin.h2":"There was no gold inside.", "fin.h3":"There was light. And beneath the light, a map.", "fin.m1":"It was your route. Every sea. Every island where you hesitated.", "fin.m2":"Every fruit you accepted, and every one you had the wisdom to let go.", "fin.mapAria":"Your route, sea by sea, drawn as a constellation", "fin.v1":"I have watched you, you know. Since the very first harbor.", "fin.v2":"You believed the treasure waited at the end of the route.", "fin.v3":"But a treasure like that is not found. You arrive carrying it.", "fin.v4":"It was in every nakama you made room for on the ship.", "fin.v5":"In every wound you tended by the campfire.", "fin.v6":"In every defeat after which you sailed again anyway.", "fin.v7":"All of that was the treasure. And it was worth it.", "fin.v8":"Now raise the anchor, captain. The sea is yours.", "fin.final":"This route is already legend. The next one will be different.", "fin.s.seas":"{n} seas", "fin.s.crew":"{n} nakama", "fin.s.fruits":"{n} Devil Fruits", "fin.s.items":"{n} items", "fin.replay":"Watch the ending again", "fin.skip":"Skip ▸▸", "fin.hint":"Tap to continue",
     'crew.dismiss':'Dismiss',
     'dismiss.eyebrow':'Crew decision', 'dismiss.title':'Dismiss {name}?',
     'dismiss.fee':'Severance pay: −{n} berries',
@@ -2197,6 +2252,7 @@ const i18n = {
     'end.lose':'La marea te tragó',
     'end.loseText':'Caíste en la etapa {n} de {m} ({name}). Cada run es distinta: el mapa se reordena.',
     'end.again':'Zarpar otra vez', 'end.retry':'Reintentar la ruta',
+    "fin.d1":"El último jefe ha caído. Y el mar, por primera vez, guarda silencio.", "fin.d2":"Delante, una isla que no figura en ningún mapa.", "fin.r1":"Cruzaste {n} mares.", "fin.r2":"Plantaste cara a {y} Emperadores y a más barcos de los que nadie sabría contar.", "fin.r3":"Todo empezó con un solo marinero y muchas ganas de ver qué había más allá.", "fin.r3f":"Todo empezó con un solo marinero y una bandera: «{flag}».", "fin.c1":"Pero no llegaste solo.", "fin.c2":"{crew} nombres. Ninguno te lo puso fácil. Todos se quedaron.", "fin.h1":"Abriste el cofre.", "fin.h2":"Dentro no había oro.", "fin.h3":"Había luz. Y, bajo la luz, un mapa.", "fin.m1":"Era tu ruta. Cada mar. Cada isla en la que dudaste.", "fin.m2":"Cada fruta que aceptaste, y cada una que supiste dejar pasar.", "fin.mapAria":"Tu ruta, mar por mar, dibujada como una constelación", "fin.v1":"Te he visto, ¿sabes? Desde el primer puerto.", "fin.v2":"Creíste que el tesoro estaba al final de la ruta.", "fin.v3":"Pero un tesoro así no se encuentra. Se llega con él.", "fin.v4":"Estaba en cada nakama al que le hiciste un sitio en el barco.", "fin.v5":"En cada herida que curaste junto al fuego del campamento.", "fin.v6":"En cada derrota tras la que, aun así, volviste a zarpar.", "fin.v7":"Todo eso era el tesoro. Y mereció la pena.", "fin.v8":"Ahora levanta el ancla, capitán. El mar es tuyo.", "fin.final":"Esta ruta ya es leyenda. La próxima será distinta.", "fin.s.seas":"{n} mares", "fin.s.crew":"{n} nakamas", "fin.s.fruits":"{n} Frutas del Diablo", "fin.s.items":"{n} objetos", "fin.replay":"Ver el final otra vez", "fin.skip":"Saltar ▸▸", "fin.hint":"Toca para avanzar",
     'crew.dismiss':'Despedir',
     'dismiss.eyebrow':'Decisión de la tripulación', 'dismiss.title':'¿Despedir a {name}?',
     'dismiss.fee':'Indemnización: −{n} berries',
@@ -3305,8 +3361,79 @@ function MapEvent({ g, setG, node, done }){
     <//>`;
 }
 
+/* ---------- final cinematico de la victoria ---------- */
+function WinCinematic({ g, onRestart }){
+  const [scene, setScene] = useState(0), [run, setRun] = useState(0);
+  const t0 = React.useRef(Date.now());
+  const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
+  const total = g.bounties.reduce((a, i) => a + STAGES[i].boss.bounty, 0);
+  const fname = g.flag && g.flag.name ? g.flag.name : '';
+  const crew = g.crew;
+  const fruits = crew.filter(c => c.fruit).length;
+  const stars = useMemo(() => { const r = mulberry32(777); return Array.from({ length:90 }, () => ({ x:r() * 100, y:r() * 78, s:1 + r() * 2.2, d:r() * 4 })); }, []);
+  const lanterns = useMemo(() => { const r = mulberry32(4242); return Array.from({ length:16 }, () => ({ x:r() * 100, dx:(r() - .5) * 120, dur:10 + r() * 8, d:r() * 9 })); }, []);
+  const D = i => ({ '--d':(i * 2.7 + .8) + 's' });
+  const L1 = (k, i, cls, p) => html`<div key=${k} className=${'fin-line ' + (cls || '')} style=${D(i)}>${t('fin.' + k, p)}</div>`;
+  const P = { n:STAGES.length, y:yonko, flag:fname, crew:crew.length };
+  const scenes = [
+    { sky:'s0', ms:12500, ship:true, body:() => html`${L1('d1', 0, '', P)}${L1('d2', 1, 'soft', P)}` },
+    { sky:'s1', ms:15500, ship:true, body:() => html`${L1('r1', 0, 'big', P)}${L1('r2', 1, '', P)}${L1(fname ? 'r3f' : 'r3', 2, 'soft', P)}` },
+    { sky:'s2', ms:19500, body:() => html`${L1('c1', 0, 'big', P)}
+      <div className="fin-crew">${crew.map((c, i) => html`<div key=${c.id} className="fin-mate" style=${{ '--d':(3.6 + i * .55) + 's' }}><${Face} look=${c.look} color=${c.color} size=${58} avatar=${c.avatar}/><b>${L(c.name)}</b><i>${t('role.' + c.frole)}</i></div>`)}</div>
+      ${L1('c2', 3 + Math.ceil(crew.length * .55 / 2.7), 'soft', P)}` },
+    { sky:'s3', ms:17000, body:() => html`
+      <svg className="fin-chest" viewBox="-20 -50 240 200" aria-hidden="true" style=${{ overflow:"visible" }}>
+        <defs><radialGradient id="fg" cx="50%" cy="50%" r="50%"><stop offset="0" stopColor="#fff6c8"/><stop offset=".45" stopColor="#ffc457" stopOpacity=".75"/><stop offset="1" stopColor="#ff9a2a" stopOpacity="0"/></radialGradient></defs>
+        <rect x="20" y="78" width="160" height="52" rx="6" fill="#5e3416" stroke="#1a0d05" strokeWidth="3"/>
+        <rect x="20" y="96" width="160" height="7" fill="#d9a441"/><rect x="92" y="88" width="16" height="22" rx="3" fill="#f3c96a" stroke="#1a0d05" strokeWidth="2"/>
+        <g className="glow"><circle cx="100" cy="76" r="86" fill="url(#fg)"/><path d="M100 76L40 -20L70 -20ZM100 76L100 -30L128 -30ZM100 76L170 -10L190 10Z" fill="#fff3bf" opacity=".28"/></g>
+        <g className="lid"><path d="M20 78Q20 30 100 30Q180 30 180 78Z" fill="#7a4620" stroke="#1a0d05" strokeWidth="3"/><path d="M20 66H180" stroke="#d9a441" strokeWidth="6"/></g>
+      </svg>
+      ${L1('h1', 1, '', P)}${L1('h2', 2, 'soft', P)}${L1('h3', 3, 'big', P)}` },
+    { sky:'s4', ms:19500, body:() => {
+      const pts = STAGES.map((s, i) => ({ x:60 + i * (780 / Math.max(1, STAGES.length - 1)), y:120 + Math.sin(i * 1.25) * 52, n:L(s.name) }));
+      return html`
+        <svg className="fin-map" viewBox="0 0 900 250" role="img" aria-label=${t('fin.mapAria')}>
+          ${pts.slice(1).map((p, i) => html`<path key=${'l' + i} className="ln" d=${'M' + pts[i].x + ' ' + pts[i].y + 'L' + p.x + ' ' + p.y} style=${{ '--d':(i * .75 + .6) + 's' }}/>`)}
+          ${pts.map((p, i) => html`<g key=${'p' + i}><circle className="pt" cx=${p.x} cy=${p.y} r=${i === pts.length - 1 ? 9 : 5} style=${{ '--d':(i * .75) + 's' }}/><text x=${p.x} y=${p.y + 30} style=${{ '--d':(i * .75 + .3) + 's' }}>${p.n}</text></g>`)}
+        </svg>
+        ${L1('m1', 3, '', P)}${L1('m2', 4, 'soft', P)}`; } },
+    { sky:'s4', ms:38000, body:() => html`<div className="fin-voice">${['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'].map((k, i) => html`<div key=${k} className=${'fin-line ' + (i === 2 ? 'sea big' : 'sea')} style=${{ '--d':(i * 4.4 + .6) + 's' }}>${t('fin.' + k, P)}</div>`)}<div className="fin-line big last" style=${{ '--d':(7 * 4.4 + .6) + 's' }}>${t('fin.v8', P)}</div></div>` },
+    { sky:'s5', ms:0, final:true, body:() => html`
+      <div className="fin-flagwrap"><${Flag} flag=${g.flag || DEFAULT_FLAG} size=${190} wave=${true}/></div>
+      ${fname ? html`<div className="flag-name">${fname}</div>` : null}
+      <div className="fin-title">${t('end.win')}</div>
+      <div className="fin-line soft" style=${{ '--d':'1.6s' }}>${t('fin.final')}</div>
+      <div className="fin-crew" style=${{ gap:10 }}>${crew.map((c, i) => html`<${Face} key=${c.id} look=${c.look} color=${c.color} size=${44} avatar=${c.avatar}/>`)}</div>
+      <div className="fin-stats"><span>${t('fin.s.seas', { n:STAGES.length })}</span><span>${t('fin.s.crew', { n:crew.length })}</span>${fruits ? html`<span>${t('fin.s.fruits', { n:fruits })}</span>` : null}<span>${t('fin.s.items', { n:g.items.length })}</span>${total > 0 ? html`<span>${t('end.total')}: ${fmtBounty(total)}</span>` : null}</div>
+      <div className="fin-actions"><button type="button" className="btn" onClick=${e => { e.stopPropagation(); onRestart(); }}>${t('end.again')}</button><button type="button" className="btn ghost" onClick=${e => { e.stopPropagation(); setScene(0); setRun(r => r + 1); }}>${t('fin.replay')}</button></div>` },
+  ];
+  const last = scenes.length - 1, sc = scenes[scene];
+  const go = n => { t0.current = Date.now(); setScene(Math.max(0, Math.min(last, n))); };
+  useEffect(() => { t0.current = Date.now(); if (sc.final) return; const id = setTimeout(() => setScene(x => Math.min(last, x + 1)), sc.ms); return () => clearTimeout(id); }, [scene, run]);
+  useEffect(() => {
+    const h = e => { if (e.key === 'Escape') go(last); else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { if (!sc.final && Date.now() - t0.current > 1200) { e.preventDefault(); go(scene + 1); } } };
+    window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h);
+  }, [scene]);
+  const wave = (c, cls) => html`<svg className=${cls} viewBox="0 0 1200 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40Q75 10 150 40T300 40T450 40T600 40T750 40T900 40T1050 40T1200 40V100H0Z" fill=${c}/><path d="M0 40Q75 10 150 40T300 40T450 40T600 40T750 40T900 40T1050 40T1200 40V100H0Z" transform="translate(1200 0)" fill=${c}/></svg>`;
+  return html`
+    <div className="fin-root" role="dialog" aria-modal="true" aria-label=${t('end.win')} onClick=${() => { if (!sc.final && Date.now() - t0.current > 1200) go(scene + 1); }}>
+      <div className=${'fin-sky ' + sc.sky}></div>
+      <div style=${{ position:'absolute', inset:0, opacity: sc.sky === 's5' ? 0 : 1, transition:'opacity 4s' }}>${stars.map((s, i) => html`<span key=${i} className="fin-star" style=${{ left:s.x + '%', top:s.y + '%', width:s.s, height:s.s, animationDelay:s.d + 's' }}></span>`)}</div>
+      <div className="fin-sea">${wave(sc.sky === 's5' ? '#27386b' : '#091733', 'a')}${wave(sc.sky === 's5' ? '#3a4a80' : '#0e2147', 'b')}</div>
+      ${sc.ship ? html`<svg className="fin-ship" viewBox="0 0 170 130" aria-hidden="true" key=${'ship' + scene}>
+        <path d="M82 6V92" stroke="#06080f" strokeWidth="4"/><path d="M86 12Q130 40 128 80H86Z" fill="#e9dfc2" stroke="#06080f" strokeWidth="2.5"/><path d="M78 20Q42 44 44 84H78Z" fill="#d9ceaa" stroke="#06080f" strokeWidth="2.5"/>
+        <path d="M82 6l22-6-4 9 4 8z" fill="#06080f"/><path d="M14 92H156Q146 118 124 118H46Q24 118 14 92Z" fill="#2b1608" stroke="#06080f" strokeWidth="3"/><path d="M20 100H150" stroke="#d9a441" strokeWidth="3"/></svg>` : null}
+      ${sc.final ? html`<div aria-hidden="true">${lanterns.map((l, i) => html`<span key=${i} className="fin-lantern" style=${{ left:l.x + '%', '--dx':l.dx + 'px', animationDuration:l.dur + 's', animationDelay:l.d + 's' }}></span>`)}</div>` : null}
+      <div className="fin-stage" key=${scene + '-' + run}>${sc.body()}</div>
+      ${!sc.final ? html`<div className="fin-ctl"><button type="button" className="btn ghost small" onClick=${e => { e.stopPropagation(); go(last); }}>${t('fin.skip')}</button></div><div className="fin-hint">${t('fin.hint')}</div>` : null}
+      <div className="fin-dots" aria-hidden="true">${scenes.map((_, i) => html`<i key=${i} className=${i === scene ? 'on' : ''}></i>`)}</div>
+    </div>`;
+}
+
 function EndScreen({ g, onRestart }){
   const win = g.over === 'win';
+  if (win) return html`<${WinCinematic} g=${g} onRestart=${onRestart}/>`;
   const yonko = STAGES.filter(s => s.bossRank === 'yonko').length;
   const total = g.bounties.reduce((a, i) => a + STAGES[i].boss.bounty, 0);
   return html`
