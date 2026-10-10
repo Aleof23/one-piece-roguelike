@@ -438,6 +438,8 @@ button.offer:disabled{cursor:not-allowed}
 }
 
 .dev-fab{position:fixed;left:8px;bottom:8px;z-index:45;font:700 11px var(--font-ui);padding:2px 7px;border:1px solid #7be0ff;border-radius:3px;background:rgba(5,20,28,.8);color:#7be0ff;opacity:.3;cursor:pointer}.dev-fab:hover{opacity:1}
+
+.boss-intel{padding:6px 10px;border:1px solid var(--rule,#2e4b7a);border-left:3px solid var(--ember);border-radius:3px;background:rgba(0,0,0,.25)}
 </style>
 
 </head>
@@ -937,11 +939,14 @@ const FOE_KINDS = {
 };
 const BOSS_WEAK = { logia:'mind', slippery:'brawl', swordmaster:'brawl', giant:'gun', swift:'mind', burn:'gun', dark:'sword', bind:'sword', pulse:null };
 
+/* Poder enemigo = (12 + 3.2 x piso) x powerMult del mar x (marine|pirate)Mult x dificultad x (0.5 + 0.1 x tamano de la banda).
+   El jefe vale como el combate pirata del ultimo piso multiplicado por bossMult del mar (>1 = clímax). */
 function enemyPower(g, node){
   const s = STAGES[g.stage], boss = node.type === 'boss';
-  const k = boss ? 1.5 * (s.boss.powerMult || 1) * (s.bossMult != null ? s.bossMult / s.powerMult : 1) : (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
-  const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n;
-  return Math.round((12 + node.f * 3.2) * s.powerMult * k * crewK);
+  const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n, diff = SETTINGS.difficulty != null ? SETTINGS.difficulty : 1;
+  if (boss) return Math.round((12 + 3.2 * 5) * s.powerMult * SETTINGS.pirateMult * (s.bossMult != null ? s.bossMult : 1.25) * diff * crewK);
+  const k = (node.type === 'pirate' ? SETTINGS.pirateMult : SETTINGS.marineMult) * (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
+  return Math.round((12 + node.f * 3.2) * s.powerMult * k * diff * crewK);
 }
 function genFoes(g, node){
   const s = STAGES[g.stage], ep = enemyPower(g, node), boss = node.type === 'boss';
@@ -1246,7 +1251,7 @@ function battleResult(g, node, st){
   const hpOf = {}; st.allies.forEach(a => { hpOf[a.id] = Math.max(0, a.hp); });
   const rows = g.crew.map(c => ({ c, from:c.hp, to: hpOf[c.id] || 0 }));
   const g2 = { ...g, crew:g.crew.map((c, i) => ({ ...c, hp:rows[i].to })) };
-  let berries = 0, item = null, fallen = [];
+  let berries = 0, item = null, items = null, fallen = [];
   if (win && g.hardcore) {
     fallen = g.crew.filter(c => (hpOf[c.id] || 0) <= 0);
     if (fallen.length) {
@@ -1262,10 +1267,10 @@ function battleResult(g, node, st){
     const free = itemPool(g);
     const chance = boss ? 1 : (node.type === 'pirate' ? SETTINGS.dropPirate : SETTINGS.dropMarine) + (m.loot || 0);
     if (boss && bossTrophy(g)) item = bossTrophy(g);
-    else if (free.length && Math.random() < chance) item = free[Math.floor(Math.random() * free.length)];
+    else if (free.length && Math.random() < chance) { item = free[Math.floor(Math.random() * free.length)]; const rest = free.filter(x => x !== item); if (rest.length) items = [item, rest[Math.floor(Math.random() * rest.length)]]; }
     if (boss) g2.bounties = [...g2.bounties, g.stage];
   }
-  return { win, boss, ep:enemyPower(g, node), rows, berries, item, fallen, rounds:st.rounds, g:g2 };
+  return { win, boss, ep:enemyPower(g, node), rows, berries, item, items:items || (item ? [item] : []), fallen, rounds:st.rounds, g:g2 };
 }
 function fight(g, node, st){ return battleResult(g, node, st && st.over ? st : autoBattle(g, node, st)); }
 /* Estimacion Monte Carlo del enfrentamiento: [clave, color, %victoria, %vida perdida media] */
@@ -1457,6 +1462,7 @@ const i18n = {
     'start.route':'Your route to the treasure',
     'start.pickCaptain':'Choose your Captain',
     'start.solo':'You set sail alone. Every other crew slot fills up by recruiting at island nodes along the map.',
+    'combat.pickOne':'Choose one of the two drops:', 'chest.pickOne':'The chest holds two fruits. Choose one:', 'map.intel':'Route boss intel: {name}',
     'start.go':'Set sail!', 'start.back':'Back', 'start.done':'Done', 'hub.captain':'Captain', 'hub.flag':'Jolly Roger', 'hub.missions':'Missions', 'hub.missionsSub':'{a} / {b} completed', 'hub.manual':'Manual',
     'save.continue':'Continue voyage (sea {s} · {n} crew · {b} ฿)',
     'save.discard':'Delete save',
@@ -1856,6 +1862,7 @@ const i18n = {
     'start.route':'Tu ruta hasta el tesoro',
     'start.pickCaptain':'Elige a tu Capitán',
     'start.solo':'Zarpas en solitario. El resto de huecos de la tripulación se llenan reclutando en los nodos de isla del mapa.',
+    'combat.pickOne':'Elige uno de los dos botines:', 'chest.pickOne':'El cofre guarda dos frutas. Elige una:', 'map.intel':'Información del jefe de ruta: {name}',
     'start.go':'¡Zarpar!', 'start.back':'Volver', 'start.done':'Listo', 'hub.captain':'Capitán', 'hub.flag':'Bandera pirata', 'hub.missions':'Misiones', 'hub.missionsSub':'{a} / {b} completadas', 'hub.manual':'Manual',
     'save.continue':'Continuar viaje (mar {s} · {n} tripulantes · {b} ฿)',
     'save.discard':'Borrar partida',
@@ -2536,6 +2543,13 @@ function Legend(){
         <span key=${ty} className="legend-item"><span style=${{ color: TYPES[ty].color, display:'inline-flex' }}><${Ico} n=${TYPES[ty].icon} size=${18}/></span>${t(key)}<${Dots} n=${n}/></span>`)}
     </div>`;
 }
+function BossIntel({ s }){
+  const b = s.boss, tr = (b.traits || []).filter(x => i18n.en['trait.' + x]);
+  if (!tr.length && !(b.haki || []).length) return null;
+  return html`<div className="boss-intel"><span className="eyebrow">${t('map.intel', { name: L(b.name) })}</span>
+    <div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}</div>
+    ${tr.length ? html`<div className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${tr.map(x => t('trait.' + x + 'D')).join(' ')}</div>` : null}</div>`;
+}
 function Compass({ angle }){
   return html`
     <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">
@@ -2649,6 +2663,7 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
           <div className="flex gap-[2px] justify-end" style=${{ color:'var(--ember)' }}>${[1, 2, 3, 4, 5].map(k => html`<span key=${k} style=${{ opacity: k <= skulls ? 1 : .25 }}><${Ico} n="skull" size=${16}/></span>`)}</div>
         </div>
       </div>
+      <${BossIntel} s=${s}/>
       <${Legend}/>
       <div className="sea-wrap flex-1 min-h-0"><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div>
     </div>`;
@@ -2999,8 +3014,8 @@ function CombatEvent({ g, setG, node, done }){
   const init = useMemo(() => battleInit(g, node), []);
   const risk = useMemo(() => projectRisk(g, node, 40), []);
   const sheet = React.useContext(SheetCtx);
-  const take = () => { setG(cur => gainItem(cur, rep.item)); setChoice('took'); };
-  const swap = old => { setG(cur => swapItem(cur, old.id, rep.item)); setChoice('took'); };
+  const take = it => { setG(cur => gainItem(cur, it)); setChoice('took'); };
+  const swap = (old, it) => { setG(cur => swapItem(cur, old.id, it)); setChoice('took'); };
   const title = nodeLabel(node, s);
   const finish = fin => { const r = battleResult(g, node, fin); setG(r.g); setRep(r); setPhase('result'); };
   if (phase === 'intro') return html`<${BossIntro} stage=${g.stage} onGo=${() => setPhase('brief')}/>`;
@@ -3035,7 +3050,8 @@ function CombatEvent({ g, setG, node, done }){
           <span className="chip">${t('bt.rounds', { n:rep.rounds })}</span>
           ${boss && !last ? html`<span className="chip" style=${{ color:'var(--kelp)' }}>${t('combat.levelUp', { n:SETTINGS.leadershipPerStage })}</span>` : null}
         </div>` : html`<p className="m-0" style=${{ color:'var(--mist)' }}>${t('combat.lost')}</p>`}
-      ${rep.win && rep.item ? html`<${LootOffer} g=${g} item=${rep.item} choice=${choice} onTake=${take} onLeave=${() => setChoice('left')} onSwap=${swap}/>` : null}
+      ${rep.win && rep.items && rep.items.length > 1 && !choice ? html`<p className="m-0 text-sm" style=${{ color:'var(--gold)' }}>${t('combat.pickOne')}</p>` : null}
+      ${rep.win && rep.items ? rep.items.filter(it => !choice || rep.items.length === 1).map(it => html`<${LootOffer} key=${it.id} g=${g} item=${it} choice=${choice} onTake=${() => take(it)} onLeave=${() => setChoice('left')} onSwap=${old => swap(old, it)}/>`) : null}
       ${rep.win && boss ? html`<div className="mx-auto w-[150px]"><${Poster} idx=${g.stage} defeated=${true}/></div>` : null}
       <button type="button" className="btn" disabled=${rep.win && !!rep.item && !choice} onClick=${() => done(rep)}>${rep.win ? (boss ? (last ? t('combat.claim') : t('combat.nextStage')) : t('combat.next')) : t('combat.outcome')}</button>
     <//>`;
@@ -3134,9 +3150,9 @@ function CampEvent({ g, setG, done }){
 
 function ChestEvent({ g, setG, done }){
   const [pool] = useState(() => availableFruits(g));
-  const [fruit, setFruit] = useState(null);
+  const [fruit, setFruit] = useState(null), [opts, setOpts] = useState([]);
   const [opened, setOpened] = useState(false);
-  const open = () => { setFruit(pool.length ? weightedPick(pool, 1)[0] : null); setOpened(true); };
+  const open = () => { const o = pool.length ? weightedPick(pool, 2) : []; setOpts(o); setFruit(o.length === 1 ? o[0] : null); setOpened(true); };
   const eligible = g.crew.filter(c => !c.fruit);
   const feed = c => { setG(eat(g, c.id, fruit)); done(); };
   const coins = () => { setG({ ...g, berries: g.berries + 150 }); done(); };
@@ -3145,9 +3161,18 @@ function ChestEvent({ g, setG, done }){
       ${!opened ? html`
         <p className="m-0" style=${{ color:'var(--mist)' }}>${t('chest.desc')}</p>
         <button type="button" className="btn" onClick=${open}>${t('chest.open')}</button>`
-      : !fruit ? html`
+      : !opts.length ? html`
         <p className="m-0" style=${{ color:'var(--mist)' }}>${t('chest.empty')}</p>
         <button type="button" className="btn" onClick=${coins}>${t('chest.take')}</button>`
+      : !fruit ? html`
+        <p className="m-0" style=${{ color:'var(--gold)' }}>${t('chest.pickOne')}</p>
+        <div className="flex flex-col gap-2">${opts.map(f => html`
+          <button key=${f.id} type="button" className="offer" style=${{ cursor:'pointer', textAlign:'left', alignItems:'flex-start' }} onClick=${() => setFruit(f)}>
+            <div className="fruit-orb" style=${{ '--fc': f.color }}><${Ico} n="fruit" size=${24} sw=${1.8}/></div>
+            <div className="flex-1 min-w-0"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'18px' }}>${L(f.name)} <span className="eyebrow">${fruitType(f)}</span></div>
+              <div className="text-sm" style=${{ color:'var(--gold)' }}>${fruitMult(f)}</div>
+              <div className="flex flex-wrap gap-1 mt-1">${fxLines(f).map(l => html`<span key=${l} className="chip">${l}</span>`)}</div></div>
+          </button>`)}</div>`
       : html`
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="fruit-orb reveal" style=${{ '--fc': fruit.color, width:92, height:92 }}><${Ico} n="fruit" size=${54} sw=${1.8}/></div>
