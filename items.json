@@ -722,6 +722,23 @@
     "lead": 1
    },
    "bossDrop": 9
+  },
+  {
+   "id": "sunny_hammocks",
+   "name": {
+    "en": "Sunny's Hammocks",
+    "es": "Hamacas del Sunny"
+   },
+   "desc": {
+    "en": "A proper night's sleep: every camp fully heals and revives the whole crew at 100%.",
+    "es": "Una noche de verdad: cada campamento cura y revive a toda la banda al 100%."
+   },
+   "icon": "tent",
+   "price": 420,
+   "fx": {
+    "campFull": 1
+   },
+   "minStage": 3
   }
  ]
 }
