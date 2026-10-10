@@ -457,7 +457,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.4.0'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.4.1'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -1503,7 +1503,7 @@ const i18n = {
     "man.c.loot":"Marines drop an item {m}% of the time and pirates {p}%. From the 5th boss onwards, each Route Boss always drops a unique trophy, better than the last. Pirates pay ×{pm} berries compared to marines and bosses ×{bm}.",
     "man.crew.hint":"Tap a name to open the full character sheet. Stats are on a 1–10 scale at level 1; ATK and HP grow with level.",
     "man.crew.filter":"Filter by role",
-    "man.crew.all":"All",
+    "man.crew.all":"All", "man.crew.sort":"Sort by", "man.crew.sort.costUp":"Leadership ↑", "man.crew.sort.costDown":"Leadership ↓", "man.crew.sort.role":"Role", "man.crew.sort.name":"Name",
     "man.crew.cost":"Cost {n}",
     "man.crew.captain":"Captain",
     "man.crew.count":"{n} characters",
@@ -1903,7 +1903,7 @@ const i18n = {
     "man.c.loot":"Los marines sueltan un objeto el {m}% de las veces y los piratas el {p}%. Desde el 5.º jefe, cada Jefe de Ruta suelta siempre un trofeo único, mejor que el anterior. Los piratas pagan ×{pm} berries respecto a los marines y los jefes ×{bm}.",
     "man.crew.hint":"Toca un nombre para abrir la ficha completa. Las estadísticas van de 1 a 10 en el nivel 1; ATQ y vida crecen con el nivel.",
     "man.crew.filter":"Filtrar por rol",
-    "man.crew.all":"Todos",
+    "man.crew.all":"Todos", "man.crew.sort":"Ordenar por", "man.crew.sort.costUp":"Liderazgo ↑", "man.crew.sort.costDown":"Liderazgo ↓", "man.crew.sort.role":"Rol", "man.crew.sort.name":"Nombre",
     "man.crew.cost":"Coste {n}",
     "man.crew.captain":"Capitán",
     "man.crew.count":"{n} personajes",
@@ -3457,6 +3457,7 @@ function DataDialog({ raw, src, errors, onFile, onReload, onClose }){
 function ManualScreen({ onClose }){
   const [tab, setTab] = useState('guide');
   const [role, setRole] = useState('all');
+  const [sort, setSort] = useState('costUp');
   const openSheet = React.useContext(SheetCtx);
   useEffect(() => {
     const h = e => { if (e.key === 'Escape') onClose(); };
@@ -3517,12 +3518,21 @@ function ManualScreen({ onClose }){
   <//>`;
   const Crew = () => {
     const roles = ['all', 'sword', 'gun', 'brawl', 'tank', 'support', 'mind'];
-    const list = NAKAMAS.filter(n => role === 'all' || n.frole === role);
+    const RO = ['sword', 'gun', 'brawl', 'tank', 'support', 'mind'], nm = d => L(d.name);
+    const cmp = { costUp:(x, y) => x.cost - y.cost || RO.indexOf(x.frole) - RO.indexOf(y.frole) || nm(x).localeCompare(nm(y)),
+      costDown:(x, y) => y.cost - x.cost || RO.indexOf(x.frole) - RO.indexOf(y.frole) || nm(x).localeCompare(nm(y)),
+      role:(x, y) => RO.indexOf(x.frole) - RO.indexOf(y.frole) || x.cost - y.cost || nm(x).localeCompare(nm(y)),
+      name:(x, y) => nm(x).localeCompare(nm(y)) }[sort];
+    const list = NAKAMAS.filter(n => role === 'all' || n.frole === role).slice().sort(cmp);
     return html`<${React.Fragment}>
       <p className="dim">${t('man.crew.hint')}</p>
       <div className="man-chips" role="group" aria-label=${t('man.crew.filter')}>
         ${roles.map(r => html`<button key=${r} type="button" className=${'man-tab' + (role === r ? ' on' : '')} style=${{ fontSize:13, padding:'3px 10px' }} onClick=${() => setRole(r)}>${r === 'all' ? t('man.crew.all') : t('role.' + r)}</button>`)}
         <span className="dim text-sm">${t('man.crew.count', { n:list.length })}</span>
+      </div>
+      <div className="man-chips" role="group" aria-label=${t('man.crew.sort')}>
+        <span className="dim text-sm">${t('man.crew.sort')}:</span>
+        ${['costUp', 'costDown', 'role', 'name'].map(k => html`<button key=${k} type="button" className=${'man-tab' + (sort === k ? ' on' : '')} style=${{ fontSize:13, padding:'3px 10px' }} onClick=${() => setSort(k)}>${t('man.crew.sort.' + k)}</button>`)}
       </div>
       <div className="man-grid">${list.map(d => html`
         <button key=${d.id} type="button" className="man-card" onClick=${() => openSheet && openSheet(makeMember(d, 1, 'tmp'))}>

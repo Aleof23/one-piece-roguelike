@@ -2446,7 +2446,7 @@
     "Armamento Endurecimiento"
    ],
    "color": "#2E7D32",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/zoro.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/roronoa-zoro.webp",
    "look": 4,
    "frole": "sword",
    "style": "sword",
@@ -2487,7 +2487,7 @@
     "Conquistador Básico"
    ],
    "color": "#E63946",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/luffy.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/monkey-d-luffy.webp",
    "look": 0,
    "frole": "brawl",
    "style": "brawl",
@@ -2528,7 +2528,7 @@
     "Observación Básico"
    ],
    "color": "#F2C94C",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/law.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/trafalgar-d-water-law.webp",
    "look": 3,
    "frole": "mind",
    "style": "sword",
@@ -2570,7 +2570,7 @@
     "Observación Básico"
    ],
    "color": "#FF4500",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/ace.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/portgas-d-ace.webp",
    "look": 1,
    "frole": "brawl",
    "style": "brawl",
@@ -2688,7 +2688,7 @@
     "Armamento Endurecimiento"
    ],
    "color": "#E74C3C",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/kid.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/eustass-kid.webp",
    "look": 2,
    "frole": "mind",
    "style": "brawl",
@@ -2766,7 +2766,7 @@
    "fruit_type": "Paramecia",
    "haki_unlocked": [],
    "color": "#FF69B4",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/bonney.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/jewelry-bonney.webp",
    "look": 5,
    "frole": "support",
    "style": "brawl",
@@ -2805,7 +2805,7 @@
     "Armamento Endurecimiento"
    ],
    "color": "#6C757D",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/bege.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/capone-bege.webp",
    "look": 3,
    "frole": "gun",
    "style": "gun",
@@ -2844,7 +2844,7 @@
     "Armamento Endurecimiento"
    ],
    "color": "#8E44AD",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/hawkins.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/basil-hawkins.webp",
    "look": 4,
    "frole": "tank",
    "style": "mind",
@@ -2923,7 +2923,7 @@
     "Conquistador Básico"
    ],
    "color": "#FF1493",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/hancock.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/boa-hancock.webp",
    "look": 5,
    "frole": "mind",
    "style": "brawl",
@@ -2962,7 +2962,7 @@
     "Armamento Endurecimiento"
    ],
    "color": "#4E342E",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/kuma.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/bartholomew-kuma.webp",
    "look": 2,
    "frole": "tank",
    "style": "brawl",
@@ -3000,7 +3000,7 @@
    "fruit_type": "Paramecia",
    "haki_unlocked": [],
    "color": "#E91E63",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/rosinante.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/donquixote-rosinante.webp",
    "look": 1,
    "frole": "support",
    "style": "gun",
@@ -3039,7 +3039,7 @@
     "Armamento Endurecimiento"
    ],
    "color": "#5D6D7E",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/weevil.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/edward-newgate.webp",
    "look": 2,
    "frole": "tank",
    "style": "brawl",
@@ -3120,7 +3120,7 @@
     "Conquistador Básico"
    ],
    "color": "#7F8C8D",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/rayleigh.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/silvers-rayleigh.webp",
    "look": 4,
    "frole": "sword",
    "style": "sword",
@@ -3161,7 +3161,7 @@
     "Conquistador Básico"
    ],
    "color": "#1ABC9C",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/dragon.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/monkey-d-dragon.webp",
    "look": 2,
    "frole": "mind",
    "style": "mind",
@@ -3348,7 +3348,7 @@
    "fruit_type": null,
    "haki_unlocked": [],
    "color": "#FFB6C1",
-   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/lola.webp",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/charlotte-lola.webp",
    "look": 5,
    "frole": "support",
    "style": "mind",
