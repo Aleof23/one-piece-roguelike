@@ -357,7 +357,7 @@ button{font-family:inherit;color:inherit}
 .svg-label{font:700 15px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;fill:#fff;pointer-events:none}
 .svg-small{font:600 12px var(--font-ui);letter-spacing:.14em;text-transform:uppercase;fill:rgba(231,242,239,.6);pointer-events:none}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px}
-.legend-item{display:flex;align-items:center;gap:6px;font:600 13px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--foam)}
+.legend-item{display:flex;align-items:center;gap:5px;font:600 12px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--foam)}
 .dots{display:inline-flex;gap:2px}
 .dots i{width:6px;height:6px;border-radius:50%;background:var(--mist);opacity:.3}
 .dots i.on{opacity:1;background:var(--gold)}
@@ -550,7 +550,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.5'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.6'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -2716,10 +2716,11 @@ function Legend(){
     </div>`;
 }
 function BossIntel({ s }){
+  const [open, setOpen] = useState(false);
   const b = s.boss, tr = (b.traits || []).filter(x => i18n.en['trait.' + x]);
-  return html`<div className="boss-intel"><span className="eyebrow">${t('map.intel', { name: L(b.name) })}</span>
-    <div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}${b.escort ? html`<span className="tg unk">${t('intel.escort', { n:b.escort.n })}</span>` : null}${b.summon ? html`<span className="tg unk">${t('intel.summon', { n:b.summon.every })}</span>` : null}${!b.escort && !b.summon ? html`<span className="tg unk">${t('intel.solo')}</span>` : null}</div>
-    ${tr.length ? html`<div className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${tr.map(x => t('trait.' + x + 'D')).join(' ')}</div>` : null}</div>`;
+  return html`<div className="boss-intel"><button type="button" className="eyebrow w-full text-left flex items-center gap-2" aria-expanded=${open} onClick=${() => setOpen(o => !o)} style=${{ background:'none', border:0, padding:0, cursor:'pointer', color:'inherit' }}><span aria-hidden="true">${open ? '▾' : '▸'}</span><span className="truncate">${t('map.intel', { name: L(b.name) })}</span></button>
+    ${open ? html`<div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}${b.escort ? html`<span className="tg unk">${t('intel.escort', { n:b.escort.n })}</span>` : null}${b.summon ? html`<span className="tg unk">${t('intel.summon', { n:b.summon.every })}</span>` : null}${!b.escort && !b.summon ? html`<span className="tg unk">${t('intel.solo')}</span>` : null}</div>
+    ${tr.length ? html`<div className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${tr.map(x => t('trait.' + x + 'D')).join(' ')}</div>` : null}</div>` : null}</div>`;
 }
 function Compass({ angle }){
   return html`
@@ -2821,7 +2822,7 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
   const angle = Math.round(Math.atan2(target.x - from.x, -(target.y - from.y)) * 180 / Math.PI);
   const skulls = Math.ceil((g.stage + 1) * 5 / STAGES.length);
   return html`
-    <div className="flex flex-col gap-3 h-full min-h-0">
+    <div className="flex flex-col gap-2 h-full min-h-0">
       <${Journey} idx=${g.stage} over=${g.over}/>
       <div className="flex items-center gap-3">
         <${Compass} angle=${angle}/>
@@ -2835,7 +2836,7 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
         </div>
       </div>
       <div className="flex-1 min-h-0 flex justify-center"><div className="sea-wrap h-full max-w-full mx-auto" style=${{ aspectRatio: MAP_W + ' / ' + MAP_H }}><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div></div>
-      <div className="shrink-0 flex flex-col gap-3"><${BossIntel} s=${s}/><${Legend}/></div>
+      <div className="shrink-0 flex flex-col gap-1"><${Legend}/><${BossIntel} s=${s}/></div>
     </div>`;
 }
 
