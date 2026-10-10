@@ -457,6 +457,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
+const APP_VERSION = '1.2.1'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -946,7 +947,7 @@ function enemyPower(g, node){
   const n = Math.max(1, g.crew.length), crewK = SETTINGS.crewScaleBase + SETTINGS.crewScaleK * n, diff = SETTINGS.difficulty != null ? SETTINGS.difficulty : 1;
   if (boss) return Math.round((12 + 3.2 * 5) * s.powerMult * SETTINGS.pirateMult * (s.bossMult != null ? s.bossMult : 1.25) * diff * crewK);
   const k = SETTINGS.marineMult * /* piratas = misma dificultad que marina */ (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
-  return Math.round((12 + node.f * 3.2) * s.powerMult * k * diff * crewK);
+  return Math.round((12 + (g.stage >= 3 ? 1.5 : node.f) * 3.2) * s.powerMult * k /* desde el mar 4 el poder no sube con el piso */ * diff * crewK);
 }
 function genFoes(g, node){
   const s = STAGES[g.stage], ep = enemyPower(g, node), boss = node.type === 'boss';
@@ -4095,7 +4096,7 @@ function App(){
       <header className="flex items-center gap-3 justify-between flex-wrap">
         <div className="flex items-baseline gap-3 min-w-0">
           ${playing ? html`<span title=${(g.flag && g.flag.name) || ''}><${Flag} flag=${g.flag || flag} size=${46}/></span>` : null}<h1 className="m-0" onClick=${devTap} style=${{ fontFamily:'var(--font-display)', fontSize:'34px', lineHeight:1, color:'var(--gold)', textShadow:'0 3px 0 #000' }}>OnePieceLike</h1>
-          <span className="eyebrow hidden md:inline">${t('app.tagline')}</span>
+          <span className="eyebrow hidden md:inline">${t('app.tagline')}</span><span className="eyebrow" style=${{ opacity:.6, marginLeft:6 }}>v${APP_VERSION}</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button type="button" className=${'btn ghost small snd-btn' + (muted ? ' off' : '')} aria-pressed=${!muted} title=${t('snd.title')} onClick=${() => { SND.unlock(); setMuted(SND.toggle()); }}>♪<span className="snd-x"></span></button>
