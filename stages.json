@@ -1,5 +1,5 @@
 {
- "_help": "The run is this list of stages, played in order. Each stage is one map that ends in a Route Boss. bossRank must be pirate | shichibukai | admiral | yonko, and the ranks should climb. bossId points to an id in characters.json bosses. powerMult is the difficulty of the whole stage (enemies and rewards). sea is two hex colors for the map gradient. enemies (optional per stage) overrides commonEnemies. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored. DIFFICULTY: enemy power per sea = powerMult (normal fights) and powerMult*bossMult (boss, relative to a pirate floor-5 fight); character boss powerMult is ignored. normalRamp/normalStageMult are neutral (0 / 1). Optional settings.difficulty is a global multiplier (default 1). Calibrated so a veteran bot clears each sea ~90%,86,83,79,75,70,64,57,48,38 (humans are usually weaker).",
+ "_help": "The run is this list of stages, played in order. Each stage is one map that ends in a Route Boss. bossRank must be pirate | shichibukai | admiral | yonko, and the ranks should climb. bossId points to an id in characters.json bosses. powerMult is the difficulty of the whole stage (enemies and rewards). sea is two hex colors for the map gradient. enemies (optional per stage) overrides commonEnemies. Text fields accept a plain string or {\"en\":\"...\",\"es\":\"...\"}. Keys starting with _ are ignored. DIFFICULTY: enemy power per sea = powerMult (normal fights) and powerMult*bossMult (boss, relative to a pirate floor-5 fight); character boss powerMult is ignored. normalRamp/normalStageMult are neutral (0 / 1). Optional settings.difficulty is a global multiplier (default 1). Global difficulty 1.15 (+15% enemy power on top of the per-sea calibration; the previous calibration was ~90%,86,83,79,75,70,64,57,48,38 for a veteran bot).",
  "settings": {
   "floors": 6,
   "crewSlots": 9,
@@ -37,7 +37,8 @@
    1,
    1,
    1
-  ]
+  ],
+  "difficulty": 1.15
  },
  "commonEnemies": {
   "marine": [
