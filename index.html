@@ -420,7 +420,7 @@ button{font-family:inherit;color:inherit}
 .fin-sea svg{position:absolute;bottom:0;left:0;width:200%;height:100%;animation:finWave 14s linear infinite}
 .fin-sea svg.b{animation-duration:22s;opacity:.7;bottom:-6%}
 @keyframes finWave{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.fin-ship{position:absolute;left:50%;bottom:15%;width:170px;margin-left:-85px;animation:finBob 5s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(255,200,120,.25))}
+.fin-ship{position:absolute;left:50%;bottom:7%;width:min(300px,60vw);margin-left:calc(min(300px,60vw) / -2);animation:finBob 5s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(255,200,120,.25))}
 @keyframes finBob{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-8px) rotate(1.4deg)}}
 .fin-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 24px 60px;text-align:center;animation:finIn 1.6s ease both}
 @keyframes finIn{from{opacity:0}}
@@ -487,6 +487,7 @@ button{font-family:inherit;color:inherit}
 @keyframes wdDeb{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
 .wd-lbl{font:italic 600 26px 'Segoe Script','Brush Script MT',cursive;fill:#f3f7ff;opacity:.9}
 .fin-under{position:relative;width:min(780px,92vw);height:110px}
+.fin-ship svg{display:block;width:100%;height:auto}.ship-flag{position:absolute;left:49%;top:-19%;width:30%;pointer-events:none}.ship-flag svg{width:100%;height:auto}.ship-wake{animation:finBob 3.4s ease-in-out infinite reverse}
 .fin-hint{position:absolute;bottom:34px;left:0;right:0;text-align:center;font:500 12px var(--font-ui);letter-spacing:.2em;text-transform:uppercase;opacity:.4;z-index:3}
 .shine{animation:shine 2.4s ease-in-out infinite}
 @keyframes shine{50%{filter:brightness(1.35) drop-shadow(0 0 10px var(--gold))}}
@@ -540,7 +541,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.2'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.3'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -3441,6 +3442,43 @@ function WorldScene({ P }){
   </div>`;
 }
 
+
+/* ---------- barco pirata propio con la bandera del usuario y el capitan en la proa ---------- */
+function PirateShip({ flag }){
+  const sail = '#efe3c3', sh = '#cdbf98', ink = '#0a0710', wood = '#3a2112', gold = '#d9a441';
+  return html`<div className="fin-ship" aria-hidden="true">
+    <svg viewBox="0 0 300 220" style=${{ overflow:'visible' }}>
+      <defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0" stopColor=${sail}/><stop offset="1" stopColor=${sh}/></linearGradient></defs>
+      <g className="ship-wake"><ellipse cx="150" cy="180" rx="140" ry="7" fill="#fff" opacity=".28"/><ellipse cx="60" cy="184" rx="60" ry="4" fill="#fff" opacity=".22"/></g>
+      <path d="M88 150V76M150 150V34M214 150V62" stroke=${ink} strokeWidth="5" strokeLinecap="round"/>
+      <path d="M150 34L88 76M150 34L214 62M150 34L36 140M150 34L262 134M88 76L36 138M214 62L262 132" stroke=${ink} strokeWidth="1" opacity=".55" fill="none"/>
+      <path d="M106 48Q150 40 194 48L190 90Q150 99 110 90Z" fill="url(#sg)" stroke=${ink} strokeWidth="2.5"/>
+      <path d="M102 100Q150 91 198 100L194 142Q150 151 106 142Z" fill="url(#sg)" stroke=${ink} strokeWidth="2.5"/>
+      <path d="M190 72Q214 66 238 72L235 104Q214 110 193 104Z" fill="url(#sg)" stroke=${ink} strokeWidth="2.5"/>
+      <path d="M92 84L92 140L52 134Q70 104 92 84Z" fill=${sail} stroke=${ink} strokeWidth="2.5"/>
+      <path d="M262 134L218 108L218 142Z" fill=${sh} stroke=${ink} strokeWidth="2.5"/>
+      <path d="M150 48Q146 70 150 90M150 100Q146 122 150 142M128 50Q124 70 128 90M172 50Q176 70 172 90M126 102Q122 122 126 142M174 102Q178 122 174 142" stroke=${ink} strokeWidth="1" opacity=".3" fill="none"/>
+      <path d="M104 48H196M100 99H200M188 72H240" stroke=${ink} strokeWidth="3.5" strokeLinecap="round"/>
+      <path d="M30 136H66V124H112V138H238Q268 138 284 122Q276 170 240 178H72Q40 172 30 136Z" fill=${wood} stroke=${ink} strokeWidth="3.5" strokeLinejoin="round"/>
+      <path d="M36 150H276" stroke=${gold} strokeWidth="3.5"/>
+      <path d="M44 162H262" stroke="#1c0f07" strokeWidth="2" opacity=".6"/>
+      ${[84, 112, 140, 168, 196, 224].map(x => html`<rect key=${x} x=${x} y="153" width="11" height="8" rx="1.5" fill="#150b05" stroke=${gold} strokeWidth="1.2"/>`)}
+      <rect x="66" y="108" width="46" height="18" rx="2" fill="#4a2a15" stroke=${ink} strokeWidth="3"/>
+      ${[74, 88, 102].map(x => html`<rect key=${x} x=${x} y="113" width="7" height="7" fill="#ffd98a"/>`)}
+      <path d="M232 138Q252 140 272 126L284 118" stroke=${ink} strokeWidth="4" fill="none" strokeLinecap="round"/>
+      <path d="M278 124Q292 118 292 132Q286 136 278 132Z" fill=${gold} stroke=${ink} strokeWidth="2.5"/>
+      <g fill=${ink} stroke=${ink} strokeWidth="1.5" strokeLinejoin="round">
+        <path d="M234 94L246 90L262 76L264 80L250 94L250 106L258 138H226L232 108Z"/>
+        <path d="M228 140H240L238 150H226Z"/><path d="M246 140H258L260 150H248Z"/>
+        <circle cx="240" cy="84" r="6.5"/>
+        <path d="M229 82Q240 66 252 82Q240 76 229 82Z"/><path d="M227 82H254L252 85H229Z"/>
+        <path d="M232 100Q216 106 208 126Q220 120 232 118Z"/>
+      </g>
+    </svg>
+    <div className="ship-flag"><${Flag} flag=${flag || DEFAULT_FLAG} size=${86} wave=${true}/></div>
+  </div>`;
+}
+
 /* ---------- final cinematico de la victoria ---------- */
 function WinCinematic({ g, onRestart }){
   const [scene, setScene] = useState(0), [run, setRun] = useState(0);
@@ -3506,11 +3544,9 @@ function WinCinematic({ g, onRestart }){
       <div className=${'fin-sky ' + sc.sky}></div>
       <div style=${{ position:'absolute', inset:0, opacity: sc.sky === 's5' ? 0 : 1, transition:'opacity 4s' }}>${stars.map((s, i) => html`<span key=${i} className="fin-star" style=${{ left:s.x + '%', top:s.y + '%', width:s.s, height:s.s, animationDelay:s.d + 's' }}></span>`)}</div>
       <div className="fin-sea" style=${{ opacity: sc.noSea ? 0 : 1, transition:'opacity 2s' }}>${wave(sc.sky === 's5' ? '#27386b' : '#091733', 'a')}${wave(sc.sky === 's5' ? '#3a4a80' : '#0e2147', 'b')}</div>
-      ${sc.ship ? html`<svg className="fin-ship" viewBox="0 0 170 130" aria-hidden="true" key=${'ship' + scene}>
-        <path d="M82 6V92" stroke="#06080f" strokeWidth="4"/><path d="M86 12Q130 40 128 80H86Z" fill="#e9dfc2" stroke="#06080f" strokeWidth="2.5"/><path d="M78 20Q42 44 44 84H78Z" fill="#d9ceaa" stroke="#06080f" strokeWidth="2.5"/>
-        <path d="M82 6l22-6-4 9 4 8z" fill="#06080f"/><path d="M14 92H156Q146 118 124 118H46Q24 118 14 92Z" fill="#2b1608" stroke="#06080f" strokeWidth="3"/><path d="M20 100H150" stroke="#d9a441" strokeWidth="3"/></svg>` : null}
+      ${sc.ship ? html`<${PirateShip} key=${'ship' + scene} flag=${g.flag}/>` : null}
       ${sc.final ? html`<div aria-hidden="true">${lanterns.map((l, i) => html`<span key=${i} className="fin-lantern" style=${{ left:l.x + '%', '--dx':l.dx + 'px', animationDuration:l.dur + 's', animationDelay:l.d + 's' }}></span>`)}</div>` : null}
-      <div className="fin-stage" key=${scene + '-' + run}>${sc.body()}</div>
+      <div className="fin-stage" key=${scene + '-' + run} style=${sc.ship ? { paddingBottom:'38vh' } : null}>${sc.body()}</div>
       ${!sc.final ? html`<div className="fin-ctl"><button type="button" className="btn ghost small" onClick=${e => { e.stopPropagation(); go(last); }}>${t('fin.skip')}</button></div><div className="fin-hint">${t('fin.hint')}</div>` : null}
       <div className="fin-dots" aria-hidden="true">${scenes.map((_, i) => html`<i key=${i} className=${i === scene ? 'on' : ''}></i>`)}</div>
     </div>`;
