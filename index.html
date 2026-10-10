@@ -457,7 +457,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.4'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.3.0'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -538,6 +538,8 @@ function buildData(raw){
     need(RANKS[b.rank], 'characters.json: boss "' + id + '" has an invalid rank "' + b.rank + '" (use pirate, shichibukai, admiral or yonko)');
     return { id, rank:b.rank, name:b.name || id, title:b.title || '', bounty:num(b.bounty, (RANKS[b.rank] || {}).bounty || 0), powerMult:num(b.powerMult, 1),
       color:b.color || (RANKS[b.rank] || {}).color || '#f6b73c', look:Math.abs(Math.round(num(b.look, 0))) % 6, avatar:b.avatar || null, placeholder:false,
+      escort:b.escort && b.escort.n > 0 ? { n:Math.min(4, Math.round(b.escort.n)), kind:b.escort.kind === 'marine' ? 'marine' : 'pirate', share:Math.max(0, Math.min(.6, +b.escort.share || .3)) } : null,
+      summon:b.summon && b.summon.every > 0 ? { every:Math.max(2, Math.round(b.summon.every)), max:Math.max(1, Math.min(3, Math.round(b.summon.max || 2))), kind:b.summon.kind === 'marine' ? 'marine' : 'pirate', share:Math.max(0, Math.min(.3, +b.summon.share || .1)) } : null,
       traits:Array.isArray(b.traits) ? b.traits : [], haki:Array.isArray(b.haki) ? b.haki : [], speed:num(b.speed, 5), desc:b.desc || null };
   });
 
@@ -991,16 +993,29 @@ function enemyPower(g, node){
   const k = SETTINGS.marineMult * /* piratas = misma dificultad que marina */ (1 + SETTINGS.normalRamp * g.stage) * ((SETTINGS.normalStageMult && SETTINGS.normalStageMult[g.stage]) || 1);
   return Math.round((12 + (g.stage >= 3 ? 1.5 : node.f) * 3.2) * s.powerMult * k /* desde el mar 4 el poder no sube con el piso */ * diff * crewK);
 }
+/* esbirros de jefe: escolta inicial o invocados. power = parte del poder del combate que representa */
+function mkMinion(power, kind, id, rnd){
+  const ks = FOE_KINDS[kind] || FOE_KINDS.pirate, k = ks[Math.floor(rnd() * ks.length)];
+  const maxHp = Math.max(4, Math.round(power * SETTINGS.foeHpK * k.hp));
+  return { id, boss:false, minion:true, kind:k.id, name:k.name, style:k.style, weak:k.weak, resist:k.resist, traits:[], spd:k.spd, haki:{ arm:0, obs:0, con:0 },
+    hp:maxHp, maxHp, atk:Math.round(power * SETTINGS.foeAtkK * k.atk * 10) / 10, stun:0, vuln:0, stunImm:0 };
+}
 function genFoes(g, node){
   const s = STAGES[g.stage], ep = enemyPower(g, node), boss = node.type === 'boss';
   const rnd = mulberry32(hashStr(g.seed + ':' + g.stage + ':' + node.id));
   if (boss) {
     const b = s.boss, tr = b.traits || [];
     const hk = b.haki || [], lv = b.rank === 'yonko' ? 3 : 2;
-    return [{ id:'f0', boss:true, bossId:b.id, name:b.name, kind:b.id, style:tr.includes('swordmaster') ? 'sword' : tr.includes('giant') ? 'brawl' : tr.includes('dark') || tr.includes('bind') ? 'mind' : 'brawl',
+    const bf = 1 - (b.escort ? b.escort.share : 0) - (b.summon ? b.summon.share * Math.min(2, b.summon.max) : 0);
+    const bep = ep * Math.max(.4, bf);
+    const boss0 = { id:'f0', boss:true, bossId:b.id, name:b.name, kind:b.id, style:tr.includes('swordmaster') ? 'sword' : tr.includes('giant') ? 'brawl' : tr.includes('dark') || tr.includes('bind') ? 'mind' : 'brawl',
       weak:BOSS_WEAK[tr.find(x => BOSS_WEAK[x])] || null, resist:null, traits:tr, spd:b.speed || 5,
       haki:{ arm:hk.includes('arm') ? lv : 0, obs:hk.includes('obs') ? lv : 0, con:hk.includes('con') ? lv : 0 },
-      tier:g.stage, hp:0, maxHp:Math.round(ep * SETTINGS.foeHpK * (tr.includes('giant') ? 1.3 : 1)), atk:Math.round(ep * SETTINGS.foeAtkK * 10) / 10, stun:0, vuln:0, stunImm:0 }].map(f => ({ ...f, hp:f.maxHp }));
+      tier:g.stage, hp:0, maxHp:Math.round(bep * SETTINGS.foeHpK * (tr.includes('giant') ? 1.3 : 1)), atk:Math.round(bep * SETTINGS.foeAtkK * 10) / 10, stun:0, vuln:0, stunImm:0 };
+    boss0.hp = boss0.maxHp;
+    const out = [boss0];
+    if (b.escort) for (let i = 0; i < b.escort.n; i++) out.push(mkMinion(ep * b.escort.share / b.escort.n, b.escort.kind, 'f' + (i + 1), rnd));
+    return out;
   }
   const kinds = FOE_KINDS[node.type] || FOE_KINDS.marine;
   const count = clamp(2 + (node.f >= 3 ? 1 : 0) + (rnd() < .25 ? 1 : 0) + (g.crew.length >= 7 ? 1 : 0), 2, 4);
@@ -1030,7 +1045,7 @@ function mkAlly(c, m = {}){
 function battleInit(g, node){
   const crew = g.crew.filter(c => c.hp > 0), H = harmony(g.crew), m = mods(g);
   const Hs = clamp(H.score + (m.harm || 0), -35, 35);
-  const st = { round:0, node:{ id:node.id, type:node.type, f:node.f }, allies:crew.map(c => mkAlly(c, m)), foes:genFoes(g, node), H:Hs,
+  const st = { round:0, stageIdx:g.stage, ep:enemyPower(g, node), node:{ id:node.id, type:node.type, f:node.f }, allies:crew.map(c => mkAlly(c, m)), foes:genFoes(g, node), H:Hs,
     atkMult:1 + Hs / 100, takenMult:1 - Hs / 200, power:1 + m.power, guard:clamp(m.guard, 0, .6), shield:Math.round(m.ward || 0), stance:'bal', over:null, rounds:0,
     regen:m.regen || 0, calm:clamp(m.calm || 0, 0, .7), revive:Math.round(m.revive || 0), reviveUsed:0 };
   const T = { atk:0, guard:0, regen:0, dodge:0, crit:0, charge:0, foeAtk:0 };
@@ -1175,6 +1190,10 @@ function foeAct(st, f, ev, rnd){
   }
   let n = f.traits.includes('swift') ? 2 : 1;
   if (f.boss) {
+    const sp = (STAGES[st.stageIdx] || {}).boss && STAGES[st.stageIdx].boss.summon;
+    if (sp && st.round % sp.every === 0 && aliveF(st).filter(x => x.minion).length < sp.max) {
+      const m = mkMinion(st.ep * sp.share, sp.kind, 'f' + (st.foes.length + 1), rnd); st.foes.push(m); ev.push({ t:'summon', id:f.id, foe:JSON.parse(JSON.stringify(m)) });
+    }
     if (f.tier >= SETTINGS.bossExtraFrom - 1) n++;
     if (aliveA(st).length >= 7) n++;
     if (st.round % SETTINGS.bossRoarEvery === 0) {
@@ -1198,7 +1217,8 @@ function reviveCheck(st, ev){
   ev.push({ t:'revive', id:a.id, n:a.hp });
 }
 function endCheck(st){
-  if (!aliveF(st).length) st.over = 'win'; else if (!aliveA(st).length) st.over = 'lose';
+  const bs = st.foes.find(f => f.boss);
+  if (!aliveF(st).length || (bs && bs.hp <= 0)) st.over = 'win'; else if (!aliveA(st).length) st.over = 'lose';
   return st.over;
 }
 /* resumen por nakama: daño hecho, daño recibido, golpes bloqueados y curación */
@@ -1454,7 +1474,7 @@ const i18n = {
     "man.g.tipsT":"Tips",
     "man.g.tips1":"Mix roles: a balanced crew gains a Harmony bonus; stacking the same role is penalized.",
     "man.g.tips2":"Check the matchup before a fight: the estimated win chance and each enemy’s weakness (Observation Haki reveals them).",
-    "bt.roar":"ROAR! The boss hits everyone","bt.enrage":"ENRAGED!",
+    "bt.roar":"ROAR! The boss hits everyone", "bt.summon":"The boss calls for backup!", "intel.escort":"Comes with {n} henchmen", "intel.summon":"Calls henchmen every {n} rounds", "intel.solo":"Fights alone: a duel","bt.enrage":"ENRAGED!",
     "man.g.tips3":"Bosses hit several times per round, roar at the whole crew every third round. Use Protect on a wounded nakama before the roar and focus the weak spot. Enemies grow with the size of your crew, so recruit for balance, not for numbers.",
     "man.g.tips4":"Rest at camps when your crew is hurt, and heal with rations before a boss.",
     "man.c.flowT":"How a fight works",
@@ -1854,7 +1874,7 @@ const i18n = {
     "man.g.tipsT":"Consejos",
     "man.g.tips1":"Mezcla roles: un equipo equilibrado gana bonus de Armonía; repetir el mismo rol se penaliza.",
     "man.g.tips2":"Mira el enfrentamiento antes de luchar: la probabilidad de victoria y la debilidad de cada enemigo (el Haki de Observación las revela).",
-    "bt.roar":"¡RUGIDO! El jefe golpea a todos","bt.enrage":"¡ENFURECIDO!",
+    "bt.roar":"¡RUGIDO! El jefe golpea a todos", "bt.summon":"¡El jefe pide refuerzos!", "intel.escort":"Viene con {n} secuaces", "intel.summon":"Invoca secuaces cada {n} rondas", "intel.solo":"Pelea solo: un duelo","bt.enrage":"¡ENFURECIDO!",
     "man.g.tips3":"Los jefes golpean varias veces por ronda y rugen contra toda la banda cada tres rondas. Protege a un herido antes del rugido y céntrate en el punto débil. Los enemigos crecen con el tamaño de tu banda: recluta por equilibrio, no por cantidad.",
     "man.g.tips4":"Descansa en los camps cuando estés herido y cura con raciones antes de un jefe.",
     "man.c.flowT":"Cómo funciona un combate",
@@ -2588,9 +2608,8 @@ function Legend(){
 }
 function BossIntel({ s }){
   const b = s.boss, tr = (b.traits || []).filter(x => i18n.en['trait.' + x]);
-  if (!tr.length && !(b.haki || []).length) return null;
   return html`<div className="boss-intel"><span className="eyebrow">${t('map.intel', { name: L(b.name) })}</span>
-    <div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}</div>
+    <div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}${b.escort ? html`<span className="tg unk">${t('intel.escort', { n:b.escort.n })}</span>` : null}${b.summon ? html`<span className="tg unk">${t('intel.summon', { n:b.summon.every })}</span>` : null}${!b.escort && !b.summon ? html`<span className="tg unk">${t('intel.solo')}</span>` : null}</div>
     ${tr.length ? html`<div className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${tr.map(x => t('trait.' + x + 'D')).join(' ')}</div>` : null}</div>`;
 }
 function Compass({ angle }){
@@ -2904,6 +2923,7 @@ function showEvent(e, v, fx){
     case 'revive': { const u = unit(e.id); if (u) { u.hp = e.n; u.stun = 0; A(e.id, 'heal'); flt(e.id, t('bt.revive'), 'heal'); fx.banner = { text:t('bt.revive'), color:'#3dd6a0' }; fx.log.push(t('log.revive', { a:evName(v, e.id) })); } d = 1.2; break; }
     case 'drain': { const u = unit(e.id); if (u) { u.hp = Math.min(u.maxHp, u.hp + e.n); flt(e.id, t('bt.drain'), 'heal'); } d = .4; break; }
     case 'pulse': A(e.id, 'special'); fx.overlay = { kind:'foecon', text:t('bt.pulse') }; fx.log.push(t('bt.pulse')); d = 1.6; break;
+    case 'summon': { v.foes.push(e.foe); A(e.id, 'special'); fx.banner = { text:t('bt.summon'), color:'#ff9a47' }; fx.log.push(t('bt.summon')); d = 1.2; break; }
     case 'roar': A(e.id, 'special'); fx.banner = { text:t('bt.roar'), color:'#ff5d47' }; fx.log.push(t('bt.roar')); d = 1.1; break;
     case 'enrage': A(e.id, 'special'); fx.banner = { text:t('bt.enrage'), color:'#ff5d47' }; fx.log.push(t('bt.enrage')); d = 1.2; break;
     case 'bind': A(e.id, 'stun'); { const u = unit(e.id); if (u) u.stun = 1; } fx.banner = { text:t('bt.bind'), color:'#ff7a59' }; d = .9; break;
