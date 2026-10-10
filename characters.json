@@ -264,6 +264,14 @@
   "bigmom": {
    "en": "Big Mom Pirates",
    "es": "Piratas de Big Mom"
+  },
+  "redhair": {
+   "en": "Red-Haired Pirates",
+   "es": "Piratas del Pelirrojo"
+  },
+  "blackbeard": {
+   "en": "Blackbeard Pirates",
+   "es": "Piratas de Barbanegra"
   }
  },
  "nakamas": [
@@ -3368,6 +3376,122 @@
     "es": "Hija de Big Mom. Su encanto y su tenacidad mantienen alta la moral."
    },
    "minStage": 1
+  },
+  {
+   "id": "char_yasopp",
+   "name": {
+    "en": "Yasopp",
+    "es": "Yasopp"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 6,
+   "baseHp": 97,
+   "baseAtk": 31,
+   "classes": [],
+   "power_source": "Rifle",
+   "fruit_type": null,
+   "haki_unlocked": [
+    "Observación Básico"
+   ],
+   "color": "#D4A017",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/yasopp.webp",
+   "look": 2,
+   "frole": "gun",
+   "style": "gun",
+   "stats": {
+    "str": 3,
+    "spd": 7,
+    "swd": 1,
+    "aim": 10,
+    "int": 6,
+    "def": 3
+   },
+   "groups": [
+    "redhair"
+   ],
+   "desc": {
+    "en": "Sniper of the Red-Haired Pirates. His aim never misses, even from the other side of the sea.",
+    "es": "Francotirador de los Piratas del Pelirrojo. Su puntería no falla, ni desde el otro lado del mar."
+   },
+   "minStage": 3
+  },
+  {
+   "id": "char_van_augur",
+   "name": {
+    "en": "Van Augur",
+    "es": "Van Augur"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 84,
+   "baseAtk": 26,
+   "classes": [],
+   "power_source": "Sniper rifle",
+   "fruit_type": null,
+   "haki_unlocked": [],
+   "color": "#5D4E37",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/van-augur.webp",
+   "look": 3,
+   "frole": "gun",
+   "style": "gun",
+   "stats": {
+    "str": 3,
+    "spd": 7,
+    "swd": 1,
+    "aim": 10,
+    "int": 5,
+    "def": 3
+   },
+   "groups": [
+    "blackbeard"
+   ],
+   "desc": {
+    "en": "Sniper of the Blackbeard Pirates. He fires from the shadows and lets his captain take the credit.",
+    "es": "Francotirador de los Piratas de Barbanegra. Dispara desde las sombras y deja que su capitán se lleve la gloria."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_beckman",
+   "name": {
+    "en": "Benn Beckman",
+    "es": "Benn Beckman"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 84,
+   "baseAtk": 26,
+   "classes": [],
+   "power_source": "Rifle",
+   "fruit_type": null,
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico"
+   ],
+   "color": "#7F8C8D",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/benn-beckman.webp",
+   "look": 1,
+   "frole": "gun",
+   "style": "gun",
+   "stats": {
+    "str": 6,
+    "spd": 7,
+    "swd": 1,
+    "aim": 10,
+    "int": 10,
+    "def": 6
+   },
+   "groups": [
+    "redhair"
+   ],
+   "desc": {
+    "en": "First mate of the Red-Haired Pirates. Calm, sharp and deadly, he reads the whole battle with a cigarette in his mouth.",
+    "es": "Segundo al mando de los Piratas del Pelirrojo. Sereno, agudo y letal, lee toda la batalla con un cigarro en la boca."
+   },
+   "minStage": 2
   },
   {
    "id": "hero_luffy",

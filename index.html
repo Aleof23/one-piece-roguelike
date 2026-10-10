@@ -457,7 +457,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.4.2'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.5.1'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -847,28 +847,36 @@ function devFruitScore(f){
   return v;
 }
 const devCrewQ = crew => crew.reduce((s, c) => s + c.atk, 0) * crew.reduce((s, c) => s + c.maxHp, 0) * (1 + harmony(crew).score / 100);
-function devBestCrew(g, want, stage){
+function devBestCrew(g, want, stage, good){
   let cand = recruitCandidates(g).slice();
   while (g.crew.length < want && cand.length) {
+    /* modo "good": respeta el liderazgo de una run normal, evita los 6 y solo mira una muestra de candidatos (como en una tienda real) */
+    let pool = good ? cand.filter(d => (d.cost <= 4 || (d.cost === 5 && g.crew.filter(c => c.cost >= 5).length < 2)) && canRecruit(d, g)) : cand;
+    if (!pool.length) break;
+    if (good) pool = pool.slice().sort(() => Math.random() - .5).slice(0, 9);
     let bi = -1, bq = -1;
-    cand.forEach((d, i) => { const q = devCrewQ([...g.crew, makeMember(d, stage, 'tmp')]); if (q > bq) { bq = q; bi = i; } });
-    const def = cand.splice(bi, 1)[0];
+    pool.forEach((d, i) => { const q = devCrewQ([...g.crew, makeMember(d, stage, 'tmp')]); if (q > bq) { bq = q; bi = i; } });
+    const def = pool[bi]; cand = cand.filter(x => x !== def);
     g = { ...g, crew:[...g.crew, makeMember(def, stage, 'c' + g.uid)], uid:g.uid + 1 };
   }
   return g;
 }
-function devBestItems(g, n, gear){
+function devBestItems(g, n, gear, good){
   for (let i = 0; i < n; i++) {
-    const it = itemPool({ ...g, stage:STAGES.length }).filter(x => !!x.equip === !!gear && !slotFull(g, x) && !g.items.some(y => y.id === x.id)).sort((a, b) => devItemScore(g, b) - devItemScore(g, a))[0];
+    let list = itemPool(good ? g : { ...g, stage:STAGES.length }).filter(x => !!x.equip === !!gear && !slotFull(g, x) && !g.items.some(y => y.id === x.id)).sort((a, b) => devItemScore(g, b) - devItemScore(g, a));
+    if (good) list = list.slice(1, 8);
+    const it = good ? list[Math.floor(Math.random() * Math.min(4, list.length))] : list[0];
     if (!it) break; g = gainItem(g, it);
   }
   return g;
 }
-function devBestFruits(g, n){
+function devBestFruits(g, n, good){
   const fs = availableFruits(g).slice().sort((a, b) => devFruitScore(b) - devFruitScore(a));
   for (let i = 0; i < n && fs.length; i++) {
     const c = g.crew.filter(x => !x.fruit && x.hp > 0).sort((a, b) => b.atk * b.maxHp - a.atk * a.maxHp)[0];
-    if (!c) break; g = eat(g, c.id, fs.shift());
+    if (!c) break;
+    const k = good ? Math.min(fs.length - 1, 2 + Math.floor(Math.random() * 6)) : 0; /* good: de las 3-8 mejores, no siempre la mejor */
+    g = eat(g, c.id, fs.splice(k, 1)[0]);
   }
   return g;
 }
@@ -877,12 +885,17 @@ function devBuild(g0, o){
   let g = { ...g0, dev:true, stage:stage - 1 };
   g.crew = g.crew.map(c => { let x = c; for (let i = 1; i < stage; i++) x = levelUp(x); return { ...x, hp:x.maxHp }; });
   const want = clamp(Math.round(o.crew || 1), 1, SETTINGS.crewSlots);
-  const cand = o.best ? [] : recruitCandidates(g).slice().sort(rnd0);
-  if (o.best) g = devBestCrew(g, want, stage);
+  const mode = o.mode || (o.best ? 'best' : 'random'), good = mode === 'good';
+  if (good) g.lead = g.lead + SETTINGS.leadershipPerStage * (stage - 1);
+  const cand = mode === 'random' ? recruitCandidates(g).slice().sort(rnd0) : [];
+  if (mode !== 'random') g = devBestCrew(g, want, stage, good);
   while (g.crew.length < want && cand.length) { const def = cand.pop(); g = { ...g, crew:[...g.crew, makeMember(def, stage, 'c' + g.uid)], uid:g.uid + 1 }; }
-  g.lead = Math.max(g.lead + SETTINGS.leadershipPerStage * (stage - 1), usedLead(g) + 2);
+  if (!good) g.lead = Math.max(g.lead + SETTINGS.leadershipPerStage * (stage - 1), usedLead(g) + 2);
   g.berries = Math.max(0, Math.round(o.berries || 0));
-  if (o.best) { g = devBestItems(g, o.relics || 0, false); g = devBestItems(g, o.gear || 0, true); g = devBestFruits(g, o.fruits || 0); }
+  if (mode !== 'random') {
+    const cap = (n, k) => good ? Math.min(n || 0, k) : (n || 0); /* good: cantidades de una run normal a ese mar */
+    g = devBestItems(g, cap(o.relics, Math.round(1 + stage * .5)), false, good); g = devBestItems(g, cap(o.gear, Math.round(1 + stage * .5)), true, good); g = devBestFruits(g, cap(o.fruits, Math.ceil(stage * .7)), good);
+  }
   else { g = devGiveItems(g, o.relics || 0, false); g = devGiveItems(g, o.gear || 0, true); g = devGiveFruits(g, o.fruits || 0); }
   g = devHealAll(g); g.map = genMap(g.seed, g.stage, ctxOf(g));
   return g;
@@ -1771,7 +1784,7 @@ const i18n = {
     'camp.sleep':'Sleep by the fire', 'camp.break':'Break camp',
     'chest.eyebrow':'Rare find', 'chest.title':'Rare Chest',
     'chest.desc':'A chest sealed with purple wax. Inside is a Devil Fruit that changes one Nakama for the whole run. Each fruit exists once, and each Nakama can eat only one.',
-    'chest.open':'Open the chest', 'chest.who':'Who eats it?', 'chest.eat':'Eat',
+    'chest.open':'Open the chest', 'chest.reject':'Refuse this fruit (+100 berries)', 'chest.rejectAll':'Refuse both fruits (+100 berries)', 'chest.back':'Back to the choice', 'chest.who':'Who eats it?', 'chest.eat':'Eat',
     'chest.change':'ATK {a1} → {a2} · HP {h1} → {h2}',
     'chest.noneLeft':'Everyone already ate a fruit. You sell this one for 150 berries.', 'chest.sell':'Sell fruit',
     'chest.empty':'Only a pile of berries inside: every Devil Fruit is already taken. +150 berries.', 'chest.take':'Take the berries',
@@ -2171,7 +2184,7 @@ const i18n = {
     'camp.sleep':'Dormir junto al fuego', 'camp.break':'Levantar el campamento',
     'chest.eyebrow':'Hallazgo poco común', 'chest.title':'Cofre raro',
     'chest.desc':'Un cofre sellado con cera morada. Dentro hay una Fruta del Diablo que cambia a un Nakama para toda la run. Cada fruta existe una sola vez y cada Nakama solo puede comer una.',
-    'chest.open':'Abrir el cofre', 'chest.who':'¿Quién se la come?', 'chest.eat':'Comer',
+    'chest.open':'Abrir el cofre', 'chest.reject':'Rechazar esta fruta (+100 berries)', 'chest.rejectAll':'Rechazar ambas frutas (+100 berries)', 'chest.back':'Volver a elegir', 'chest.who':'¿Quién se la come?', 'chest.eat':'Comer',
     'chest.change':'ATQ {a1} → {a2} · Vida {h1} → {h2}',
     'chest.noneLeft':'Todos tus Nakamas ya probaron una fruta. Esta la vendes por 150 berries.', 'chest.sell':'Vender fruta',
     'chest.empty':'Solo hay un montón de berries: todas las Frutas del Diablo ya tienen dueño. +150 berries.', 'chest.take':'Coger los berries',
@@ -3220,6 +3233,7 @@ function ChestEvent({ g, setG, done }){
   const eligible = g.crew.filter(c => !c.fruit);
   const feed = c => { setG(eat(g, c.id, fruit)); done(); };
   const coins = () => { setG({ ...g, berries: g.berries + 150 }); done(); };
+  const reject = () => { setG({ ...g, berries: g.berries + 100 }); done(); };
   return html`
     <${Modal} tone="#b66dff" eyebrow=${t('chest.eyebrow')} title=${t('chest.title')} icon="fruit">
       ${!opened ? html`
@@ -3236,7 +3250,8 @@ function ChestEvent({ g, setG, done }){
             <div className="flex-1 min-w-0"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'18px' }}>${L(f.name)} <span className="eyebrow">${fruitType(f)}</span></div>
               <div className="text-sm" style=${{ color:'var(--gold)' }}>${fruitMult(f)}</div>
               <div className="flex flex-wrap gap-1 mt-1">${fxLines(f).map(l => html`<span key=${l} className="chip">${l}</span>`)}</div></div>
-          </button>`)}</div>`
+          </button>`)}</div>
+        <button type="button" className="btn ghost small" onClick=${reject}>${t('chest.rejectAll')}</button>`
       : html`
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="fruit-orb reveal" style=${{ '--fc': fruit.color, width:92, height:92 }}><${Ico} n="fruit" size=${54} sw=${1.8}/></div>
@@ -3254,7 +3269,8 @@ function ChestEvent({ g, setG, done }){
               <div className="flex-1 min-w-0"><div className="font-bold" style=${{ fontFamily:'var(--font-ui)', fontSize:'18px' }}>${L(c.name)}</div><div className="desc">${t('chest.change', { a1: c.atk, a2: Math.round(c.atk * fruit.atk), h1: c.maxHp, h2: Math.round(c.maxHp * fruit.hp) })}</div></div>
               <span className="price">${t('chest.eat')}</span>
             </button>`)}</div>`
-        : html`<p className="m-0" style=${{ color:'var(--mist)' }}>${t('chest.noneLeft')}</p><button type="button" className="btn" onClick=${coins}>${t('chest.sell')}</button>`}`}
+        : html`<p className="m-0" style=${{ color:'var(--mist)' }}>${t('chest.noneLeft')}</p><button type="button" className="btn" onClick=${coins}>${t('chest.sell')}</button>`}
+        <div className="flex flex-wrap gap-2 justify-center">${opts.length > 1 ? html`<button type="button" className="btn ghost small" onClick=${() => setFruit(null)}>${t('chest.back')}</button>` : null}<button type="button" className="btn ghost small" onClick=${reject}>${t('chest.reject')}</button></div>`}
     <//>`;
 }
 
@@ -3639,7 +3655,7 @@ function DevAsk({ onOk, onClose }){
     </form></div>`;
 }
 function DevPanel({ g, phase, meta, onBuild, setG, updateMeta, onClose, onLock }){
-  const [o, setO] = useState({ stage:10, crew:9, berries:5000, relics:6, gear:6, fruits:9, best:true });
+  const [o, setO] = useState({ stage:10, crew:9, berries:5000, relics:6, gear:6, fruits:9, mode:'best' });
   const num = (k, min, max) => html`<input type="number" className="flag-input" style=${{ width:90, maxWidth:90 }} min=${min} max=${max} value=${o[k]} onChange=${e => setO({ ...o, [k]:clamp(+e.target.value || 0, min, max) })}/>`;
   const row = (label, input) => html`<label className="flex items-center justify-between gap-3"><span>${label}</span>${input}</label>`;
   const play = phase === 'play' && g;
@@ -3654,7 +3670,7 @@ function DevPanel({ g, phase, meta, onBuild, setG, updateMeta, onClose, onLock }
         ${row('Sea (1–' + STAGES.length + ')', num('stage', 1, STAGES.length))}
         ${row('Crew size (1–' + SETTINGS.crewSlots + ')', num('crew', 1, SETTINGS.crewSlots))}
         ${row('Berries', num('berries', 0, 99999))}
-        ${row('Best build (optimal crew, relics, gear and fruits instead of random)', html`<input type="checkbox" checked=${!!o.best} onChange=${e => setO({ ...o, best:e.target.checked })}/>`)}
+        ${row('Build quality', html`<select className="flag-input" style=${{ width:170, maxWidth:170 }} value=${o.mode || 'best'} onChange=${e => setO({ ...o, mode:e.target.value })}><option value="best">Perfect (best of everything)</option><option value="good">Good (optimized, realistic)</option><option value="random">Random</option></select>`)}
         ${row('Relics', num('relics', 0, 6))}${row('Gear', num('gear', 0, 6))}${row('Devil Fruits', num('fruits', 0, 9))}
         <button type="button" className="btn" onClick=${() => onBuild(o)}>Start dev run</button>
         ${play ? html`
