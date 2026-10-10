@@ -467,6 +467,15 @@ button{font-family:inherit;color:inherit}
 @keyframes wdBreak{0%{transform:none;opacity:1}18%{transform:translate(calc(var(--dx)*.08),calc(var(--dy)*.08)) rotate(calc(var(--rot)*.1));opacity:1;filter:brightness(2)}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.3);opacity:0}}
 .wd-blast{transform-box:fill-box;transform-origin:center;animation:wdBlast 1s ease-out forwards;animation-delay:var(--d);opacity:0}
 @keyframes wdBlast{0%{transform:scale(.1);opacity:1}60%{opacity:.95}100%{transform:scale(2.3);opacity:0}}
+.wd-core{animation-duration:.55s}
+.wd-ring{fill:none;stroke:#fff3c4;stroke-width:4;opacity:0;transform-box:fill-box;transform-origin:center;animation:wdRing .9s ease-out forwards;animation-delay:var(--d)}
+@keyframes wdRing{0%{transform:scale(.2);opacity:.95;stroke-width:7}100%{transform:scale(3.2);opacity:0;stroke-width:1}}
+.wd-smoke{opacity:0;transform-box:fill-box;transform-origin:center;animation:wdSmoke 2.2s ease-out forwards;animation-delay:var(--d)}
+@keyframes wdSmoke{0%{transform:scale(.3) translateY(0);opacity:.75}100%{transform:scale(2.4) translateY(-40px);opacity:0}}
+.wd-spark{opacity:0;transform-box:fill-box;transform-origin:left center;animation:wdSpark .8s ease-out forwards;animation-delay:var(--d);rotate:var(--sa)}
+@keyframes wdSpark{0%{translate:0 0;opacity:1}100%{translate:var(--sx) var(--sy);opacity:0}}
+.wd-bolt{fill:none;stroke:#fff;stroke-width:4;stroke-linejoin:miter;opacity:0;filter:drop-shadow(0 0 6px #9fd8ff) drop-shadow(0 0 12px #6ab7ff);animation:wdBolt .42s steps(1,end) forwards;animation-delay:var(--d)}
+@keyframes wdBolt{0%{opacity:1}30%{opacity:.2}55%{opacity:1}100%{opacity:0}}
 .wd-bomb{animation:wdBomb .45s ease-in forwards;animation-delay:var(--d);opacity:0}
 @keyframes wdBomb{0%{transform:translate(40px,-170px);opacity:1}99%{transform:translate(0,0);opacity:1}100%{transform:translate(0,0);opacity:0}}
 .wd-beam{opacity:0;transform-box:fill-box;transform-origin:50% 100%;animation:wdBeam 1s ease-out 5s both}
@@ -541,7 +550,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.3'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.5'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -2825,9 +2834,8 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
           <div className="flex gap-[2px] justify-end" style=${{ color:'var(--ember)' }}>${[1, 2, 3, 4, 5].map(k => html`<span key=${k} style=${{ opacity: k <= skulls ? 1 : .25 }}><${Ico} n="skull" size=${16}/></span>`)}</div>
         </div>
       </div>
-      <${BossIntel} s=${s}/>
-      <${Legend}/>
-      <div className="sea-wrap flex-1 min-h-0"><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div>
+      <div className="flex-1 min-h-0 flex justify-center"><div className="sea-wrap h-full max-w-full mx-auto" style=${{ aspectRatio: MAP_W + ' / ' + MAP_H }}><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div></div>
+      <div className="shrink-0 flex flex-col gap-3"><${BossIntel} s=${s}/><${Legend}/></div>
     </div>`;
 }
 
@@ -3433,9 +3441,16 @@ function WorldScene({ P }){
         <circle className="wd-bloom" cx="300" cy="300" r="270" fill="#bff3ff"/>
       </g>
       <g className="wd-beam"><path d="M540 -60L474 290L462 290L500 -60Z" fill="#fff6c8" filter="url(#wg)"/><path d="M522 -60L471 290L465 290L506 -60Z" fill="#fff"/></g>
-      ${pts.filter((_, i) => i % 1 === 0).map((p, i) => html`<g key=${'x' + i}>
-        <circle className="wd-bomb" cx=${p.x} cy=${p.y} r="5" fill="#fff0b0" style=${{ '--d':(5.1 + i * .38) + 's' }}/>
-        <circle className="wd-blast" cx=${p.x} cy=${p.y} r="46" fill="url(#wb)" style=${{ '--d':(5.5 + i * .38) + 's' }}/></g>`)}
+      ${pts.map((p, i) => { const d0 = 5.5 + i * .38, r = mulberry32(100 + i);
+        const sparks = Array.from({ length:9 }, (_, k) => { const a = (k / 9) * 6.283 + r() * .5, l = 38 + r() * 40; return { x:Math.cos(a) * l, y:Math.sin(a) * l, a:a * 57.3 }; });
+        return html`<g key=${'x' + i}>
+        <path className="wd-bolt" d=${'M' + (p.x + 40) + ' ' + (p.y - 230) + 'L' + (p.x + 18) + ' ' + (p.y - 140) + 'L' + (p.x + 30) + ' ' + (p.y - 132) + 'L' + (p.x + 4) + ' ' + (p.y - 50) + 'L' + (p.x + 10) + ' ' + (p.y - 46) + 'L' + p.x + ' ' + p.y} style=${{ '--d':(d0 - .42) + 's' }}/>
+        <circle className="wd-bomb" cx=${p.x} cy=${p.y} r="5" fill="#fff0b0" style=${{ '--d':(d0 - .4) + 's' }}/>
+        <circle className="wd-smoke" cx=${p.x} cy=${p.y - 6} r="30" fill="#2a2330" style=${{ '--d':(d0 + .15) + 's' }}/>
+        <circle className="wd-blast" cx=${p.x} cy=${p.y} r="52" fill="url(#wb)" style=${{ '--d':d0 + 's' }}/>
+        <circle className="wd-blast wd-core" cx=${p.x} cy=${p.y} r="24" fill="#fff" style=${{ '--d':d0 + 's' }}/>
+        <circle className="wd-ring" cx=${p.x} cy=${p.y} r="26" style=${{ '--d':(d0 + .05) + 's' }}/>
+        ${sparks.map((q, k) => html`<rect key=${k} className="wd-spark" x=${p.x} y=${p.y - 1} width="14" height="2.5" rx="1.2" fill="#ffe08a" style=${{ '--sx':q.x + 'px', '--sy':q.y + 'px', '--sa':q.a + 'deg', '--d':(d0 + .02) + 's' }}/>`)}</g>`; })}
       ${deb.map((d, i) => html`<rect key=${'d' + i} className="wd-debris" x=${d.x} y=${d.y} width=${d.s} height=${d.s} fill=${i % 3 ? '#ff8a3d' : '#ffe08a'} style=${{ '--dx':d.dx + 'px', '--dy':d.dy + 'px', '--rot':d.rot + 'deg', '--d':d.d + 's' }}/>`)}
       <circle className="wd-shock" cx="300" cy="300" r="60"/>
     </svg>
@@ -3467,13 +3482,6 @@ function PirateShip({ flag }){
       ${[74, 88, 102].map(x => html`<rect key=${x} x=${x} y="113" width="7" height="7" fill="#ffd98a"/>`)}
       <path d="M232 138Q252 140 272 126L284 118" stroke=${ink} strokeWidth="4" fill="none" strokeLinecap="round"/>
       <path d="M278 124Q292 118 292 132Q286 136 278 132Z" fill=${gold} stroke=${ink} strokeWidth="2.5"/>
-      <g fill=${ink} stroke=${ink} strokeWidth="1.5" strokeLinejoin="round">
-        <path d="M234 94L246 90L262 76L264 80L250 94L250 106L258 138H226L232 108Z"/>
-        <path d="M228 140H240L238 150H226Z"/><path d="M246 140H258L260 150H248Z"/>
-        <circle cx="240" cy="84" r="6.5"/>
-        <path d="M229 82Q240 66 252 82Q240 76 229 82Z"/><path d="M227 82H254L252 85H229Z"/>
-        <path d="M232 100Q216 106 208 126Q220 120 232 118Z"/>
-      </g>
     </svg>
     <div className="ship-flag"><${Flag} flag=${flag || DEFAULT_FLAG} size=${86} wave=${true}/></div>
   </div>`;
