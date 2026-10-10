@@ -224,6 +224,46 @@
   "galley": {
    "en": "Galley-La",
    "es": "Galley-La"
+  },
+  "heart": {
+   "en": "Heart Pirates",
+   "es": "Piratas Heart"
+  },
+  "kid": {
+   "en": "Kid Pirates",
+   "es": "Piratas de Kid"
+  },
+  "worst": {
+   "en": "Worst Generation",
+   "es": "Peor Generación"
+  },
+  "whitebeard": {
+   "en": "Whitebeard Pirates",
+   "es": "Piratas de Barbablanca"
+  },
+  "donquixote": {
+   "en": "Donquixote Family",
+   "es": "Familia Donquixote"
+  },
+  "wano": {
+   "en": "Wano",
+   "es": "Wano"
+  },
+  "warlords": {
+   "en": "Warlords",
+   "es": "Shichibukai"
+  },
+  "alabasta": {
+   "en": "Alabasta",
+   "es": "Arabasta"
+  },
+  "rogers": {
+   "en": "Roger Pirates",
+   "es": "Piratas de Roger"
+  },
+  "bigmom": {
+   "en": "Big Mom Pirates",
+   "es": "Piratas de Big Mom"
   }
  },
  "nakamas": [
@@ -261,8 +301,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 55,
-   "baseAtk": 12,
+   "baseHp": 60,
+   "baseAtk": 15,
    "classes": [
     "Tirador",
     "Soporte"
@@ -276,10 +316,10 @@
    "style": "mind",
    "stats": {
     "str": 2,
-    "spd": 6,
+    "spd": 7,
     "swd": 2,
-    "aim": 6,
-    "int": 9,
+    "aim": 7,
+    "int": 10,
     "def": 2
    },
    "groups": [
@@ -288,7 +328,8 @@
    "desc": {
     "en": "Navigator of the Straw Hats. Her Clima-Tact turns the weather itself into a weapon.",
     "es": "Navegante de los Sombrero de Paja. Su Clima-Tact convierte el propio clima en un arma."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_usopp",
@@ -300,7 +341,7 @@
    "recruitable": true,
    "cost": 3,
    "baseHp": 60,
-   "baseAtk": 16,
+   "baseAtk": 17,
    "classes": [
     "Tirador",
     "Francotirador"
@@ -316,10 +357,10 @@
    "style": "gun",
    "stats": {
     "str": 3,
-    "spd": 5,
+    "spd": 6,
     "swd": 1,
     "aim": 10,
-    "int": 7,
+    "int": 8,
     "def": 2
    },
    "groups": [
@@ -329,7 +370,8 @@
    "desc": {
     "en": "Sniper and champion liar of the Straw Hats. His Pop Greens and impossible aim win fights from afar.",
     "es": "Francotirador y gran mentiroso de los Sombrero de Paja. Sus Pop Green y su puntería imposible ganan combates a distancia."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_sanji",
@@ -340,8 +382,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 80,
-   "baseAtk": 20,
+   "baseHp": 103,
+   "baseAtk": 23,
    "classes": [
     "Luchador",
     "Artista Marcial"
@@ -357,12 +399,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 8,
-    "spd": 9,
+    "str": 9,
+    "spd": 10,
     "swd": 3,
     "aim": 2,
-    "int": 6,
-    "def": 6
+    "int": 7,
+    "def": 7
    },
    "groups": [
     "strawhat"
@@ -370,7 +412,8 @@
    "desc": {
     "en": "The Straw Hats' cook and a master of kicks. He fights with blazing leg strikes and never hits a woman.",
     "es": "Cocinero de los Sombrero de Paja y maestro de las patadas. Pelea con golpes de pierna ardientes y jamás golpea a una mujer."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_chopper",
@@ -381,8 +424,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 65,
-   "baseAtk": 13,
+   "baseHp": 56,
+   "baseAtk": 11,
    "classes": [
     "Médico",
     "Luchador"
@@ -395,12 +438,12 @@
    "frole": "support",
    "style": "mind",
    "stats": {
-    "str": 6,
-    "spd": 5,
+    "str": 7,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
-    "int": 8,
-    "def": 5
+    "int": 9,
+    "def": 6
    },
    "groups": [
     "strawhat"
@@ -408,7 +451,8 @@
    "desc": {
     "en": "Reindeer doctor of the Straw Hats. He changes form to fight and his medicine keeps the crew standing.",
     "es": "Reno doctor de los Sombrero de Paja. Cambia de forma para pelear y su medicina mantiene en pie a la tripulación."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_robin",
@@ -419,8 +463,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 65,
-   "baseAtk": 17,
+   "baseHp": 70,
+   "baseAtk": 19,
    "classes": [
     "Control",
     "Luchador"
@@ -433,12 +477,12 @@
    "frole": "mind",
    "style": "mind",
    "stats": {
-    "str": 4,
-    "spd": 6,
+    "str": 5,
+    "spd": 7,
     "swd": 2,
     "aim": 3,
-    "int": 9,
-    "def": 4
+    "int": 10,
+    "def": 5
    },
    "groups": [
     "strawhat"
@@ -446,7 +490,8 @@
    "desc": {
     "en": "Archaeologist of the Straw Hats. With the Hana Hana no Mi she sprouts limbs anywhere and binds her foes.",
     "es": "Arqueóloga de los Sombrero de Paja. Con la Hana Hana no Mi hace brotar extremidades por doquier y ata a sus rivales."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_franky",
@@ -457,8 +502,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 100,
-   "baseAtk": 19,
+   "baseHp": 120,
+   "baseAtk": 15,
    "classes": [
     "Tanque",
     "Artillero"
@@ -471,12 +516,12 @@
    "frole": "tank",
    "style": "brawl",
    "stats": {
-    "str": 9,
+    "str": 10,
     "spd": 4,
     "swd": 2,
     "aim": 6,
     "int": 6,
-    "def": 9
+    "def": 10
    },
    "groups": [
     "strawhat"
@@ -484,7 +529,8 @@
    "desc": {
     "en": "Shipwright and cyborg of the Straw Hats. A walking arsenal powered by cola.",
     "es": "Carpintero naval y cyborg de los Sombrero de Paja. Un arsenal andante alimentado por cola."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_brook",
@@ -495,7 +541,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 60,
+   "baseHp": 79,
    "baseAtk": 20,
    "classes": [
     "Espadachín",
@@ -509,11 +555,11 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 4,
-    "spd": 8,
-    "swd": 9,
+    "str": 5,
+    "spd": 9,
+    "swd": 10,
     "aim": 1,
-    "int": 5,
+    "int": 6,
     "def": 3
    },
    "groups": [
@@ -522,7 +568,8 @@
    "desc": {
     "en": "Skeleton musician and swordsman. Revived by the Yomi Yomi no Mi, he cuts down foes before they notice.",
     "es": "Músico esqueleto y espadachín. Revivido por la Yomi Yomi no Mi, corta a sus rivales antes de que lo noten."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_jinbe",
@@ -533,8 +580,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 110,
-   "baseAtk": 21,
+   "baseHp": 103,
+   "baseAtk": 23,
    "classes": [
     "Luchador",
     "Karate Gyojin"
@@ -550,12 +597,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 9,
-    "spd": 6,
+    "str": 10,
+    "spd": 7,
     "swd": 2,
     "aim": 1,
-    "int": 7,
-    "def": 9
+    "int": 8,
+    "def": 10
    },
    "groups": [
     "strawhat",
@@ -564,7 +611,8 @@
    "desc": {
     "en": "Knight of the Sea and master of Fish-Man Karate. A steady wall who commands the water around him.",
     "es": "Caballero del Mar y maestro del Karate Gyojin. Un muro firme que domina el agua a su alrededor."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_vivi",
@@ -575,8 +623,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 2,
-   "baseHp": 55,
-   "baseAtk": 11,
+   "baseHp": 48,
+   "baseAtk": 8,
    "classes": [
     "Soporte",
     "Luchador"
@@ -590,17 +638,18 @@
    "style": "sword",
    "stats": {
     "str": 3,
-    "spd": 6,
-    "swd": 5,
+    "spd": 7,
+    "swd": 6,
     "aim": 3,
-    "int": 8,
+    "int": 9,
     "def": 3
    },
    "groups": [],
    "desc": {
     "en": "Princess of Alabasta. She fights with her Peacock Slashers and inspires everyone around her.",
     "es": "Princesa de Arabasta. Lucha con sus Peacock Slashers e inspira a quienes la rodean."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_carrot",
@@ -611,7 +660,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 65,
+   "baseHp": 87,
    "baseAtk": 19,
    "classes": [
     "Luchador",
@@ -627,12 +676,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 9,
+    "str": 7,
+    "spd": 10,
     "swd": 2,
     "aim": 1,
-    "int": 4,
-    "def": 4
+    "int": 5,
+    "def": 5
    },
    "groups": [
     "minks"
@@ -640,7 +689,8 @@
    "desc": {
     "en": "Energetic Mink warrior of Zou. Her electro and Sulong form make her blindingly fast.",
     "es": "Enérgica guerrera Mink de Zou. Su electro y su forma Sulong la vuelven cegadoramente veloz."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_pedro",
@@ -651,8 +701,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 75,
-   "baseAtk": 21,
+   "baseHp": 79,
+   "baseAtk": 20,
    "classes": [
     "Espadachín",
     "Mink"
@@ -668,12 +718,12 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 7,
-    "spd": 7,
-    "swd": 8,
+    "str": 8,
+    "spd": 8,
+    "swd": 9,
     "aim": 2,
     "int": 5,
-    "def": 6
+    "def": 7
    },
    "groups": [
     "minks"
@@ -681,7 +731,8 @@
    "desc": {
     "en": "Captain of the Guardians of Zou. A loyal Mink swordsman who protects his people to the end.",
     "es": "Capitán de los Guardianes de Zou. Un espadachín Mink leal que protege a los suyos hasta el final."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_pekoms",
@@ -692,8 +743,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 85,
-   "baseAtk": 18,
+   "baseHp": 87,
+   "baseAtk": 19,
    "classes": [
     "Luchador",
     "Mink"
@@ -708,12 +759,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 8,
-    "spd": 5,
+    "str": 9,
+    "spd": 6,
     "swd": 2,
     "aim": 1,
-    "int": 4,
-    "def": 8
+    "int": 5,
+    "def": 9
    },
    "groups": [
     "minks"
@@ -721,7 +772,8 @@
    "desc": {
     "en": "Mink bodyguard and heavy fighter. Immense strength and a hardened body.",
     "es": "Mink guardaespaldas y pesado luchador. Fuerza inmensa y un cuerpo endurecido."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_wanda",
@@ -732,7 +784,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 65,
+   "baseHp": 67,
    "baseAtk": 17,
    "classes": [
     "Espadachín",
@@ -746,12 +798,12 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 5,
-    "spd": 8,
-    "swd": 8,
+    "str": 6,
+    "spd": 9,
+    "swd": 9,
     "aim": 1,
-    "int": 4,
-    "def": 4
+    "int": 5,
+    "def": 5
    },
    "groups": [
     "minks"
@@ -759,7 +811,8 @@
    "desc": {
     "en": "Mink swordswoman of the Inuarashi clan. Fast and fierce, she strikes with crackling electro.",
     "es": "Espadachina Mink del clan de Inuarashi. Rápida y feroz, ataca con electro chispeante."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_conis",
@@ -770,8 +823,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 1,
-   "baseHp": 40,
-   "baseAtk": 7,
+   "baseHp": 37,
+   "baseAtk": 5,
    "classes": [
     "Soporte"
    ],
@@ -784,10 +837,10 @@
    "style": "mind",
    "stats": {
     "str": 1,
-    "spd": 4,
+    "spd": 5,
     "swd": 1,
     "aim": 3,
-    "int": 8,
+    "int": 9,
     "def": 2
    },
    "groups": [
@@ -796,7 +849,8 @@
    "desc": {
     "en": "Kind girl of Skypiea. Not a fighter, but her dials give the crew useful tricks.",
     "es": "Amable chica de Skypiea. No es luchadora, pero sus dials dan trucos útiles a la tripulación."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_wyper",
@@ -807,8 +861,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 85,
-   "baseAtk": 22,
+   "baseHp": 70,
+   "baseAtk": 21,
    "classes": [
     "Luchador",
     "Tirador"
@@ -821,12 +875,12 @@
    "frole": "gun",
    "style": "gun",
    "stats": {
-    "str": 7,
-    "spd": 7,
+    "str": 8,
+    "spd": 8,
     "swd": 2,
-    "aim": 7,
-    "int": 5,
-    "def": 6
+    "aim": 8,
+    "int": 6,
+    "def": 7
    },
    "groups": [
     "sky"
@@ -834,7 +888,8 @@
    "desc": {
     "en": "Fierce Shandian warrior. He wields a burst dial and unbending determination.",
     "es": "Feroz guerrero Shandia. Maneja un dial de ráfaga y una determinación inquebrantable."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_gan_fall",
@@ -845,8 +900,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 70,
-   "baseAtk": 16,
+   "baseHp": 74,
+   "baseAtk": 15,
    "classes": [
     "Lanza",
     "Jinete"
@@ -861,12 +916,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 8,
+    "str": 7,
+    "spd": 9,
     "swd": 3,
     "aim": 2,
-    "int": 5,
-    "def": 5
+    "int": 6,
+    "def": 6
    },
    "groups": [
     "sky"
@@ -874,7 +929,8 @@
    "desc": {
     "en": "Former God of Skypiea and rider of the great bird Pierre. Lance in hand, he charges first.",
     "es": "Antiguo Dios de Skypiea y jinete del gran pájaro Pierre. Lanza en mano, carga el primero."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_kaya",
@@ -885,8 +941,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 2,
-   "baseHp": 45,
-   "baseAtk": 6,
+   "baseHp": 48,
+   "baseAtk": 8,
    "classes": [
     "Médico",
     "Soporte"
@@ -903,7 +959,7 @@
     "spd": 3,
     "swd": 1,
     "aim": 1,
-    "int": 9,
+    "int": 10,
     "def": 1
    },
    "groups": [
@@ -912,7 +968,8 @@
    "desc": {
     "en": "Gentle young doctor. Her medical knowledge mends allies in the darkest hours.",
     "es": "Joven doctora de gran bondad. Sus conocimientos médicos curan a los aliados en las horas más oscuras."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_gin",
@@ -923,8 +980,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 75,
-   "baseAtk": 19,
+   "baseHp": 60,
+   "baseAtk": 17,
    "classes": [
     "Luchador",
     "Armas"
@@ -934,15 +991,15 @@
    "haki_unlocked": [],
    "color": "#696969",
    "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/gin.webp",
-   "frole": "brawl",
-   "style": "brawl",
+   "frole": "gun",
+   "style": "gun",
    "stats": {
-    "str": 6,
-    "spd": 6,
+    "str": 5,
+    "spd": 7,
     "swd": 2,
-    "aim": 3,
-    "int": 4,
-    "def": 5
+    "aim": 8,
+    "int": 5,
+    "def": 6
    },
    "groups": [
     "krieg"
@@ -950,7 +1007,8 @@
    "desc": {
     "en": "Ruthless fighter of the Krieg Pirates turned man of honor. Tonfas and a stubborn heart.",
     "es": "Despiadado luchador de los Piratas de Krieg convertido en hombre de honor. Tonfas y un corazón obstinado."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_krieg",
@@ -961,8 +1019,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 90,
-   "baseAtk": 18,
+   "baseHp": 102,
+   "baseAtk": 12,
    "classes": [
     "Tanque",
     "Artillero"
@@ -988,7 +1046,8 @@
    "desc": {
     "en": "Don Krieg, 'Admiral' of a pirate armada. Layers of armor and an arsenal of guns.",
     "es": "Don Krieg, 'Almirante' de una armada pirata. Capas de armadura y un arsenal de armas."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_pearl",
@@ -999,8 +1058,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 2,
-   "baseHp": 100,
-   "baseAtk": 13,
+   "baseHp": 87,
+   "baseAtk": 9,
    "classes": [
     "Tanque"
    ],
@@ -1012,7 +1071,7 @@
    "frole": "tank",
    "style": "brawl",
    "stats": {
-    "str": 5,
+    "str": 6,
     "spd": 2,
     "swd": 1,
     "aim": 1,
@@ -1025,7 +1084,8 @@
    "desc": {
     "en": "Krieg's bodyguard, shielded by an unbreakable defense. Nothing gets past him.",
     "es": "Guardaespaldas de Krieg, protegido por una defensa irrompible. Nada pasa a su lado."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_kuroobi",
@@ -1036,8 +1096,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 80,
-   "baseAtk": 19,
+   "baseHp": 74,
+   "baseAtk": 15,
    "classes": [
     "Luchador",
     "Karate Gyojin"
@@ -1050,12 +1110,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 8,
-    "spd": 5,
+    "str": 9,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
-    "int": 4,
-    "def": 6
+    "int": 5,
+    "def": 7
    },
    "groups": [
     "fishmen"
@@ -1063,7 +1123,8 @@
    "desc": {
     "en": "Fish-Man karate master of the Arlong Pirates. His strikes burst the very water.",
     "es": "Maestro de karate gyojin de los Piratas de Arlong. Sus golpes revientan el propio agua."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_hatchan",
@@ -1074,8 +1135,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 75,
-   "baseAtk": 18,
+   "baseHp": 67,
+   "baseAtk": 17,
    "classes": [
     "Espadachín",
     "Pulpo"
@@ -1088,12 +1149,12 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 6,
-    "spd": 5,
-    "swd": 9,
+    "str": 7,
+    "spd": 6,
+    "swd": 10,
     "aim": 1,
     "int": 3,
-    "def": 4
+    "def": 5
    },
    "groups": [
     "fishmen"
@@ -1101,7 +1162,8 @@
    "desc": {
     "en": "Six-sword octopus fish-man. He spins six blades at once.",
     "es": "Pulpo gyojin de seis espadas. Hace girar seis hojas a la vez."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_camie",
@@ -1112,8 +1174,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 2,
-   "baseHp": 45,
-   "baseAtk": 5,
+   "baseHp": 48,
+   "baseAtk": 8,
    "classes": [
     "Soporte"
    ],
@@ -1126,7 +1188,7 @@
    "style": "mind",
    "stats": {
     "str": 1,
-    "spd": 5,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
     "int": 3,
@@ -1138,7 +1200,8 @@
    "desc": {
     "en": "Cheerful mermaid. Frail in a fight, but her good spirits lift the whole crew.",
     "es": "Alegre sirena. Frágil en combate, pero su buen ánimo levanta a toda la tripulación."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_duval",
@@ -1149,8 +1212,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 2,
-   "baseHp": 65,
-   "baseAtk": 14,
+   "baseHp": 51,
+   "baseAtk": 13,
    "classes": [
     "Luchador",
     "Tirador"
@@ -1163,18 +1226,19 @@
    "frole": "gun",
    "style": "gun",
    "stats": {
-    "str": 5,
-    "spd": 6,
+    "str": 6,
+    "spd": 7,
     "swd": 2,
-    "aim": 5,
+    "aim": 6,
     "int": 3,
-    "def": 4
+    "def": 5
    },
    "groups": [],
    "desc": {
     "en": "Reformed pirate on a roaring bike. A brawler with surprisingly accurate fire.",
     "es": "Pirata redimido sobre una moto rugiente. Un peleón con un fuego sorprendentemente certero."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_paulie",
@@ -1185,8 +1249,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 75,
-   "baseAtk": 17,
+   "baseHp": 74,
+   "baseAtk": 15,
    "classes": [
     "Luchador",
     "Armas"
@@ -1199,12 +1263,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 5,
+    "str": 7,
+    "spd": 6,
     "swd": 2,
     "aim": 2,
-    "int": 4,
-    "def": 6
+    "int": 5,
+    "def": 7
    },
    "groups": [
     "galley"
@@ -1212,7 +1276,8 @@
    "desc": {
     "en": "Galley-La carpenter who fights with ropes. Strong, steady and stubborn.",
     "es": "Carpintero de Galley-La que pelea con cuerdas. Fuerte, firme y obstinado."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_kaku",
@@ -1223,8 +1288,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 80,
-   "baseAtk": 22,
+   "baseHp": 93,
+   "baseAtk": 25,
    "classes": [
     "Espadachín",
     "Rokushiki"
@@ -1239,12 +1304,12 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 7,
-    "spd": 9,
-    "swd": 9,
+    "str": 8,
+    "spd": 10,
+    "swd": 10,
     "aim": 1,
-    "int": 6,
-    "def": 6
+    "int": 7,
+    "def": 7
    },
    "groups": [
     "cp9"
@@ -1252,7 +1317,8 @@
    "desc": {
     "en": "CP9 agent with the Ushi Ushi no Mi (Giraffe). A Rokushiki swordsman of lethal speed.",
     "es": "Agente del CP9 con la Ushi Ushi no Mi (Jirafa). Espadachín de Rokushiki de velocidad letal."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_kalifa",
@@ -1264,7 +1330,7 @@
    "recruitable": true,
    "cost": 3,
    "baseHp": 60,
-   "baseAtk": 16,
+   "baseAtk": 15,
    "classes": [
     "Control",
     "Rokushiki"
@@ -1277,11 +1343,11 @@
    "frole": "mind",
    "style": "mind",
    "stats": {
-    "str": 4,
-    "spd": 8,
+    "str": 5,
+    "spd": 9,
     "swd": 1,
     "aim": 1,
-    "int": 8,
+    "int": 9,
     "def": 3
    },
    "groups": [
@@ -1290,7 +1356,8 @@
    "desc": {
     "en": "CP9 secretary. Her soap bubbles leave foes sluggish and exposed.",
     "es": "Secretaria del CP9. Sus burbujas de jabón dejan a los rivales lentos y expuestos."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_kumadori",
@@ -1301,8 +1368,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 80,
-   "baseAtk": 18,
+   "baseHp": 74,
+   "baseAtk": 15,
    "classes": [
     "Luchador",
     "Rokushiki"
@@ -1315,12 +1382,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 8,
-    "spd": 6,
+    "str": 9,
+    "spd": 7,
     "swd": 2,
     "aim": 1,
-    "int": 4,
-    "def": 6
+    "int": 5,
+    "def": 7
    },
    "groups": [
     "cp9"
@@ -1328,7 +1395,8 @@
    "desc": {
     "en": "Kabuki-faced CP9 agent. Brutal Rokushiki strikes and a theatrical flair.",
     "es": "Agente del CP9 de rostro kabuki. Brutales golpes de Rokushiki y aire teatral."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_fukuro",
@@ -1339,8 +1407,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 70,
-   "baseAtk": 17,
+   "baseHp": 74,
+   "baseAtk": 15,
    "classes": [
     "Luchador",
     "Rokushiki"
@@ -1353,12 +1421,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 7,
+    "str": 7,
+    "spd": 8,
     "swd": 3,
     "aim": 1,
-    "int": 5,
-    "def": 5
+    "int": 6,
+    "def": 6
    },
    "groups": [
     "cp9"
@@ -1366,7 +1434,8 @@
    "desc": {
     "en": "Zipper-mouthed CP9 agent. A Rokushiki fighter who strikes in a flash.",
     "es": "Agente del CP9 de boca con cremallera. Un luchador de Rokushiki que ataca en un destello."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_blueno",
@@ -1378,7 +1447,7 @@
    "recruitable": true,
    "cost": 4,
    "baseHp": 70,
-   "baseAtk": 17,
+   "baseAtk": 19,
    "classes": [
     "Control",
     "Rokushiki"
@@ -1391,12 +1460,12 @@
    "frole": "mind",
    "style": "mind",
    "stats": {
-    "str": 7,
-    "spd": 7,
+    "str": 8,
+    "spd": 8,
     "swd": 1,
     "aim": 1,
-    "int": 7,
-    "def": 6
+    "int": 8,
+    "def": 7
    },
    "groups": [
     "cp9"
@@ -1404,7 +1473,8 @@
    "desc": {
     "en": "CP9's door man. His Doa Doa no Mi opens doors in the air to slip past any defense.",
     "es": "El hombre de las puertas del CP9. Su Doa Doa no Mi abre puertas en el aire para esquivar cualquier defensa."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_perona",
@@ -1415,8 +1485,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 55,
-   "baseAtk": 20,
+   "baseHp": 70,
+   "baseAtk": 19,
    "classes": [
     "Control",
     "Soporte"
@@ -1430,10 +1500,10 @@
    "style": "mind",
    "stats": {
     "str": 1,
-    "spd": 4,
+    "spd": 5,
     "swd": 1,
     "aim": 2,
-    "int": 9,
+    "int": 10,
     "def": 2
    },
    "groups": [
@@ -1442,7 +1512,8 @@
    "desc": {
     "en": "The Ghost Princess. Her Horo Horo ghosts drain the will to fight.",
     "es": "La Princesa Fantasma. Sus fantasmas Horo Horo drenan las ganas de pelear."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_absalom",
@@ -1453,8 +1524,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 75,
-   "baseAtk": 18,
+   "baseHp": 74,
+   "baseAtk": 15,
    "classes": [
     "Sigilo",
     "Luchador"
@@ -1467,12 +1538,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 7,
-    "spd": 5,
+    "str": 8,
+    "spd": 6,
     "swd": 2,
     "aim": 1,
-    "int": 4,
-    "def": 5
+    "int": 5,
+    "def": 6
    },
    "groups": [
     "thriller"
@@ -1480,7 +1551,8 @@
    "desc": {
     "en": "Invisible brute of Thriller Bark. He strikes from nowhere.",
     "es": "Bruto invisible de Thriller Bark. Ataca desde la nada."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_moria",
@@ -1491,8 +1563,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 100,
-   "baseAtk": 20,
+   "baseHp": 84,
+   "baseAtk": 23,
    "classes": [
     "Control",
     "Invocador"
@@ -1505,12 +1577,12 @@
    "frole": "mind",
    "style": "mind",
    "stats": {
-    "str": 9,
+    "str": 10,
     "spd": 3,
     "swd": 1,
     "aim": 1,
-    "int": 9,
-    "def": 7
+    "int": 10,
+    "def": 8
    },
    "groups": [
     "thriller"
@@ -1518,7 +1590,8 @@
    "desc": {
     "en": "Warlord who commands shadows. He fills the field with zombie soldiers.",
     "es": "Shichibukai que domina las sombras. Llena el campo de soldados zombi."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_cavendish",
@@ -1529,8 +1602,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 75,
-   "baseAtk": 24,
+   "baseHp": 93,
+   "baseAtk": 25,
    "classes": [
     "Espadachín"
    ],
@@ -1545,12 +1618,12 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 6,
-    "spd": 9,
-    "swd": 9,
+    "str": 7,
+    "spd": 10,
+    "swd": 10,
     "aim": 1,
-    "int": 5,
-    "def": 4
+    "int": 6,
+    "def": 5
    },
    "groups": [
     "dressrosa"
@@ -1558,7 +1631,8 @@
    "desc": {
     "en": "Beautiful swordsman of the Beautiful Pirates. His sword Durandal is as fast as it is deadly.",
     "es": "Hermoso espadachín de los Piratas Bellos. Su espada Durandal es tan veloz como mortal."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_bartolomeo",
@@ -1569,8 +1643,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 100,
-   "baseAtk": 17,
+   "baseHp": 143,
+   "baseAtk": 18,
    "classes": [
     "Tanque",
     "Control"
@@ -1583,11 +1657,11 @@
    "frole": "tank",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 4,
+    "str": 7,
+    "spd": 5,
     "swd": 1,
     "aim": 1,
-    "int": 5,
+    "int": 6,
     "def": 10
    },
    "groups": [
@@ -1596,7 +1670,8 @@
    "desc": {
     "en": "Cannibal pirate with the Bari Bari barrier. An unshakeable fan and unbreakable defender.",
     "es": "Pirata caníbal con la barrera Bari Bari. Fan inquebrantable y defensor impenetrable."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_sai",
@@ -1607,8 +1682,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 80,
-   "baseAtk": 23,
+   "baseHp": 87,
+   "baseAtk": 19,
    "classes": [
     "Luchador",
     "Artes Marciales"
@@ -1623,12 +1698,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 8,
-    "spd": 6,
+    "str": 9,
+    "spd": 7,
     "swd": 1,
     "aim": 1,
     "int": 3,
-    "def": 5
+    "def": 6
    },
    "groups": [
     "dressrosa"
@@ -1636,7 +1711,8 @@
    "desc": {
     "en": "Fighter of the Chinjao Family, fierce and ruthless. He hits hard with hardened fists.",
     "es": "Luchador de la Familia Chinjao, fiero y despiadado. Golpea fuerte con puños endurecidos."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_ideo",
@@ -1647,8 +1723,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 80,
-   "baseAtk": 20,
+   "baseHp": 102,
+   "baseAtk": 12,
    "classes": [
     "Luchador",
     "Artes Marciales"
@@ -1658,15 +1734,15 @@
    "haki_unlocked": [],
    "color": "#8B0000",
    "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/ideo.webp",
-   "frole": "brawl",
+   "frole": "tank",
    "style": "brawl",
    "stats": {
-    "str": 9,
+    "str": 10,
     "spd": 5,
     "swd": 1,
     "aim": 1,
     "int": 3,
-    "def": 6
+    "def": 9
    },
    "groups": [
     "dressrosa"
@@ -1674,7 +1750,8 @@
    "desc": {
     "en": "Boxer of the Colosseum. His rolling charges flatten anything in his path.",
     "es": "Boxeador del Coliseo. Sus embestidas rodantes aplastan todo a su paso."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_leo",
@@ -1685,8 +1762,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 55,
-   "baseAtk": 15,
+   "baseHp": 56,
+   "baseAtk": 11,
    "classes": [
     "Soporte",
     "Control"
@@ -1700,10 +1777,10 @@
    "style": "mind",
    "stats": {
     "str": 2,
-    "spd": 5,
+    "spd": 6,
     "swd": 3,
     "aim": 2,
-    "int": 8,
+    "int": 9,
     "def": 2
    },
    "groups": [
@@ -1712,7 +1789,8 @@
    "desc": {
     "en": "Prince of the Tontatta. Tiny, but his toy tricks surprise anyone who underestimates him.",
     "es": "Príncipe de los Tontatta. Diminuto, pero sus trucos de juguete sorprenden a quien lo subestima."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_hajrudin",
@@ -1723,8 +1801,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 140,
-   "baseAtk": 25,
+   "baseHp": 143,
+   "baseAtk": 18,
    "classes": [
     "Tanque",
     "Gigante"
@@ -1742,7 +1820,7 @@
     "swd": 2,
     "aim": 1,
     "int": 3,
-    "def": 9
+    "def": 10
    },
    "groups": [
     "dressrosa"
@@ -1750,7 +1828,8 @@
    "desc": {
     "en": "Gentle giant of the Colosseum. A tower of strength and patience.",
     "es": "Gigante gentil del Coliseo. Una torre de fuerza y paciencia."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_orlumbus",
@@ -1761,8 +1840,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 85,
-   "baseAtk": 16,
+   "baseHp": 60,
+   "baseAtk": 15,
    "classes": [
     "Estratega",
     "Luchador"
@@ -1775,12 +1854,12 @@
    "frole": "mind",
    "style": "mind",
    "stats": {
-    "str": 6,
+    "str": 7,
     "spd": 4,
     "swd": 3,
     "aim": 3,
-    "int": 9,
-    "def": 6
+    "int": 10,
+    "def": 7
    },
    "groups": [
     "dressrosa"
@@ -1788,7 +1867,8 @@
    "desc": {
     "en": "Tactician of the Dressrosa pirates. He plans three moves ahead.",
     "es": "Estratega de los piratas de Dressrosa. Planea tres jugadas por delante."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_boo",
@@ -1799,8 +1879,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 2,
-   "baseHp": 65,
-   "baseAtk": 15,
+   "baseHp": 63,
+   "baseAtk": 11,
    "classes": [
     "Luchador"
    ],
@@ -1812,18 +1892,19 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 5,
+    "str": 7,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
     "int": 3,
-    "def": 5
+    "def": 6
    },
    "groups": [],
    "desc": {
     "en": "Martial artist and sparring partner. Reliable in a scrap.",
     "es": "Artista marcial y compañero de entrenamiento. Fiable en una refriega."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_chinjao",
@@ -1834,8 +1915,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 105,
-   "baseAtk": 25,
+   "baseHp": 103,
+   "baseAtk": 23,
    "classes": [
     "Luchador"
    ],
@@ -1851,11 +1932,11 @@
    "style": "brawl",
    "stats": {
     "str": 10,
-    "spd": 5,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
     "int": 3,
-    "def": 8
+    "def": 9
    },
    "groups": [
     "dressrosa"
@@ -1863,7 +1944,8 @@
    "desc": {
     "en": "Old-school tough guy with a mighty fist and the Haki to match.",
     "es": "Matón de la vieja escuela con un puño formidable y un Haki a la altura."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_koala",
@@ -1874,7 +1956,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 65,
+   "baseHp": 87,
    "baseAtk": 19,
    "classes": [
     "Luchador",
@@ -1888,12 +1970,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 8,
+    "str": 7,
+    "spd": 9,
     "swd": 2,
     "aim": 1,
-    "int": 7,
-    "def": 4
+    "int": 8,
+    "def": 5
    },
    "groups": [
     "revo",
@@ -1902,7 +1984,8 @@
    "desc": {
     "en": "Officer of the Revolutionary Army and Fish-Man karate expert. Quick and clever.",
     "es": "Oficial del Ejército Revolucionario y experta en karate gyojin. Rápida e ingeniosa."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_sabo",
@@ -1913,7 +1996,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 6,
-   "baseHp": 95,
+   "baseHp": 120,
    "baseAtk": 27,
    "classes": [
     "Luchador",
@@ -1931,12 +2014,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 9,
-    "spd": 8,
-    "swd": 5,
+    "str": 10,
+    "spd": 9,
+    "swd": 6,
     "aim": 1,
-    "int": 9,
-    "def": 6
+    "int": 10,
+    "def": 7
    },
    "groups": [
     "revo"
@@ -1944,7 +2027,8 @@
    "desc": {
     "en": "Chief of Staff of the Revolutionary Army. Flames, dragon claws and Haki.",
     "es": "Jefe de Estado Mayor del Ejército Revolucionario. Llamas, garras de dragón y Haki."
-   }
+   },
+   "minStage": 3
   },
   {
    "id": "char_betty",
@@ -1955,8 +2039,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 60,
-   "baseAtk": 12,
+   "baseHp": 66,
+   "baseAtk": 13,
    "classes": [
     "Soporte",
     "Buff"
@@ -1970,10 +2054,10 @@
    "style": "mind",
    "stats": {
     "str": 3,
-    "spd": 5,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
-    "int": 8,
+    "int": 9,
     "def": 3
    },
    "groups": [
@@ -1982,7 +2066,8 @@
    "desc": {
     "en": "Revolutionary Army commander. Her Kobu Kobu fruit rallies the troops.",
     "es": "Comandante del Ejército Revolucionario. Su fruta Kobu Kobu enardece a las tropas."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_lindbergh",
@@ -1993,8 +2078,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 65,
-   "baseAtk": 20,
+   "baseHp": 70,
+   "baseAtk": 21,
    "classes": [
     "Tirador",
     "Tecnología"
@@ -2007,12 +2092,12 @@
    "frole": "gun",
    "style": "gun",
    "stats": {
-    "str": 4,
-    "spd": 5,
+    "str": 5,
+    "spd": 6,
     "swd": 1,
-    "aim": 9,
-    "int": 8,
-    "def": 5
+    "aim": 10,
+    "int": 9,
+    "def": 6
    },
    "groups": [
     "revo"
@@ -2020,7 +2105,8 @@
    "desc": {
     "en": "Revolutionary Army commander and outstanding marksman. Unerring with firearms.",
     "es": "Comandante del Ejército Revolucionario y excelente tirador. Infalible con las armas de fuego."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_morley",
@@ -2031,8 +2117,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 110,
-   "baseAtk": 19,
+   "baseHp": 143,
+   "baseAtk": 18,
    "classes": [
     "Tanque",
     "Control"
@@ -2049,8 +2135,8 @@
     "spd": 2,
     "swd": 1,
     "aim": 1,
-    "int": 5,
-    "def": 9
+    "int": 6,
+    "def": 10
    },
    "groups": [
     "revo"
@@ -2058,7 +2144,8 @@
    "desc": {
     "en": "Giant Revolutionary Army commander. He shoves foes aside with the Oshi Oshi no Mi.",
     "es": "Comandante gigante del Ejército Revolucionario. Aparta a los enemigos con la Oshi Oshi no Mi."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_ivankov",
@@ -2069,8 +2156,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 80,
-   "baseAtk": 17,
+   "baseHp": 79,
+   "baseAtk": 16,
    "classes": [
     "Soporte",
     "Luchador"
@@ -2083,12 +2170,12 @@
    "frole": "support",
    "style": "mind",
    "stats": {
-    "str": 6,
-    "spd": 6,
+    "str": 7,
+    "spd": 7,
     "swd": 2,
     "aim": 1,
-    "int": 9,
-    "def": 5
+    "int": 10,
+    "def": 6
    },
    "groups": [
     "revo"
@@ -2096,7 +2183,8 @@
    "desc": {
     "en": "Queen of Kamabakka Land. Her hormones heal, empower and astonish.",
     "es": "Reina de Kamabakka. Sus hormonas curan, potencian y asombran."
-   }
+   },
+   "minStage": 2
   },
   {
    "id": "char_bon_clay",
@@ -2107,8 +2195,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 70,
-   "baseAtk": 18,
+   "baseHp": 87,
+   "baseAtk": 19,
    "classes": [
     "Luchador",
     "Infiltrador"
@@ -2121,12 +2209,12 @@
    "frole": "brawl",
    "style": "brawl",
    "stats": {
-    "str": 6,
-    "spd": 7,
+    "str": 7,
+    "spd": 8,
     "swd": 2,
     "aim": 1,
-    "int": 6,
-    "def": 5
+    "int": 7,
+    "def": 6
    },
    "groups": [
     "revo",
@@ -2135,7 +2223,8 @@
    "desc": {
     "en": "Okama kenpo master who can copy anyone's face. First he dances, then he strikes.",
     "es": "Maestro del okama kenpo capaz de copiar el rostro de cualquiera. Primero baila, luego golpea."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_galdino",
@@ -2146,8 +2235,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 55,
-   "baseAtk": 16,
+   "baseHp": 60,
+   "baseAtk": 15,
    "classes": [
     "Control",
     "Soporte"
@@ -2160,12 +2249,12 @@
    "frole": "mind",
    "style": "mind",
    "stats": {
-    "str": 4,
-    "spd": 5,
+    "str": 5,
+    "spd": 6,
     "swd": 1,
     "aim": 1,
-    "int": 7,
-    "def": 5
+    "int": 8,
+    "def": 6
    },
    "groups": [
     "baroque"
@@ -2173,7 +2262,8 @@
    "desc": {
     "en": "Mr. 3, the wax wielder. He hardens everything into a fortress.",
     "es": "Mr. 3, el maestro de la cera. Lo endurece todo hasta formar una fortaleza."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_daz_bones",
@@ -2184,8 +2274,8 @@
    "captain": false,
    "recruitable": true,
    "cost": 4,
-   "baseHp": 85,
-   "baseAtk": 22,
+   "baseHp": 79,
+   "baseAtk": 20,
    "classes": [
     "Espadachín",
     "Tanque"
@@ -2198,12 +2288,12 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 8,
-    "spd": 7,
-    "swd": 9,
+    "str": 9,
+    "spd": 8,
+    "swd": 10,
     "aim": 1,
     "int": 4,
-    "def": 6
+    "def": 7
    },
    "groups": [
     "baroque"
@@ -2211,7 +2301,8 @@
    "desc": {
     "en": "Mr. 1, the Human Blade. His Supa Supa body cuts through anything.",
     "es": "Mr. 1, el Hombre Espada. Su cuerpo Supa Supa corta lo que sea."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_shirahoshi",
@@ -2221,9 +2312,9 @@
    },
    "captain": false,
    "recruitable": true,
-   "cost": 6,
-   "baseHp": 60,
-   "baseAtk": 5,
+   "cost": 4,
+   "baseHp": 66,
+   "baseAtk": 13,
    "classes": [
     "Soporte",
     "Control"
@@ -2238,11 +2329,11 @@
    "frole": "support",
    "style": "mind",
    "stats": {
-    "str": 4,
+    "str": 5,
     "spd": 1,
     "swd": 1,
     "aim": 1,
-    "int": 6,
+    "int": 7,
     "def": 10
    },
    "groups": [
@@ -2251,7 +2342,8 @@
    "desc": {
     "en": "The Mermaid Princess. Gentle in battle, but the Conqueror's Haki inside her can silence a fleet.",
     "es": "La Princesa Sirena. Dulce en combate, pero el Haki del Rey que lleva dentro puede silenciar una flota."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_rebecca",
@@ -2262,7 +2354,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 3,
-   "baseHp": 60,
+   "baseHp": 67,
    "baseAtk": 17,
    "classes": [
     "Espadachín"
@@ -2277,11 +2369,11 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 5,
-    "spd": 8,
-    "swd": 8,
+    "str": 6,
+    "spd": 9,
+    "swd": 9,
     "aim": 1,
-    "int": 5,
+    "int": 6,
     "def": 4
    },
    "groups": [
@@ -2290,7 +2382,8 @@
    "desc": {
     "en": "Colosseum gladiator and heir to Dressrosa's throne. Light and fast with her sword.",
     "es": "Gladiadora del Coliseo y heredera del trono de Dressrosa. Ligera y veloz con su espada."
-   }
+   },
+   "minStage": 1
   },
   {
    "id": "char_kyros",
@@ -2301,7 +2394,7 @@
    "captain": false,
    "recruitable": true,
    "cost": 5,
-   "baseHp": 95,
+   "baseHp": 93,
    "baseAtk": 25,
    "classes": [
     "Espadachín",
@@ -2318,7 +2411,7 @@
    "frole": "sword",
    "style": "sword",
    "stats": {
-    "str": 8,
+    "str": 9,
     "spd": 7,
     "swd": 10,
     "aim": 1,
@@ -2331,7 +2424,950 @@
    "desc": {
     "en": "Former Dressrosa soldier with a single leg and a legendary blade. A sword tempered with Haki.",
     "es": "Antiguo soldado de Dressrosa con una sola pierna y una hoja legendaria. Una espada templada con Haki."
-   }
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_zoro",
+   "name": {
+    "en": "Roronoa Zoro",
+    "es": "Roronoa Zoro"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 93,
+   "baseAtk": 25,
+   "classes": [],
+   "power_source": "Santoryu",
+   "fruit_type": null,
+   "haki_unlocked": [
+    "Observación Básico",
+    "Armamento Endurecimiento"
+   ],
+   "color": "#2E7D32",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/zoro.webp",
+   "look": 4,
+   "frole": "sword",
+   "style": "sword",
+   "stats": {
+    "str": 9,
+    "spd": 8,
+    "swd": 10,
+    "aim": 1,
+    "int": 5,
+    "def": 7
+   },
+   "groups": [
+    "strawhat"
+   ],
+   "desc": {
+    "en": "The three-sword swordsman. He cuts through anything for his captain.",
+    "es": "El espadachín de las tres espadas. Corta cualquier cosa por su capitán."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_luffy",
+   "name": {
+    "en": "Monkey D. Luffy",
+    "es": "Monkey D. Luffy"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 6,
+   "baseHp": 120,
+   "baseAtk": 27,
+   "classes": [],
+   "power_source": "Gomu Gomu no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico",
+    "Conquistador Básico"
+   ],
+   "color": "#E63946",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/luffy.webp",
+   "look": 0,
+   "frole": "brawl",
+   "style": "brawl",
+   "stats": {
+    "str": 10,
+    "spd": 9,
+    "swd": 1,
+    "aim": 1,
+    "int": 5,
+    "def": 8
+   },
+   "groups": [
+    "strawhat",
+    "worst"
+   ],
+   "desc": {
+    "en": "Captain of the Straw Hats. Rubber body, huge heart and a fist that never stops.",
+    "es": "Capitán de los Sombrero de Paja. Cuerpo de goma, enorme corazón y un puño que no se detiene."
+   },
+   "minStage": 3
+  },
+  {
+   "id": "char_law",
+   "name": {
+    "en": "Trafalgar D. Water Law",
+    "es": "Trafalgar D. Water Law"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 84,
+   "baseAtk": 23,
+   "classes": [],
+   "power_source": "Ope Ope no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico"
+   ],
+   "color": "#F2C94C",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/law.webp",
+   "look": 3,
+   "frole": "mind",
+   "style": "sword",
+   "stats": {
+    "str": 6,
+    "spd": 8,
+    "swd": 8,
+    "aim": 2,
+    "int": 10,
+    "def": 5
+   },
+   "groups": [
+    "heart",
+    "worst",
+    "warlords"
+   ],
+   "desc": {
+    "en": "Surgeon of Death. His Room bends space and the battlefield bends with it.",
+    "es": "El Cirujano de la Muerte. Su Room dobla el espacio y el campo de batalla con él."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_ace",
+   "name": {
+    "en": "Portgas D. Ace",
+    "es": "Portgas D. Ace"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 103,
+   "baseAtk": 23,
+   "classes": [],
+   "power_source": "Mera Mera no Mi",
+   "fruit_type": "Logia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico"
+   ],
+   "color": "#FF4500",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/ace.webp",
+   "look": 1,
+   "frole": "brawl",
+   "style": "brawl",
+   "stats": {
+    "str": 9,
+    "spd": 9,
+    "swd": 2,
+    "aim": 1,
+    "int": 6,
+    "def": 6
+   },
+   "groups": [
+    "whitebeard"
+   ],
+   "desc": {
+    "en": "Fire Fist. Second division commander of the Whitebeard Pirates.",
+    "es": "Puño de Fuego. Comandante de la segunda división de los Piratas de Barbablanca."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_yamato",
+   "name": {
+    "en": "Yamato",
+    "es": "Yamato"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 103,
+   "baseAtk": 23,
+   "classes": [],
+   "power_source": "Inu Inu no Mi, Model: Okuchi no Makami",
+   "fruit_type": "Zoan",
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Conquistador Básico"
+   ],
+   "color": "#7EC8E3",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/yamato.webp",
+   "look": 2,
+   "frole": "brawl",
+   "style": "brawl",
+   "stats": {
+    "str": 10,
+    "spd": 7,
+    "swd": 2,
+    "aim": 1,
+    "int": 6,
+    "def": 9
+   },
+   "groups": [
+    "wano"
+   ],
+   "desc": {
+    "en": "Guardian of Wano who wields ice, thunder and Conqueror's Haki with a club.",
+    "es": "Guardián de Wano que combate con hielo, trueno y Haki del Conquistador y una maza."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_kinemon",
+   "name": {
+    "en": "Kin'emon",
+    "es": "Kin'emon"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 3,
+   "baseHp": 67,
+   "baseAtk": 17,
+   "classes": [],
+   "power_source": "Fuku Fuku no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#C0392B",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/kinemon.webp",
+   "look": 5,
+   "frole": "sword",
+   "style": "sword",
+   "stats": {
+    "str": 6,
+    "spd": 6,
+    "swd": 9,
+    "aim": 1,
+    "int": 6,
+    "def": 5
+   },
+   "groups": [
+    "wano"
+   ],
+   "desc": {
+    "en": "Samurai of Wano who turns leaves into disguises and fights with refined swordsmanship.",
+    "es": "Samurái de Wano que convierte hojas en disfraces y lucha con espada refinada."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_kid",
+   "name": {
+    "en": "Eustass Kid",
+    "es": "Eustass Kid"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 84,
+   "baseAtk": 23,
+   "classes": [],
+   "power_source": "Jiki Jiki no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#E74C3C",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/kid.webp",
+   "look": 2,
+   "frole": "mind",
+   "style": "brawl",
+   "stats": {
+    "str": 10,
+    "spd": 6,
+    "swd": 2,
+    "aim": 3,
+    "int": 8,
+    "def": 7
+   },
+   "groups": [
+    "kid",
+    "worst"
+   ],
+   "desc": {
+    "en": "Captain of the Kid Pirates. He pulls every piece of metal into one huge punch.",
+    "es": "Capitán de los Piratas de Kid. Atrae todo el metal en un puñetazo gigantesco."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_killer",
+   "name": {
+    "en": "Killer",
+    "es": "Killer"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 4,
+   "baseHp": 79,
+   "baseAtk": 20,
+   "classes": [],
+   "power_source": "Punishers",
+   "fruit_type": null,
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#F1C40F",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/killer.webp",
+   "look": 1,
+   "frole": "sword",
+   "style": "sword",
+   "stats": {
+    "str": 7,
+    "spd": 9,
+    "swd": 9,
+    "aim": 1,
+    "int": 5,
+    "def": 6
+   },
+   "groups": [
+    "kid",
+    "worst"
+   ],
+   "desc": {
+    "en": "Kid's right hand. The Massacre Soldier spins his blades into a blur.",
+    "es": "La mano derecha de Kid. El Soldado de la Masacre convierte sus cuchillas en un torbellino."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_bonney",
+   "name": {
+    "en": "Jewelry Bonney",
+    "es": "Jewelry Bonney"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 3,
+   "baseHp": 56,
+   "baseAtk": 11,
+   "classes": [],
+   "power_source": "Toshi Toshi no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [],
+   "color": "#FF69B4",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/bonney.webp",
+   "look": 5,
+   "frole": "support",
+   "style": "brawl",
+   "stats": {
+    "str": 5,
+    "spd": 7,
+    "swd": 1,
+    "aim": 1,
+    "int": 9,
+    "def": 3
+   },
+   "groups": [
+    "worst"
+   ],
+   "desc": {
+    "en": "The Big Eater. She ages allies and foes to heal or to wear them down.",
+    "es": "La Gran Devoradora. Envejece o rejuvenece a aliados y enemigos para curar o desgastar."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_bege",
+   "name": {
+    "en": "Capone \"Gang\" Bege",
+    "es": "Capone \"Gang\" Bege"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 4,
+   "baseHp": 70,
+   "baseAtk": 21,
+   "classes": [],
+   "power_source": "Shiro Shiro no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#6C757D",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/bege.webp",
+   "look": 3,
+   "frole": "gun",
+   "style": "gun",
+   "stats": {
+    "str": 5,
+    "spd": 6,
+    "swd": 1,
+    "aim": 10,
+    "int": 8,
+    "def": 7
+   },
+   "groups": [
+    "worst"
+   ],
+   "desc": {
+    "en": "Mafia boss who fights from inside his own living fortress.",
+    "es": "Jefe mafioso que combate desde el interior de su fortaleza viviente."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_hawkins",
+   "name": {
+    "en": "Basil Hawkins",
+    "es": "Basil Hawkins"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 4,
+   "baseHp": 120,
+   "baseAtk": 15,
+   "classes": [],
+   "power_source": "Wara Wara no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#8E44AD",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/hawkins.webp",
+   "look": 4,
+   "frole": "tank",
+   "style": "mind",
+   "stats": {
+    "str": 6,
+    "spd": 6,
+    "swd": 3,
+    "aim": 1,
+    "int": 9,
+    "def": 9
+   },
+   "groups": [
+    "worst"
+   ],
+   "desc": {
+    "en": "The Magician. Straw doll shields send the damage somewhere else.",
+    "es": "El Mago. Muñecos de paja que desvían el daño hacia otro lugar."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_bepo",
+   "name": {
+    "en": "Bepo",
+    "es": "Bepo"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 3,
+   "baseHp": 102,
+   "baseAtk": 12,
+   "classes": [],
+   "power_source": "Electro",
+   "fruit_type": null,
+   "haki_unlocked": [],
+   "color": "#F5F5F5",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/bepo.webp",
+   "look": 0,
+   "frole": "tank",
+   "style": "brawl",
+   "stats": {
+    "str": 8,
+    "spd": 9,
+    "swd": 1,
+    "aim": 1,
+    "int": 5,
+    "def": 7
+   },
+   "groups": [
+    "heart",
+    "minks"
+   ],
+   "desc": {
+    "en": "Navigator of the Heart Pirates. A polar bear Mink who kicks with Sulong speed.",
+    "es": "Navegante de los Piratas Heart. Un oso polar Mink de patadas veloces."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_hancock",
+   "name": {
+    "en": "Boa Hancock",
+    "es": "Boa Hancock"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 84,
+   "baseAtk": 23,
+   "classes": [],
+   "power_source": "Mero Mero no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico",
+    "Conquistador Básico"
+   ],
+   "color": "#FF1493",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/hancock.webp",
+   "look": 5,
+   "frole": "mind",
+   "style": "brawl",
+   "stats": {
+    "str": 7,
+    "spd": 9,
+    "swd": 2,
+    "aim": 2,
+    "int": 9,
+    "def": 6
+   },
+   "groups": [
+    "warlords"
+   ],
+   "desc": {
+    "en": "The Pirate Empress. Her beauty turns enemies to stone.",
+    "es": "La Emperatriz Pirata. Su belleza convierte a sus enemigos en piedra."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_kuma",
+   "name": {
+    "en": "Bartholomew Kuma",
+    "es": "Bartholomew Kuma"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 143,
+   "baseAtk": 18,
+   "classes": [],
+   "power_source": "Nikyu Nikyu no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#4E342E",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/kuma.webp",
+   "look": 2,
+   "frole": "tank",
+   "style": "brawl",
+   "stats": {
+    "str": 9,
+    "spd": 5,
+    "swd": 1,
+    "aim": 1,
+    "int": 7,
+    "def": 10
+   },
+   "groups": [
+    "warlords",
+    "revo"
+   ],
+   "desc": {
+    "en": "The Tyrant. A paw that repels everything: pain, attacks and distance.",
+    "es": "El Tirano. Una zarpa que repele todo: el dolor, los ataques y la distancia."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_rosinante",
+   "name": {
+    "en": "Donquixote Rosinante (Corazon)",
+    "es": "Donquixote Rosinante (Corazón)"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 3,
+   "baseHp": 56,
+   "baseAtk": 11,
+   "classes": [],
+   "power_source": "Nagi Nagi no Mi",
+   "fruit_type": "Paramecia",
+   "haki_unlocked": [],
+   "color": "#E91E63",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/rosinante.webp",
+   "look": 1,
+   "frole": "support",
+   "style": "gun",
+   "stats": {
+    "str": 3,
+    "spd": 6,
+    "swd": 1,
+    "aim": 7,
+    "int": 8,
+    "def": 5
+   },
+   "groups": [
+    "donquixote"
+   ],
+   "desc": {
+    "en": "The Heart in the shadows. His silence cancels the noise of battle.",
+    "es": "El Corazón en las sombras. Su silencio anula el ruido de la batalla."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_weevil",
+   "name": {
+    "en": "Edward Weevil",
+    "es": "Edward Weevil"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 4,
+   "baseHp": 120,
+   "baseAtk": 15,
+   "classes": [],
+   "power_source": "Zoan",
+   "fruit_type": "Zoan",
+   "haki_unlocked": [
+    "Armamento Endurecimiento"
+   ],
+   "color": "#5D6D7E",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/weevil.webp",
+   "look": 2,
+   "frole": "tank",
+   "style": "brawl",
+   "stats": {
+    "str": 9,
+    "spd": 3,
+    "swd": 2,
+    "aim": 1,
+    "int": 5,
+    "def": 9
+   },
+   "groups": [
+    "whitebeard"
+   ],
+   "desc": {
+    "en": "Self-proclaimed son of Whitebeard. A huge pirate captain who refuses to fall.",
+    "es": "Autoproclamado hijo de Barbablanca. Un enorme capitán pirata que se niega a caer."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_marco",
+   "name": {
+    "en": "Marco",
+    "es": "Marco"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 5,
+   "baseHp": 79,
+   "baseAtk": 16,
+   "classes": [],
+   "power_source": "Tori Tori no Mi, Model: Phoenix",
+   "fruit_type": "Zoan",
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico"
+   ],
+   "color": "#3498DB",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/marco.webp",
+   "look": 2,
+   "frole": "support",
+   "style": "brawl",
+   "stats": {
+    "str": 8,
+    "spd": 8,
+    "swd": 2,
+    "aim": 1,
+    "int": 7,
+    "def": 7
+   },
+   "groups": [
+    "whitebeard"
+   ],
+   "desc": {
+    "en": "The Phoenix. First division commander whose blue flames heal wounds.",
+    "es": "El Fénix. Comandante de la primera división; sus llamas azules curan las heridas."
+   },
+   "minStage": 2
+  },
+  {
+   "id": "char_rayleigh",
+   "name": {
+    "en": "Silvers Rayleigh",
+    "es": "Silvers Rayleigh"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 6,
+   "baseHp": 108,
+   "baseAtk": 30,
+   "classes": [],
+   "power_source": "Haki",
+   "fruit_type": null,
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico",
+    "Conquistador Básico"
+   ],
+   "color": "#7F8C8D",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/rayleigh.webp",
+   "look": 4,
+   "frole": "sword",
+   "style": "sword",
+   "stats": {
+    "str": 9,
+    "spd": 8,
+    "swd": 10,
+    "aim": 1,
+    "int": 9,
+    "def": 8
+   },
+   "groups": [
+    "rogers"
+   ],
+   "desc": {
+    "en": "The Dark King. Right hand of the Pirate King and master of all three Hakis.",
+    "es": "El Rey Oscuro. Mano derecha del Rey de los Piratas y maestro de los tres Hakis."
+   },
+   "minStage": 3
+  },
+  {
+   "id": "char_dragon",
+   "name": {
+    "en": "Monkey D. Dragon",
+    "es": "Monkey D. Dragon"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 6,
+   "baseHp": 97,
+   "baseAtk": 27,
+   "classes": [],
+   "power_source": "Wind control",
+   "fruit_type": null,
+   "haki_unlocked": [
+    "Armamento Endurecimiento",
+    "Observación Básico",
+    "Conquistador Básico"
+   ],
+   "color": "#1ABC9C",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/dragon.webp",
+   "look": 2,
+   "frole": "mind",
+   "style": "mind",
+   "stats": {
+    "str": 8,
+    "spd": 8,
+    "swd": 3,
+    "aim": 1,
+    "int": 10,
+    "def": 9
+   },
+   "groups": [
+    "revo"
+   ],
+   "desc": {
+    "en": "Leader of the Revolutionary Army. The storm itself follows his orders.",
+    "es": "Líder del Ejército Revolucionario. La tormenta misma sigue sus órdenes."
+   },
+   "minStage": 3
+  },
+  {
+   "id": "char_inazuma",
+   "name": {
+    "en": "Inazuma",
+    "es": "Inazuma"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 3,
+   "baseHp": 56,
+   "baseAtk": 11,
+   "classes": [],
+   "power_source": "Newkama Kenpo",
+   "fruit_type": null,
+   "haki_unlocked": [],
+   "color": "#E056FD",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/inazuma.webp",
+   "look": 5,
+   "frole": "support",
+   "style": "brawl",
+   "stats": {
+    "str": 7,
+    "spd": 6,
+    "swd": 2,
+    "aim": 1,
+    "int": 7,
+    "def": 5
+   },
+   "groups": [
+    "revo"
+   ],
+   "desc": {
+    "en": "Revolutionary Newkama. Her Hormone techniques patch up the crew.",
+    "es": "Newkama revolucionaria. Sus técnicas hormonales remiendan a la banda."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_monet",
+   "name": {
+    "en": "Monet",
+    "es": "Monet"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 4,
+   "baseHp": 70,
+   "baseAtk": 19,
+   "classes": [],
+   "power_source": "Yuki Yuki no Mi",
+   "fruit_type": "Logia",
+   "haki_unlocked": [
+    "Observación Básico"
+   ],
+   "color": "#B0E0E6",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/monet.webp",
+   "look": 3,
+   "frole": "mind",
+   "style": "mind",
+   "stats": {
+    "str": 5,
+    "spd": 8,
+    "swd": 1,
+    "aim": 2,
+    "int": 9,
+    "def": 5
+   },
+   "groups": [
+    "donquixote"
+   ],
+   "desc": {
+    "en": "Snow Harpy. She freezes the field and slows the enemy down.",
+    "es": "Arpía de Nieve. Congela el campo y ralentiza al enemigo."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_pell",
+   "name": {
+    "en": "Pell",
+    "es": "Pell"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 3,
+   "baseHp": 60,
+   "baseAtk": 17,
+   "classes": [],
+   "power_source": "Tori Tori no Mi, Model: Falcon",
+   "fruit_type": "Zoan",
+   "haki_unlocked": [],
+   "color": "#D35400",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/pell.webp",
+   "look": 1,
+   "frole": "gun",
+   "style": "gun",
+   "stats": {
+    "str": 6,
+    "spd": 9,
+    "swd": 1,
+    "aim": 8,
+    "int": 5,
+    "def": 5
+   },
+   "groups": [
+    "alabasta"
+   ],
+   "desc": {
+    "en": "Guardian of Alabasta who bombs the field from the sky.",
+    "es": "Guardián de Arabasta que bombardea el campo desde el cielo."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_igaram",
+   "name": {
+    "en": "Igaram",
+    "es": "Igaram"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 2,
+   "baseHp": 87,
+   "baseAtk": 9,
+   "classes": [],
+   "power_source": "Royal guard",
+   "fruit_type": null,
+   "haki_unlocked": [],
+   "color": "#95A5A6",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/igaram.webp",
+   "look": 3,
+   "frole": "tank",
+   "style": "sword",
+   "stats": {
+    "str": 6,
+    "spd": 5,
+    "swd": 6,
+    "aim": 1,
+    "int": 3,
+    "def": 7
+   },
+   "groups": [
+    "alabasta"
+   ],
+   "desc": {
+    "en": "Captain of the Royal Guard. Loyal to the point of standing in front of any blow.",
+    "es": "Capitán de la Guardia Real. Leal hasta ponerse delante de cualquier golpe."
+   },
+   "minStage": 1
+  },
+  {
+   "id": "char_lola",
+   "name": {
+    "en": "Charlotte Lola",
+    "es": "Charlotte Lola"
+   },
+   "captain": false,
+   "recruitable": true,
+   "cost": 2,
+   "baseHp": 48,
+   "baseAtk": 8,
+   "classes": [],
+   "power_source": "Persuasion",
+   "fruit_type": null,
+   "haki_unlocked": [],
+   "color": "#FFB6C1",
+   "avatar": "https://hlryizauzapedkefdviw.supabase.co/storage/v1/object/public/characters/lola.webp",
+   "look": 5,
+   "frole": "support",
+   "style": "mind",
+   "stats": {
+    "str": 2,
+    "spd": 5,
+    "swd": 1,
+    "aim": 1,
+    "int": 7,
+    "def": 3
+   },
+   "groups": [
+    "bigmom"
+   ],
+   "desc": {
+    "en": "Daughter of Big Mom. Charm and tenacity keep morale high.",
+    "es": "Hija de Big Mom. Su encanto y su tenacidad mantienen alta la moral."
+   },
+   "minStage": 1
   },
   {
    "id": "hero_luffy",
@@ -2374,7 +3410,8 @@
     "en": "The Straw Hat captain. A rubber body, fists that never quit and a will that grows the more he is hurt.",
     "es": "El capitán de los Sombrero de Paja. Cuerpo de goma, puños que no se rinden y una voluntad que crece cuanto más herido está."
    },
-   "perk": "bruiser"
+   "perk": "bruiser",
+   "alias": "char_luffy"
   },
   {
    "id": "hero_zoro",
@@ -2417,7 +3454,8 @@
     "en": "The three-sword swordsman. A relentless duelist who punishes a single target.",
     "es": "El espadachín de las tres espadas. Un duelista implacable que castiga a un solo objetivo."
    },
-   "perk": "duelist"
+   "perk": "duelist",
+   "alias": "char_zoro"
   },
   {
    "id": "hero_nami",

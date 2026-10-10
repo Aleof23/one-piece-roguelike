@@ -457,7 +457,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.3.0'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.4.0'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -606,7 +606,8 @@ function recruitOffers(g, k = 3){
   const have = r => g.crew.filter(c => c.frole === r).length;
   const chosen = [];
   const draw = (list, wf) => { const o = list.map(x => ({ x, k:-Math.log(Math.random() || 1e-9) / Math.max(.01, wf(x)) })).sort((a, b) => a.k - b.k)[0]; return o ? o.x : null; };
-  const base = n => (n.weight || 1) * (have(n.frole) === 0 ? 2 : have(n.frole) >= (ROLE_CAP[n.frole] || 3) ? .4 : 1);
+  const COST_W = { 1:1, 2:1, 3:1, 4:.8, 5:.5, 6:.3 }; /* los nakamas caros (5-6 de liderazgo) salen bastante menos que los de 3-4 */
+  const base = n => (n.weight || 1) * (COST_W[n.cost] || .3) * (have(n.frole) === 0 ? 2 : have(n.frole) >= (ROLE_CAP[n.frole] || 3) ? .4 : 1);
   const first = draw(fresh.filter(n => canRecruit(n, g)), base) || draw(fresh, base);
   if (first) chosen.push(first);
   while (chosen.length < k) {
