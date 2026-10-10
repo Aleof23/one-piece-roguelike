@@ -457,7 +457,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.4.1'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.4.2'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -3673,6 +3673,8 @@ function DevPanel({ g, phase, meta, onBuild, setG, updateMeta, onClose, onLock }
         <div className="sect-title">Progress</div>
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn ghost small" onClick=${() => updateMeta(m => ({ ...m, best:STAGES.length, maxCrew:SETTINGS.crewSlots, fruits:9, berries:99999, events:99 }))}>Unlock every mission reward</button>
+          <button type="button" className="btn ghost small" onClick=${() => { if (!confirm('Reset missions, unlocks and records (keeps flag, language and settings)?')) return; try { localStorage.removeItem(META_KEY); localStorage.removeItem(SAVE_KEY); localStorage.removeItem('lp-tut'); } catch (e) {} location.reload(); }}>Reset progress</button>
+          <button type="button" className="btn ghost small" onClick=${() => { if (!confirm('Reset EVERYTHING saved in this browser (progress, current run, flag, tutorial, language, sound)? Dev mode stays unlocked.')) return; try { Object.keys(localStorage).filter(k => k.indexOf('lp-') === 0 && k !== DEV_KEY).forEach(k => localStorage.removeItem(k)); } catch (e) {} location.reload(); }}>Reset all local data</button>
           <button type="button" className="btn ghost small" onClick=${onLock}>Lock dev mode</button>
           <button type="button" className="btn ghost small" onClick=${onClose}>Close</button>
         </div>
