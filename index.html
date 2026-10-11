@@ -334,7 +334,6 @@ button{font-family:inherit;color:inherit}
 .map-table .sea-wrap{box-shadow:0 14px 28px rgba(0,0,0,.65),0 3px 0 rgba(0,0,0,.5),inset 0 0 0 3px #b8893a,inset 0 0 0 5px #000,inset 0 0 0 6px var(--line)}
 .map-table.side{padding:8px}
 .map-table.side .legend{position:absolute;left:12px;bottom:12px;flex-direction:column;flex-wrap:nowrap;gap:7px;padding:9px 10px;background:rgba(8,16,22,.72);border:1px solid #000;border-radius:5px;z-index:3}
-.map-table.side .boss-intel{position:absolute;right:12px;top:12px;width:min(210px,calc((100% - 40px) / 2 - 150px + 150px));max-width:260px;background:rgba(8,16,22,.86);z-index:4}
 .sea-wrap{border:3px solid #000;box-shadow:inset 0 0 0 2px var(--line);border-radius:6px;overflow:hidden;background:var(--abyss)}
 .drift{animation:drift 14s ease-in-out infinite alternate}
 @keyframes drift{to{transform:translateX(-26px)}}
@@ -537,6 +536,7 @@ button.offer:disabled{cursor:not-allowed}
 
 .dev-fab{position:fixed;left:8px;bottom:8px;z-index:45;font:700 11px var(--font-ui);padding:2px 7px;border:1px solid #7be0ff;border-radius:3px;background:rgba(5,20,28,.8);color:#7be0ff;opacity:.3;cursor:pointer}.dev-fab:hover{opacity:1}
 
+.boss-intel.hd{position:absolute;right:0;top:0;width:100%;z-index:20;box-shadow:0 8px 20px rgba(0,0,0,.55);background:rgba(8,16,22,.96)}
 .boss-intel{padding:6px 10px;border:1px solid var(--rule,#2e4b7a);border-left:3px solid var(--ember);border-radius:3px;background:rgba(0,0,0,.25)}
 </style>
 
@@ -555,7 +555,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.10'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.11'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -2723,7 +2723,7 @@ function Legend(){
 function BossIntel({ s }){
   const [open, setOpen] = useState(false);
   const b = s.boss, tr = (b.traits || []).filter(x => i18n.en['trait.' + x]);
-  return html`<div className="boss-intel"><button type="button" className="eyebrow w-full text-left flex items-center gap-2" aria-expanded=${open} onClick=${() => setOpen(o => !o)} style=${{ background:'none', border:0, padding:0, cursor:'pointer', color:'inherit' }}><span aria-hidden="true">${open ? '▾' : '▸'}</span><span className="truncate">${t('map.intel', { name: L(b.name) })}</span></button>
+  return html`<div className="boss-intel hd"><button type="button" className="eyebrow w-full text-left flex items-center gap-2" aria-expanded=${open} onClick=${() => setOpen(o => !o)} style=${{ background:'none', border:0, padding:0, cursor:'pointer', color:'inherit' }}><span aria-hidden="true">${open ? '▾' : '▸'}</span><span className="truncate">${t('map.intel', { name: L(b.name) })}</span></button>
     ${open ? html`<div><div className="flex flex-wrap gap-1 mt-1">${tr.map(x => html`<span key=${x} className="tg tr" title=${t('trait.' + x + 'D')}>${t('trait.' + x)}</span>`)}${(b.haki || []).map(h => html`<span key=${h} className="tg unk">${t('haki.' + h)}</span>`)}${b.escort ? html`<span className="tg unk">${t('intel.escort', { n:b.escort.n })}</span>` : null}${b.summon ? html`<span className="tg unk">${t('intel.summon', { n:b.summon.every })}</span>` : null}${!b.escort && !b.summon ? html`<span className="tg unk">${t('intel.solo')}</span>` : null}</div>
     ${tr.length ? html`<div className="text-xs mt-1" style=${{ color:'var(--mist)' }}>${tr.map(x => t('trait.' + x + 'D')).join(' ')}</div>` : null}</div>` : null}</div>`;
 }
@@ -2825,7 +2825,6 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
   const av = availableIds(g);
   const target = hover ? g.map.byId[hover] : (av.length === 1 ? g.map.byId[av[0]] : g.map.floors[g.map.floors.length - 1][0]);
   const angle = Math.round(Math.atan2(target.x - from.x, -(target.y - from.y)) * 180 / Math.PI);
-  const skulls = Math.ceil((g.stage + 1) * 5 / STAGES.length);
   const root = useRef(null), [side, setSide] = useState(false);
   useEffect(() => {
     const el = root.current; if (!el) return;
@@ -2844,13 +2843,10 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
           <div className="eyebrow">${t('map.stage', { n: g.stage + 1, m: STAGES.length, rank: t('rank.' + s.bossRank) })}</div>
           <h2 className="ptitle m-0 truncate" style=${{ fontSize:'26px' }}>${L(s.name)}</h2>
         </div>
-        <div className="text-right shrink-0">
-          <div className="eyebrow">${t('map.danger')}</div>
-          <div className="flex gap-[2px] justify-end" style=${{ color:'var(--ember)' }}>${[1, 2, 3, 4, 5].map(k => html`<span key=${k} style=${{ opacity: k <= skulls ? 1 : .25 }}><${Ico} n="skull" size=${16}/></span>`)}</div>
-        </div>
+        <div className="shrink-0 relative" style=${{ width:'min(300px,46%)', alignSelf:'flex-start' }}><${BossIntel} s=${s}/></div>
       </div>
-      <div className=${'map-table flex-1 min-h-0 flex justify-center items-center' + (side ? ' side' : '')}><div className="sea-wrap h-full max-w-full mx-auto" style=${{ aspectRatio: MAP_W + ' / ' + MAP_H }}><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div>${side ? html`<${Legend}/>` : null}${side ? html`<${BossIntel} s=${s}/>` : null}</div>
-      ${side ? null : html`<div className="shrink-0 flex flex-col gap-1"><${Legend}/><${BossIntel} s=${s}/></div>`}
+      <div className=${'map-table flex-1 min-h-0 flex justify-center items-center' + (side ? ' side' : '')}><div className="sea-wrap h-full max-w-full mx-auto" style=${{ aspectRatio: MAP_W + ' / ' + MAP_H }}><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div>${side ? html`<${Legend}/>` : null}</div>
+      ${side ? null : html`<div className="shrink-0"><${Legend}/></div>`}
     </div>`;
 }
 
