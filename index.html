@@ -179,25 +179,12 @@ button.man-card:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 .sea-wrap{position:relative;box-shadow:inset 0 0 0 3px #b8893a,inset 0 0 0 5px #000,inset 0 0 0 6px var(--line),0 6px 18px rgba(0,0,0,.45)}
 .sea-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(2,10,14,.55) 100%),radial-gradient(circle at 10px 10px,#e8c36a 0 4px,transparent 5px),radial-gradient(circle at calc(100% - 10px) 10px,#e8c36a 0 4px,transparent 5px),radial-gradient(circle at 10px calc(100% - 10px),#e8c36a 0 4px,transparent 5px),radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),#e8c36a 0 4px,transparent 5px)}
 /* ===== pulido visual v6 ===== */
-.mode-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;align-self:stretch;margin-bottom:12px}
-.mode-opt{--mc:var(--gold);position:relative;display:flex;align-items:center;gap:14px;text-align:left;padding:14px 18px;border:3px solid #000;border-radius:8px;color:var(--foam);cursor:pointer;overflow:hidden;
-  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(0,0,0,.35)),radial-gradient(circle at 12% 20%,color-mix(in srgb,var(--mc) 22%,transparent),transparent 60%),#0b1d28;
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--mc) 35%,transparent),0 4px 0 #000;transition:transform .15s,box-shadow .15s,filter .15s;filter:saturate(.7) brightness(.85)}
-.mode-opt:hover{transform:translateY(-2px);filter:none}
-.mode-opt:active{transform:translateY(1px)}
-.mode-opt.easy{--mc:#4fd68e}.mode-opt.standard{--mc:#f6b73c}.mode-opt.hardcore{--mc:#ff5d47}
-.mode-opt .mo-ico{flex:none;display:grid;place-items:center;width:56px;height:56px;border-radius:50%;border:3px solid #000;color:var(--mc);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--mc) 35%,#06141c),#06141c);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--mc) 60%,transparent)}
-.mode-opt .mo-body{display:flex;flex-direction:column;gap:4px;min-width:0}
-.mode-opt b{font:700 21px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--mc)}
-.mode-opt small{font-size:13.5px;line-height:1.35;color:var(--foam);opacity:.82}
-.mo-lv{display:flex;gap:3px;margin-top:2px}.mo-lv i{display:inline-flex;color:#2a4458}.mo-lv i.on{color:var(--mc)}
-.mo-check{position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--font-ui);background:var(--mc);color:#000;border:2px solid #000;opacity:0;transform:scale(.6);transition:.15s}
-.mode-opt.on{filter:none;transform:translateY(-2px);box-shadow:inset 0 0 0 3px var(--mc),0 0 22px color-mix(in srgb,var(--mc) 45%,transparent),0 4px 0 #000}
-.mode-opt.on .mo-check{opacity:1;transform:none}
-.mode-opt.hardcore.on{animation:hcPulse 2.2s ease-in-out infinite}
-@keyframes hcPulse{50%{box-shadow:inset 0 0 0 3px var(--mc),0 0 32px color-mix(in srgb,var(--mc) 70%,transparent),0 4px 0 #000}}
-@media(max-width:900px){.mode-pick{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.mode-opt.hardcore.on{animation:none}.mode-opt{transition:none}}
+.mode-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;align-self:stretch;margin-bottom:10px}
+.mode-opt{display:flex;flex-direction:column;gap:3px;text-align:left;padding:8px 12px;border:2px solid #000;border-radius:4px;background:rgba(0,0,0,.3);color:var(--foam);cursor:pointer;box-shadow:inset 0 0 0 1px var(--line)}
+.mode-opt b{font:700 14px var(--font-ui);letter-spacing:.1em;text-transform:uppercase}.mode-opt small{font-size:12px;color:var(--mist);line-height:1.3}
+.mode-opt.easy b{color:#6fe3a0}.mode-opt.standard b{color:var(--gold)}.mode-opt.hardcore b{color:#ff8a78}
+.mode-opt.on{background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 2px var(--gold)}.mode-opt.hardcore.on{box-shadow:inset 0 0 0 2px #ff5d47}
+@media(max-width:640px){.mode-pick{grid-template-columns:1fr}}
 .hc-toggle{display:flex;gap:10px;align-items:center;justify-content:center;padding:8px 12px;margin-bottom:10px;border:2px dashed #b3261a;border-radius:4px;color:var(--foam);cursor:pointer;font-size:14px}
 .hc-toggle input{width:18px;height:18px;accent-color:#ff5d47;flex:none}
 .hc-toggle b{color:#ff8a78}
@@ -574,7 +561,7 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.14'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.12'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
 const MAP_W = 560, MAP_H = 830;
@@ -1674,7 +1661,7 @@ const i18n = {
     'data.invalidJson':'{name} is not valid JSON.',
     'nav.crew':'Crew', 'nav.map':'Map', 'nav.loot':'Loot',
     'loot.relics':'Passive relics', 'loot.gear':'Equipment', 'loot.noGear':'No equipment yet. Swords, guns and gear drop from fights and the market.', 'loot.equipTo':'Tap a crew member’s face to equip the item to them.',
-    'hc.name':'Hardcore', 'hc.desc':'A nakama who falls in battle is gone for good, with no revival of any kind. If the Captain falls, the voyage ends. No second chances.', 'mode.title':'Difficulty', 'mode.easy':'Easy', 'mode.easyD':'Relax and enjoy the voyage. Enemies hit softer and fall faster.', 'mode.standard':'Standard', 'mode.standardD':'The intended challenge. Recommended for your first voyage.', 'hc.fell':'{name} fell and is lost forever', 'hc.chip':'Hardcore',
+    'hc.name':'Hardcore', 'hc.desc':'A nakama who falls in battle is gone for good, with no revival of any kind. If the Captain falls, the voyage ends. Standard enemy strength.', 'mode.title':'Difficulty', 'mode.easy':'Easy', 'mode.easyD':'Enemies are much weaker (×0.85).', 'mode.standard':'Standard', 'mode.standardD':'The intended challenge (×1.10).', 'hc.fell':'{name} fell and is lost forever', 'hc.chip':'Hardcore',
     'flag.e.trident':'Trident','flag.e.flames':'Flames','flag.e.lightning':'Lightning','flag.e.crescent':'Crescent moon','flag.e.stars':'Stars','flag.e.compass':'Compass rose','flag.e.tentacles':'Tentacles','flag.e.keys':'Keys', 'flag.close':'Close', 'flag.open':'Customize',
     'flag.section':'Your Jolly Roger', 'flag.title':'Pirate flag', 'flag.yours':'Your flag', 'flag.name':'Crew name', 'flag.namePh':'Name your crew', 'flag.random':'Random', 'flag.reset':'Reset',
     'flag.cloth':'Cloth', 'flag.shape':'Shape', 'flag.pattern':'Pattern', 'flag.trim':'Stitching', 'flag.skull':'Skull', 'flag.gear':'Headgear and marks', 'flag.skullTone':'Skull tone', 'flag.emblem':'Emblem', 'flag.emblemTone':'Emblem tone',
@@ -1842,20 +1829,6 @@ const i18n = {
     "ev.res.trap":"BOOM! The chest was rigged. Everyone is hurt.", "ev.res.item":"Inside: {item}!", "ev.res.gold":"Inside: {n} berries!",
     "ev.res.pact":"The pact is sealed. They are stronger now, and weaker.", "ev.res.wreck":"You loot the wrecks: {n} berries!", "ev.res.smash":"The whirlpool throws you against the rocks. Everyone is hurt.",
     "ev.res.won":"Lucky dice! You win {n} berries.", "ev.res.lost":"Loaded dice. You lose {n} berries.", "ev.res.leave":"You sail on.", "ev.res.none":"Nothing happens.",
-    "tour.next":"Next", "tour.back":"Back", "tour.done":"Let's sail!", "tour.skip":"Skip tour", "tour.of":"{n} / {m}",
-    "tour.t0":"Welcome aboard, Captain!", "tour.b0":"A quick tour of the screen so you know what everything means. Press Next (or the → key) to continue; you can skip at any time and replay it from the Tutorial button.",
-    "tour.t1":"The sea map", "tour.b1":"Each sea is a map. You start at the port at the bottom and sail upward, choosing one node at a time. Only the glowing nodes connected to your ship can be picked. Routes fork, so plan the path you want. At the top waits the Route Boss.",
-    "tour.t2":"Node types", "tour.b2":"Combat: fight marines or pirates for berries and loot (the dots show how common each type is). Island: a market to spend berries or a place to recruit a nakama. Camp: heals your crew. Rare chest: may hold a Devil Fruit. Event: a surprise, good or bad.",
-    "tour.t3":"The Route Boss", "tour.b3":"Open this panel to see who guards the end of the sea and what makes them special: traits, escorts or summons. Beating the boss lets you advance to the next sea and puts their bounty on your board.",
-    "tour.t4":"Your nakama", "tour.b4":"This is your crew. You begin alone as the Captain. Recruit more at Island nodes, up to 9. Every nakama has a role, stats, a special move and fights automatically; you only decide the stance and when to use specials.",
-    "tour.t5":"Leadership", "tour.b5":"Each nakama costs leadership equal to their rank. Your limit grows by +3 for every Route Boss you defeat. If you are full, you must dismiss someone (for a fee) before recruiting a stronger nakama.",
-    "tour.t6":"Harmony", "tour.b6":"Mixing different roles gives a bonus to damage and defense. Stacking the same role (four swordsmen, say) is penalized. Check this bar before recruiting.",
-    "tour.t7":"Relics", "tour.b7":"Passive relics give permanent bonuses to the whole crew: power, guard, berries, camp healing and more. You can carry up to six. Click one to read it or discard it.",
-    "tour.t8":"Equipment", "tour.b8":"Swords, guns and gear drop from fights and markets. Each piece is worn by one nakama: pick who holds it, and re-assign it any time.",
-    "tour.t9":"Devil Fruits", "tour.b9":"Found in rare chests. A fruit gives a nakama a unique power, and you may refuse it at the chest. Each nakama can hold one, and the fruit is lost if the nakama falls in hardcore.",
-    "tour.t10":"The 10 seas", "tour.b10":"Your voyage has 10 seas: three Pirate and Shichibukai seas, then Admirals and finally the four Yonko, before the treasure. Each boss is harder than the last, and the crew you build must grow with them.",
-    "tour.t11":"Bounty board", "tour.b11":"Every Route Boss you defeat pins a wanted poster here. Clear all ten to claim the One Piece.",
-    "tour.t12":"Ready to sail", "tour.b12":"Pick a glowing node on the map to begin. Your first fight will show combat tips. Good luck, Captain!",
     "tut.skip":"Skip tutorial", "tut.ok":"Got it", "tut.step":"Tip {n}/{m}",
     "tut.stance":"Pick how your crew fights each round: Quick hits first and dodges more, Power hits harder but last, Balanced is in between.",
     "tut.special":"Each nakama fills a bar as they fight. When it is full, a Special button appears: tap it before pressing Next to unleash it.",
@@ -2089,7 +2062,7 @@ const i18n = {
     'data.invalidJson':'{name} no es un JSON válido.',
     'nav.crew':'Banda', 'nav.map':'Mapa', 'nav.loot':'Botín',
     'loot.relics':'Reliquias pasivas', 'loot.gear':'Equipo', 'loot.noGear':'Aún sin equipo. Espadas, armas y demás caen en combates y en el mercado.', 'loot.equipTo':'Toca la cara de un tripulante para equiparle el objeto.',
-    'hc.name':'Hardcore', 'hc.desc':'Un nakama que cae en combate se pierde para siempre, sin revivir de ninguna forma. Si cae el Capitán, termina el viaje. Sin segundas oportunidades.', 'mode.title':'Dificultad', 'mode.easy':'Fácil', 'mode.easyD':'Relájate y disfruta del viaje. Los enemigos golpean menos y caen antes.', 'mode.standard':'Estándar', 'mode.standardD':'El desafío pensado. Recomendado para tu primer viaje.', 'hc.fell':'{name} ha caído y se pierde para siempre', 'hc.chip':'Hardcore',
+    'hc.name':'Hardcore', 'hc.desc':'Un nakama que cae en combate se pierde para siempre, sin revivir de ninguna forma. Si cae el Capitán, termina el viaje. Enemigos como en Estándar.', 'mode.title':'Dificultad', 'mode.easy':'Fácil', 'mode.easyD':'Enemigos mucho más débiles (×0,85).', 'mode.standard':'Estándar', 'mode.standardD':'El desafío pensado (×1,10).', 'hc.fell':'{name} ha caído y se pierde para siempre', 'hc.chip':'Hardcore',
     'flag.e.trident':'Tridente','flag.e.flames':'Llamas','flag.e.lightning':'Rayos','flag.e.crescent':'Luna creciente','flag.e.stars':'Estrellas','flag.e.compass':'Rosa de los vientos','flag.e.tentacles':'Tentáculos','flag.e.keys':'Llaves', 'flag.close':'Cerrar', 'flag.open':'Personalizar',
     'flag.section':'Tu bandera pirata', 'flag.title':'Bandera pirata', 'flag.yours':'Tu bandera', 'flag.name':'Nombre de la tripulación', 'flag.namePh':'Pon nombre a tu banda', 'flag.random':'Aleatoria', 'flag.reset':'Reiniciar',
     'flag.cloth':'Tela', 'flag.shape':'Forma', 'flag.pattern':'Diseño', 'flag.trim':'Costura', 'flag.skull':'Calavera', 'flag.gear':'Tocado y marcas', 'flag.skullTone':'Tono de la calavera', 'flag.emblem':'Emblema', 'flag.emblemTone':'Tono del emblema',
@@ -2257,20 +2230,6 @@ const i18n = {
     "ev.res.trap":"¡BUM! El cofre estaba trampeado. Todos salen heridos.", "ev.res.item":"Dentro: ¡{item}!", "ev.res.gold":"Dentro: ¡{n} berries!",
     "ev.res.pact":"El pacto está sellado. Ahora es más fuerte, y más débil.", "ev.res.wreck":"Saqueas los restos: ¡{n} berries!", "ev.res.smash":"El remolino te lanza contra las rocas. Todos salen heridos.",
     "ev.res.won":"¡Dados con suerte! Ganas {n} berries.", "ev.res.lost":"Dados trucados. Pierdes {n} berries.", "ev.res.leave":"Sigues navegando.", "ev.res.none":"No pasa nada.",
-    "tour.next":"Siguiente", "tour.back":"Atrás", "tour.done":"¡A zarpar!", "tour.skip":"Saltar guía", "tour.of":"{n} / {m}",
-    "tour.t0":"¡Bienvenido a bordo, Capitán!", "tour.b0":"Un recorrido rápido por la pantalla para que sepas qué significa cada cosa. Pulsa Siguiente (o la tecla →) para continuar; puedes saltarlo cuando quieras y repetirlo desde el botón Tutorial.",
-    "tour.t1":"El mapa del mar", "tour.b1":"Cada mar es un mapa. Empiezas en el puerto, abajo, y navegas hacia arriba eligiendo un nodo cada vez. Solo puedes elegir los nodos que brillan y están conectados a tu barco. Las rutas se bifurcan, así que planea tu camino. Arriba te espera el Jefe de Ruta.",
-    "tour.t2":"Tipos de nodo", "tour.b2":"Combate: lucha contra marinos o piratas por berries y botín (los puntos indican lo frecuente que es cada tipo). Isla: un mercado para gastar berries o un lugar para reclutar un nakama. Camp: cura a tu banda. Cofre raro: puede esconder una Fruta del Diablo. Suceso: una sorpresa, buena o mala.",
-    "tour.t3":"El Jefe de Ruta", "tour.b3":"Abre este panel para ver quién guarda el final del mar y qué lo hace especial: rasgos, escoltas o invocaciones. Al vencerlo avanzas al siguiente mar y su recompensa se añade a tu tablón.",
-    "tour.t4":"Tus nakamas", "tour.b4":"Esta es tu banda. Empiezas solo, como Capitán. Recluta más en los nodos de Isla, hasta 9. Cada nakama tiene un rol, estadísticas y un especial, y lucha automáticamente; tú decides la postura y cuándo usar los especiales.",
-    "tour.t5":"Liderazgo", "tour.b5":"Cada nakama cuesta tanto liderazgo como su rango. Tu límite sube +3 por cada Jefe de Ruta que derrotas. Si estás lleno, tendrás que despedir a alguien (con coste) para reclutar a un nakama más fuerte.",
-    "tour.t6":"Armonía", "tour.b6":"Mezclar roles distintos da bonus de daño y defensa. Repetir el mismo rol (cuatro espadachines, por ejemplo) penaliza. Mira esta barra antes de reclutar.",
-    "tour.t7":"Reliquias", "tour.b7":"Las reliquias pasivas dan bonus permanentes a toda la banda: poder, guardia, berries, curación de camp y más. Puedes llevar hasta seis. Pulsa una para leerla o descartarla.",
-    "tour.t8":"Equipo", "tour.b8":"Espadas, pistolas y equipo caen de los combates y los mercados. Cada pieza la lleva un nakama: elige quién y reasígnala cuando quieras.",
-    "tour.t9":"Frutas del Diablo", "tour.b9":"Se encuentran en cofres raros. Una fruta da un poder único a un nakama, y puedes rechazarla en el cofre. Cada nakama puede llevar una, y en hardcore la fruta se pierde si el nakama cae.",
-    "tour.t10":"Los 10 mares", "tour.b10":"Tu viaje tiene 10 mares: Piratas y Shichibukai primero, luego Almirantes y por último los cuatro Yonko, antes del tesoro. Cada jefe es más duro que el anterior y tu banda debe crecer con ellos.",
-    "tour.t11":"Tablón de recompensas", "tour.b11":"Cada Jefe de Ruta que derrotas deja aquí su cartel de se busca. Completa los diez para reclamar el One Piece.",
-    "tour.t12":"Listo para zarpar", "tour.b12":"Elige un nodo brillante del mapa para empezar. Tu primer combate mostrará consejos de combate. ¡Suerte, Capitán!",
     "tut.skip":"Saltar tutorial", "tut.ok":"Entendido", "tut.step":"Consejo {n}/{m}",
     "tut.stance":"Elige cómo lucha tu banda cada ronda: Rápido golpea antes y esquiva más, Poderoso pega más fuerte pero el último, Equilibrado es el punto medio.",
     "tut.special":"Cada nakama llena una barra mientras lucha. Cuando está llena aparece un botón de Especial: púlsalo antes de dar a Siguiente para lanzarlo.",
@@ -2610,15 +2569,15 @@ function CrewPanel({ g, onDismiss }){
   return html`
     <div>
       <div className="panel-head"><span className="eyebrow">${t('crew.eyebrow')} ${g.hardcore ? html`<span className="hc-chip">${t('hc.chip')}</span>` : (g.mode === 'easy' ? html`<span className="hc-chip" style=${{ background:'#2f7d4f' }}>${t('mode.easy')}</span>` : null)}</span><h2 className="ptitle m-0">${t('crew.title')}</h2></div>
-      <ul data-tour="crew" className="flex flex-col gap-2 p-0 m-0">
+      <ul className="flex flex-col gap-2 p-0 m-0">
         ${g.crew.map(c => html`<${CrewCard} key=${c.id} c=${c} onDismiss=${onDismiss}/>`)}
         ${Array.from({ length: empties }).map((_, i) => html`
           <li key=${'e' + i} className="slot-empty slim">
             <span><b style=${{ color:'var(--foam)', fontWeight:600 }}>${t('crew.slot', { n: g.crew.length + i + 1 })}</b> · ${t('crew.emptyHint')}</span>
           </li>`)}
       </ul>
-      <div className="sect" data-tour="lead"><${LeadMeter} g=${g}/></div>
-      <div className="sect" data-tour="harmony"><${HarmonyPanel} crew=${g.crew}/></div>
+      <div className="sect"><${LeadMeter} g=${g}/></div>
+      <div className="sect"><${HarmonyPanel} crew=${g.crew}/></div>
     </div>`;
 }
 
@@ -2661,7 +2620,7 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
       <div className="panel-head"><span className="eyebrow">${t('loot.eyebrow')}</span><h2 className="ptitle m-0">${t('loot.title')}</h2></div>
 
       <div className="sect-title" style=${{ marginTop: 0 }}>${t('loot.relics')} <span style=${{ color:'var(--mist)' }}>${relics.length}/${MAX_RELICS}</span></div>
-      <div data-tour="relics" className="grid grid-cols-6 gap-2">
+      <div className="grid grid-cols-6 gap-2">
         ${Array.from({ length: MAX_RELICS }).map((_, i) => { const it = relics[i]; return it
           ? html`<button key=${it.id} type="button" className=${'item-slot filled' + (sel === it.id ? ' sel' : '')} aria-pressed=${sel === it.id} title=${L(it.name) + ': ' + L(it.desc)} onClick=${() => { setSel(sel === it.id ? null : it.id); setConfirm(false); }} onMouseEnter=${() => setTip(it)} onFocus=${() => setTip(it)} onMouseLeave=${() => setTip(null)} onBlur=${() => setTip(null)}><${Ico} n=${it.icon} size=${24}/></button>`
           : html`<div key=${'e' + i} className="item-slot empty"><${Ico} n="treasure" size=${18} sw=${1.4}/></div>`; })}
@@ -2684,7 +2643,7 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
                 : null}
         </div>`}
 
-      <div className="sect" data-tour="gear">
+      <div className="sect">
         <div className="sect-title">${t('loot.gear')} <span style=${{ color:'var(--mist)' }}>${gear.length}/${MAX_GEAR}</span></div>
         ${gear.length === 0 ? html`<div className="slot-empty slim">${t('loot.noGear')}</div>` : html`<p className="m-0 mb-2 text-xs" style=${{ color:'var(--mist)' }}>${t('loot.equipTo')}</p>`}
         <div className="flex flex-col gap-2">
@@ -2710,7 +2669,7 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
         </div>
       </div>
 
-      <div className="sect" data-tour="fruits">
+      <div className="sect">
         <div className="sect-title">${t('loot.fruits')}</div>
         <div className="flex flex-col gap-2">
           ${fruited.map(c => html`
@@ -2726,7 +2685,7 @@ function LootPanel({ g, onDiscard, onEquip, onUnequip, locked }){
         </div>
       </div>
 
-      <div className="sect" data-tour="bounty">
+      <div className="sect">
         <div className="sect-title">${t('loot.bounties')} <span style=${{ color:'var(--mist)' }}>${g.bounties.length}/${STAGES.length}</span></div>
         <div className="cork">
           <div className="grid grid-cols-2 gap-2">
@@ -4035,66 +3994,6 @@ function MissionsPanel({ meta }){
     </div>`;
 }
 
-/* ---------- guia interactiva para jugadores nuevos ---------- */
-const TOUR_STEPS = [
-  { k:0 }, { k:1, sel:'.sea-wrap', tab:'map' }, { k:2, sel:'.legend', tab:'map' }, { k:3, sel:'.boss-intel', tab:'map' },
-  { k:4, sel:'[data-tour=crew]', tab:'crew' }, { k:5, sel:'[data-tour=lead]', tab:'crew' }, { k:6, sel:'[data-tour=harmony]', tab:'crew' },
-  { k:7, sel:'[data-tour=relics]', tab:'loot' }, { k:8, sel:'[data-tour=gear]', tab:'loot' }, { k:9, sel:'[data-tour=fruits]', tab:'loot' },
-  { k:10, sel:'.route', tab:'map' }, { k:11, sel:'[data-tour=bounty]', tab:'loot' }, { k:12, tab:'map' },
-];
-function Tour({ onClose, setTab }){
-  const [i, setI] = useState(0), [rect, setRect] = useState(null), [cs, setCs] = useState({ w:380, h:200 });
-  const card = useRef(null);
-  const st = TOUR_STEPS[i], last = i === TOUR_STEPS.length - 1;
-  useEffect(() => {
-    if (st.tab) setTab(st.tab);
-    let alive = true;
-    const m = () => {
-      if (!alive) return;
-      const el = st.sel ? document.querySelector(st.sel) : null;
-      if (!el){ setRect(null); return; }
-      const r = el.getBoundingClientRect();
-      if (r.width < 2 && r.height < 2){ setRect(null); return; }
-      const pad = 6; setRect(o => { const n = { x:Math.max(4, r.left - pad), y:Math.max(4, r.top - pad), w:Math.min(innerWidth - 8, r.width + pad * 2), h:Math.min(innerHeight - 8, r.height + pad * 2) }; return o && o.x === n.x && o.y === n.y && o.w === n.w && o.h === n.h ? o : n; });
-    };
-    const first = setTimeout(() => { const el = st.sel ? document.querySelector(st.sel) : null; if (el && el.scrollIntoView) el.scrollIntoView({ block:'nearest' }); m(); }, 90);
-    const iv = setInterval(m, 300);
-    window.addEventListener('resize', m);
-    return () => { alive = false; clearTimeout(first); clearInterval(iv); window.removeEventListener('resize', m); };
-  }, [i]);
-  useEffect(() => { if (card.current){ const b = card.current.getBoundingClientRect(); setCs(o => (Math.abs(o.w - b.width) > 1 || Math.abs(o.h - b.height) > 1) ? { w:b.width, h:b.height } : o); } });
-  const go = d => { const n = i + d; if (n < 0) return; if (n >= TOUR_STEPS.length){ onClose(); return; } setI(n); };
-  useEffect(() => {
-    const f = e => { if (e.key === 'ArrowRight' || e.key === 'Enter'){ e.preventDefault(); go(1); } else if (e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); } else if (e.key === 'Escape'){ e.preventDefault(); onClose(); } };
-    window.addEventListener('keydown', f); return () => window.removeEventListener('keydown', f);
-  });
-  const vw = innerWidth, vh = innerHeight, G = 16, cw = Math.min(380, vw - 24), ch = cs.h;
-  let pos = { left:(vw - cw) / 2, top:Math.max(12, (vh - ch) / 2) };
-  if (rect){
-    const fit = (l, tp) => ({ left:Math.max(12, Math.min(vw - cw - 12, l)), top:Math.max(12, Math.min(vh - ch - 12, tp)) });
-    if (rect.x + rect.w + G + cw <= vw - 8) pos = fit(rect.x + rect.w + G, rect.y);
-    else if (rect.x - G - cw >= 8) pos = fit(rect.x - G - cw, rect.y);
-    else if (rect.y + rect.h + G + ch <= vh - 8) pos = fit(rect.x + rect.w / 2 - cw / 2, rect.y + rect.h + G);
-    else if (rect.y - G - ch >= 8) pos = fit(rect.x + rect.w / 2 - cw / 2, rect.y - G - ch);
-    else pos = { left:(vw - cw) / 2, top: rect.y > vh / 2 ? 12 : vh - ch - 12 };
-  }
-  return html`<div className="tour" role="dialog" aria-modal="true" aria-label=${t('tour.t' + st.k)}>
-    <div className="tour-block" onClick=${e => e.stopPropagation()}></div>
-    ${rect ? html`<div className="tour-spot" style=${{ left:rect.x, top:rect.y, width:rect.w, height:rect.h }}></div>` : html`<div className="tour-dim"></div>`}
-    <div className="tour-card" ref=${card} style=${{ left:pos.left, top:pos.top, width:cw }}>
-      <span className="eyebrow">${t('tour.of', { n:i + 1, m:TOUR_STEPS.length })}</span>
-      <h3>${t('tour.t' + st.k)}</h3>
-      <p>${t('tour.b' + st.k)}</p>
-      <div className="tour-foot">
-        <div className="tour-dots" aria-hidden="true">${TOUR_STEPS.map((_, j) => html`<i key=${j} className=${j === i ? 'on' : ''}></i>`)}</div>
-        ${!last ? html`<button type="button" className="btn ghost small" onClick=${onClose}>${t('tour.skip')}</button>` : null}
-        ${i > 0 ? html`<button type="button" className="btn ghost small" onClick=${() => go(-1)}>${t('tour.back')}</button>` : null}
-        <button type="button" className="btn small" onClick=${() => go(1)} autoFocus>${last ? t('tour.done') : t('tour.next')}</button>
-      </div>
-    </div>
-  </div>`;
-}
-
 function StartScreen({ meta, flag, setFlag, mode, setMode, saved, onContinue, onDiscardSave, captainId, setCaptainId, avatarId, setAvatarId, archId, setArchId, onStart, onManual }){
   const [view, setView] = useState(null);
   const caps = NAKAMAS.filter(n => n.captain).sort((a, b) => (a.hero ? 1 : 0) - (b.hero ? 1 : 0));
@@ -4203,16 +4102,7 @@ function StartScreen({ meta, flag, setFlag, mode, setMode, saved, onContinue, on
         </button>
       </div>
       <div className="mode-pick self-center" role="radiogroup" aria-label=${t('mode.title')}>
-        ${[['easy', 'heart', 1, 'mode.easy', 'mode.easyD'], ['standard', 'swords', 2, 'mode.standard', 'mode.standardD'], ['hardcore', 'skull', 3, 'hc.name', 'hc.desc']].map(([k, ic, lv, n, d]) => html`
-          <button key=${k} type="button" role="radio" aria-checked=${mode === k} className=${'mode-opt ' + k + (mode === k ? ' on' : '')} onClick=${() => setMode(k)}>
-            <span className="mo-ico"><${Ico} n=${ic} size=${30} sw=${1.8}/></span>
-            <span className="mo-body">
-              <b>${t(n)}</b>
-              <small>${t(d)}</small>
-              <span className="mo-lv" aria-hidden="true">${[1, 2, 3].map(j => html`<i key=${j} className=${j <= lv ? 'on' : ''}><${Ico} n="skull" size=${13} sw=${2}/></i>`)}</span>
-            </span>
-            <span className="mo-check" aria-hidden="true">✓</span>
-          </button>`)}
+        ${[['easy', 'mode.easy', 'mode.easyD'], ['standard', 'mode.standard', 'mode.standardD'], ['hardcore', 'hc.name', 'hc.desc']].map(([k, n, d]) => html`<button key=${k} type="button" role="radio" aria-checked=${mode === k} className=${'mode-opt ' + k + (mode === k ? ' on' : '')} onClick=${() => setMode(k)}><b>${t(n)}</b><small>${t(d)}</small></button>`)}
       </div>
       <span className="text-xs text-center" style=${{ color:'var(--mist)' }}>${t('start.counts', { n:NAKAMAS.length, b:BOSSES.length, f:FRUITS.length, s:STAGES.length })}</span>
     </div>`;
@@ -4479,8 +4369,6 @@ function App(){
   const [sheet, setSheet] = useState(null);
   const [manualOpen, setManualOpen] = useState(false);
   const [tutOn, setTutOn] = useState(false);
-  const [tour, setTour] = useState(false);
-  const closeTour = () => { setTour(false); try { localStorage.setItem('lp-tour', '1'); } catch (e) {} };
   const [meta, setMetaState] = useState(readMeta);
   const [toast, setToast] = useState(null);
   const updateMeta = fn => setMetaState(m => { const n = fn(m); if (n !== m) writeMeta(n); return n; });
@@ -4536,7 +4424,7 @@ function App(){
     setErrors([]); installData(res.data); goStart();
   };
 
-  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(effCaptain(meta, captainId).id, { avatarId, archetypeId:effArch(meta, archId).id, mode, flag:normFlag(flag) })); setTab('map'); setPhase('play'); let seen = '1'; try { seen = localStorage.getItem('lp-tour'); } catch (e) {} if (seen !== '1') setTimeout(() => setTour(true), 350); };
+  const start = () => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(newGame(effCaptain(meta, captainId).id, { avatarId, archetypeId:effArch(meta, archId).id, mode, flag:normFlag(flag) })); setTab('map'); setPhase('play'); };
 
   const continueSave = () => { const sv = readSave(); if (!sv) { setSaved(null); return; } BATTLE_PREFS.auto = !!sv.auto; BATTLE_PREFS.fast = !!sv.fast; setG(sv.g); setModal(null); setTab('map'); setPhase('play'); };
   const discardSave = () => { clearSave(); setSaved(null); };
@@ -4585,7 +4473,7 @@ function App(){
             <span className="timer" style=${{ color:'var(--gold)' }} title=${t('hdr.berries')}><span style=${{ fontSize:'18px' }}>฿</span> ${g.berries}</span>` : null}
           <${LangToggle} lang=${lang} setLang=${setLang}/>
           <button type="button" className="btn small man-open" onClick=${() => setManualOpen(true)}>${t('man.btn')}</button>
-          <button type="button" className="btn ghost small" title=${t('hdr.tutorialTip')} onClick=${() => { try { localStorage.setItem('lp-tut', '[]'); } catch (e) {} setTutOn(true); setTimeout(() => setTutOn(false), 2500); if (phase === 'play') setTour(true); else { try { localStorage.removeItem('lp-tour'); } catch (e) {} } }}>${tutOn ? '✓ ' + t('hdr.tutorialOn') : t('hdr.tutorial')}</button>
+          <button type="button" className="btn ghost small" title=${t('hdr.tutorialTip')} onClick=${() => { try { localStorage.setItem('lp-tut', '[]'); } catch (e) {} setTutOn(true); setTimeout(() => setTutOn(false), 2500); }}>${tutOn ? '✓ ' + t('hdr.tutorialOn') : t('hdr.tutorial')}</button>
           <button type="button" className="btn ghost small" onClick=${() => setDataOpen(true)}>${t('hdr.data')}</button>
           ${phase === 'play' || phase === 'start' ? html`<button type="button" className="btn ghost small" onClick=${goStart}>${t('hdr.newRun')}</button>` : null}
         </div>
@@ -4630,7 +4518,6 @@ function App(){
       ${manualOpen ? html`<${ManualScreen} onClose=${() => setManualOpen(false)}/>` : null}
       ${devAsk ? html`<${DevAsk} onClose=${() => setDevAsk(false)} onOk=${() => { try { localStorage.setItem(DEV_KEY, '1'); } catch (e) {} setDevOn(true); setDevAsk(false); setDevOpen(true); }}/>` : null}
       ${devOn && !devOpen ? html`<button type="button" className="dev-fab" onClick=${() => setDevOpen(true)} aria-label="Developer mode">DEV</button>` : null}
-      ${tour && phase === 'play' ? html`<${Tour} onClose=${closeTour} setTab=${setTab}/>` : null}
       ${devOpen ? html`<${DevPanel} g=${g} phase=${phase} meta=${meta} setG=${setG} updateMeta=${updateMeta} onClose=${() => setDevOpen(false)} onLock=${() => { try { localStorage.removeItem(DEV_KEY); } catch (e) {} setDevOn(false); setDevOpen(false); }} onBuild=${o => { BATTLE_PREFS.auto = false; BATTLE_PREFS.fast = false; setG(devBuild(newGame(effCaptain(meta, captainId).id, { avatarId, archetypeId:effArch(meta, archId).id, hardcore:false, flag:normFlag(flag) }), o)); setModal(null); setTab('map'); setPhase('play'); setDevOpen(false); }}/>` : null}
       ${sheet ? html`<${CharSheet} c=${sheet} onClose=${() => setSheet(null)}/>` : null}
       ${zoom ? html`<${ZoomModal} z=${zoom} onClose=${() => setZoom(null)}/>` : null}
