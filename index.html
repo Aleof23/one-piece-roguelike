@@ -330,7 +330,7 @@ button{font-family:inherit;color:inherit}
 .poster.ghost .q{font-family:var(--font-display);font-size:24px;line-height:1}
 
 /* mapa */
-.map-table{padding:14px 16px;border-radius:8px;border:3px solid #000;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,rgba(255,190,100,.22),transparent 65%),repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 2px,transparent 2px 120px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 9px),linear-gradient(180deg,#5a3a20,#3e2615 55%,#2f1c0f);box-shadow:inset 0 0 0 2px #7a5430,inset 0 0 40px rgba(0,0,0,.6)}
+.map-table{padding:10px 12px;border-radius:8px;border:3px solid #000;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,rgba(255,190,100,.22),transparent 65%),repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 2px,transparent 2px 120px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 9px),linear-gradient(180deg,#5a3a20,#3e2615 55%,#2f1c0f);box-shadow:inset 0 0 0 2px #7a5430,inset 0 0 40px rgba(0,0,0,.6)}
 .map-table .sea-wrap{box-shadow:0 14px 28px rgba(0,0,0,.65),0 3px 0 rgba(0,0,0,.5),inset 0 0 0 3px #b8893a,inset 0 0 0 5px #000,inset 0 0 0 6px var(--line)}
 .sea-wrap{border:3px solid #000;box-shadow:inset 0 0 0 2px var(--line);border-radius:6px;overflow:hidden;background:var(--abyss)}
 .drift{animation:drift 14s ease-in-out infinite alternate}
@@ -552,10 +552,10 @@ button.offer:disabled{cursor:not-allowed}
    characters.json, fruits.json, stages.json e items.json (ver buildData).
    ===================================================================== */
 let STAGES = [], NAKAMAS = [], BOSSES = [], FRUITS = [], ITEMS = [];
-const APP_VERSION = '1.2.9'; /* sube este numero en cada cambio de archivo */
+const APP_VERSION = '1.2.10'; /* sube este numero en cada cambio de archivo */
 let COMMON_ENEMIES = { marine: [], pirate: [] };
 let SETTINGS = {};
-const MAP_W = 560, MAP_H = 830;
+const MAP_W = 1000, MAP_H = 680, MAP_DOCK = { x:500, y:650 };
 
 /* Rangos de jefe: estructura del juego, no contenido (el contenido son los JSON). */
 const RANKS = {
@@ -721,7 +721,7 @@ const canRecruit = (def, g) => def.cost <= leadRoom(g) && g.crew.length < SETTIN
 function genMap(seed, si, ctx){
   const F = SETTINGS.floors;
   const rnd = mulberry32(seed + si * 7919);
-  const laneX = l => 80 + l * 100, floorY = f => 650 - f * (588 / (F - 1));
+  const laneX = l => 100 + l * 200, floorY = f => 585 - f * (523 / (F - 1));
   const floors = [];
   for (let f = 0; f < F; f++){
     if (f === F - 1){ floors.push([{ lane:2 }]); continue; }
@@ -731,8 +731,8 @@ function genMap(seed, si, ctx){
   }
   floors.forEach((row, f) => row.forEach((n, i) => {
     n.f = f; n.id = f + '-' + i;
-    n.x = f === F - 1 ? 280 : laneX(n.lane) + (rnd() * 24 - 12);
-    n.y = f === F - 1 ? 62 : floorY(f) + (rnd() * 22 - 11);
+    n.x = f === F - 1 ? 500 : laneX(n.lane) + (rnd() * 40 - 20);
+    n.y = f === F - 1 ? 62 : floorY(f) + (rnd() * 18 - 9);
     n.nextN = [];
   }));
   // rutas bifurcadas: todo nodo sale hacia arriba y a todo nodo le llega alguna ruta
@@ -796,7 +796,7 @@ function genMap(seed, si, ctx){
     delete n.nextN;
   });
   const byId = {}; flat.forEach(n => byId[n.id] = n);
-  return { nodes:flat, byId, floors };
+  return { nodes:flat, byId, floors, v:2 };
 }
 
 /* ---------- estado de la run ---------- */
@@ -2750,7 +2750,7 @@ function SeaMap({ g, burst, hover, setHover, onPick }){
     return 'locked';
   };
   const edges = [];
-  const dock = { x:280, y:775 };
+  const dock = MAP_DOCK;
   map.floors[0].forEach(b => edges.push({ k:'d-' + b.id, a:dock, b, cls: g.pos === null ? 'avail' : g.visited[0] === b.id ? 'done' : '' }));
   map.nodes.forEach(a => a.next.forEach(bid => {
     const b = map.byId[bid];
@@ -2760,7 +2760,7 @@ function SeaMap({ g, burst, hover, setHover, onPick }){
   }));
   const waves = [];
   const wr = mulberry32(g.seed + g.stage);
-  for (let i = 0; i < 22; i++) waves.push({ x: wr() * 520, y: 30 + wr() * 740, w: 22 + wr() * 26 });
+  for (let i = 0; i < 22; i++) waves.push({ x: wr() * 940, y: 30 + wr() * 600, w: 26 + wr() * 34 });
   const hn = hover ? map.byId[hover] : null;
   return html`
     <svg viewBox=${'0 0 ' + MAP_W + ' ' + MAP_H} preserveAspectRatio="xMidYMid meet" className="w-full h-full block" role="group" aria-label=${t('map.aria', { name: L(s.name) })}>
@@ -2771,7 +2771,7 @@ function SeaMap({ g, burst, hover, setHover, onPick }){
       <g className="drift" fill="none" stroke="#fff" strokeOpacity=".09" strokeWidth="2.5" strokeLinecap="round">
         ${waves.map((w, i) => html`<path key=${i} d=${'M' + w.x + ' ' + w.y + 'q' + (w.w / 4) + ' -8 ' + (w.w / 2) + ' 0t' + (w.w / 2) + ' 0'}/>`)}
       </g>
-      <g transform="translate(486 774)" opacity=".28" stroke="#fff" fill="none" strokeWidth="1.5">
+      <g transform="translate(70 70)" opacity=".28" stroke="#fff" fill="none" strokeWidth="1.5">
         <circle r="30"/><circle r="20"/><path d="M0 -40V40M-40 0H40M-22 -22L22 22M22 -22L-22 22"/><path d="M0 -40l5 12h-10z" fill="#fff"/>
       </g>
       ${edges.map(e => {
@@ -2803,7 +2803,7 @@ function SeaMap({ g, burst, hover, setHover, onPick }){
               <${IcoG} n=${icon} color=${st === 'done' ? '#f6b73c' : T.color} scale=${isBoss ? 2.2 : 1.3} sw=${isBoss ? 1.3 : 1.9}/>
               ${st === 'done' ? html`<g transform=${'translate(' + (R - 4) + ' ' + (-R + 4) + ')'}><circle r="8" fill="#f6b73c" stroke="#000" strokeWidth="2"/><path d="M-4 0l3 3 5-6" fill="none" stroke="#2a1700" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></g>` : null}
             </g>
-            ${isBoss ? html`<text y=${R + 22} textAnchor="middle" className="svg-label">${lbl}</text>` : null}
+            ${isBoss ? html`<text x=${R + 16} y="5" textAnchor="start" className="svg-label">${lbl}</text>` : null}
           </g>`;
       })}
       ${hn && hn.type !== 'boss' ? (() => {
@@ -2818,7 +2818,7 @@ function SeaMap({ g, burst, hover, setHover, onPick }){
 
 function MapPanel({ g, burst, hover, setHover, onPick }){
   const s = STAGES[g.stage];
-  const from = g.pos ? g.map.byId[g.pos] : { x:280, y:775 };
+  const from = g.pos ? g.map.byId[g.pos] : MAP_DOCK;
   const av = availableIds(g);
   const target = hover ? g.map.byId[hover] : (av.length === 1 ? g.map.byId[av[0]] : g.map.floors[g.map.floors.length - 1][0]);
   const angle = Math.round(Math.atan2(target.x - from.x, -(target.y - from.y)) * 180 / Math.PI);
@@ -2837,7 +2837,7 @@ function MapPanel({ g, burst, hover, setHover, onPick }){
           <div className="flex gap-[2px] justify-end" style=${{ color:'var(--ember)' }}>${[1, 2, 3, 4, 5].map(k => html`<span key=${k} style=${{ opacity: k <= skulls ? 1 : .25 }}><${Ico} n="skull" size=${16}/></span>`)}</div>
         </div>
       </div>
-      <div className="map-table flex-1 min-h-0 flex justify-center items-center"><div className="sea-wrap h-full max-w-full mx-auto" style=${{ aspectRatio: MAP_W + ' / ' + MAP_H }}><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div></div>
+      <div className="map-table flex-1 min-h-0 flex justify-center items-center"><div className="sea-wrap w-full h-full" style=${{ background:'radial-gradient(circle at 50% 35%,' + s.sea[0] + ',' + s.sea[1] + ' 80%)' }}><${SeaMap} g=${g} burst=${burst} hover=${hover} setHover=${setHover} onPick=${onPick}/></div></div>
       <div className="shrink-0 flex flex-col gap-1"><${Legend}/><${BossIntel} s=${s}/></div>
     </div>`;
 }
@@ -4098,6 +4098,7 @@ function readSave(){
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
     if (!s || !s.g || !s.g.map || !s.g.crew || !s.g.crew.length || s.g.over || !STAGES[s.g.stage]) return null;
+    if (!s.g.map.v){ const m = s.g.map; m.nodes.forEach(n => { n.x = 100 + (n.x - 80) * 2; n.y = 62 + (n.y - 62) * (523 / 588); }); m.v = 2; }
     return s;
   } catch (e) { return null; }
 }
